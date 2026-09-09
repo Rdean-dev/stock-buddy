@@ -1,0 +1,1 @@
+notes for project filtering for patterns hopefully in the future through checkbox/toggel
