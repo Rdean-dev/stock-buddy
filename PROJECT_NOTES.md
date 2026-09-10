@@ -30,6 +30,7 @@ The Watchlist and Stock Detail layouts are built with mock/static data. Pattern 
 
 **Live stock data/API integration has NOT been done yet.**
 
+Maintenance: Re-run npm audit during next Expo SDK upgrade; 27 transitive vulnerabilities remained because current fixes required breaking Expo/Expo Router changes.
 ---
 
 ## ✅ Watchlist
@@ -249,6 +250,7 @@ Rough order:
 6. Add loading/error handling
 7. Decide stock refresh strategy
 8. Continue remaining app features
+9. dark and light theme using native hooks
 
 ---
 
@@ -257,16 +259,16 @@ Rough order:
 Update only this section before leaving the project:
 
 **Last worked on:**
-...
+   Tab layout for the mobile app.
 
 **Finished:**
-...
+   Passing the selected ticker from Watchlist to Stock Detail.
 
 **Still working on:**
-...
+   Mobile tab layout. Planning to resketch the Home page.
 
 **Next thing to do:**
-...
+   Resketch the Home page, then continue the mobile tab layout.
 
 **Important bug / thought:**
-...
+   Web layout direction: top navigation + left-side navigation + main content area, inspired by Codecademy's dashboard. Mobile will use bottom tabs.

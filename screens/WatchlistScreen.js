@@ -30,6 +30,7 @@ function WatchlistScreen(){
     return (
         <ScrollView style={styles.container}>
             <Text style={styles.title}>My Watchlist</Text>
+            
 
             {stockData.map((stock) => (
                 <Link key={stock.ticker} href={{
