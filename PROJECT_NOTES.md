@@ -251,24 +251,22 @@ Rough order:
 7. Decide stock refresh strategy
 8. Continue remaining app features
 9. dark and light theme using native hooks
-
+10. web layout
 ---
 
 # Before I Stop Working
 
-Update only this section before leaving the project:
+Last worked on:
+Pattern Scanner date-range picker.
 
-**Last worked on:**
-   Tab layout for the mobile app.
+Finished:
+Mobile tab layout. Passing the selected ticker from Watchlist to Stock Detail. Set up the native Date Range Picker structure with Start Date and End Date controls, including picker visibility and date-change handling.
 
-**Finished:**
-   Passing the selected ticker from Watchlist to Stock Detail.
+Still working on:
+Date Range Picker for the Pattern Scanner. Native version needs selected-date display/polish; web version still needs to be built.
 
-**Still working on:**
-   Mobile tab layout. Planning to resketch the Home page.
+Next thing to do:
+Finish the native Date Range Picker by displaying the selected dates, then create DateRangePicker.web.tsx using the same props/interface.
 
-**Next thing to do:**
-   Resketch the Home page, then continue the mobile tab layout.
-
-**Important bug / thought:**
-   Web layout direction: top navigation + left-side navigation + main content area, inspired by Codecademy's dashboard. Mobile will use bottom tabs.
+Important bug / thought:
+Web and mobile will share routes/features but can use platform-specific UI. Web layout direction is top navigation + left-side navigation + main content area, inspired by Codecademy’s dashboard; mobile uses bottom tabs. The installed @react-native-community/datetimepicker version is 8.4.4, so the native picker uses onChange rather than the newer onValueChange API.

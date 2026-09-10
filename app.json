@@ -39,7 +39,8 @@
           }
         }
       ],
-      "@react-native-vector-icons/fontawesome6"
+      "@react-native-vector-icons/fontawesome6",
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,

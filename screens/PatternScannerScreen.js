@@ -2,6 +2,7 @@ import React from "react";
 import {useState} from 'react';
 import {Text, StyleSheet, View, ScrollView } from 'react-native';
 import PatternCard from '../components/PatternCard';
+import DateRangePicker from "../components/DateRangePicker";
 
 const patternData = [
   {
@@ -20,12 +21,15 @@ const patternData = [
 
 export default function PatternScannerScreen() {
     const {pattern, setPattern} = useState([]);
+    const [startDate, setStartDate] = useState();
+    const [endDate, setEndDate] = useState();
+
     return (
         <ScrollView>
             <Text>Pattern Scanner</Text>
             <View style={{}}>
                 <Text>Stock Ticker DropDown Menu</Text>
-                <Text>Date Range</Text>
+                <DateRangePicker startDate={startDate} endDate={endDate} onStartDateChange={setStartDate} onEndDateChange={setEndDate}/>
                 <Text>Pattern Type dropdown/checklist</Text>
             </View>
             <View>
