@@ -2,17 +2,39 @@ import React from 'react';
 
 import {Text, StyleSheet, View, ScrollView } from 'react-native';
 
-export function PatternCard({pattern}){
+export default function PatternCard({pattern}){
     
 
     return(
-        <View>
-            <Text>{pattern.name}</Text>
-            <Text>Count: {pattern.count}</Text>
-            <Text>Type: {pattern.type}</Text>
-            <Text>Dates: {pattern.dates.join(', ')}</Text>
+        <View style={styles.patternCard}>
+            <Text style={styles.header}>{pattern.name}</Text>
+            <Text style={styles.patternText}>Count: {pattern.count}</Text>
+            <Text style={styles.patternText}>Type: {pattern.type}</Text>
+            <Text style={styles.patternText}>Dates: {pattern.dates.join(', ')}</Text>
         </View>
     );
 
 
 }
+
+const styles = StyleSheet.create({
+    patternCard: {
+        backgroundColor: "#ccc7c7",
+        margin: 8,
+        borderRadius: 15,
+        padding: 15,
+    },
+
+    patternText: {
+        color: "#131010",
+        fontWeight: "bold",
+        fontSize: 15,
+    },
+    header: {
+        fontSize: 22,
+        fontWeight: "bold",
+        color: "black",
+        marginBottom: 4,
+    },
+
+})

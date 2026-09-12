@@ -3,10 +3,10 @@ import {Text, View, StyleSheet, Button, Pressable} from 'react-native';
 import {useState} from 'react';
 
 type DateRangePickerProps = {
-  startDate: Date;
-  endDate: Date;
-  onStartDateChange: (date: Date) => void;
-  onEndDateChange: (date: Date) => void;
+  startDate: Date | null;
+  endDate: Date | null;
+  onStartDateChange: (date: Date | null) => void;
+  onEndDateChange: (date: Date | null) => void;
 };
 
 export default function DateRangePicker({startDate, endDate, onStartDateChange, onEndDateChange}: DateRangePickerProps) {
@@ -32,16 +32,43 @@ export default function DateRangePicker({startDate, endDate, onStartDateChange, 
 
 
     return(
-        <View>
-            {showStartPicker && (<DateTimePicker 
-                mode="date" onChange={handleStartDateChange} value={startDate}/>)}
-            <Pressable onPress={() => setShowStartPicker(!showStartPicker)}><Text>Start Date</Text></Pressable>
-            {showEndPicker && (<DateTimePicker 
-                mode="date" onChange={handleEndDateChange} value={endDate}/>)}
-            <Pressable onPress={() => setShowEndPicker(!showEndPicker)}><Text>End Date</Text></Pressable>
+        <View style={styles.dateRow}>
+            <View style={styles.dateSection}>
+                <Pressable style={styles.date} onPress={() => setShowStartPicker(!showStartPicker)}><Text>Start Date</Text><Text>{(startDate) ? startDate.toLocaleDateString() : "Select a date"}</Text></Pressable>
+                {showStartPicker && (<DateTimePicker 
+                    mode="date" onChange={handleStartDateChange} value={startDate ?? new Date()}/>)}
+            </View>
+            <View style={styles.dateSection}>
+                <Pressable style={styles.date} onPress={() => setShowEndPicker(!showEndPicker)}><Text>End Date</Text><Text>{(endDate) ? endDate.toLocaleDateString() : " Select a date"}</Text></Pressable>
+                {showEndPicker && (<DateTimePicker 
+                    mode="date" onChange={handleEndDateChange} value={endDate ?? new Date()}/>)}
+            </View>   
         </View>
         
     
     );
 
+
 }
+
+const styles = StyleSheet.create({
+
+    dateRow: {
+        
+        flexDirection: 'row',
+        gap: 10,
+    },
+
+    dateSection: {
+        flex: 1,
+    },
+    
+    date: {
+        backgroundColor: 'white',
+        borderWidth: 4,
+        borderStyle: 'solid',
+        borderColor: 'blue',
+        padding: 8
+
+    },
+})

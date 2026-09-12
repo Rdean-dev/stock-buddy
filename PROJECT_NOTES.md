@@ -257,16 +257,22 @@ Rough order:
 # Before I Stop Working
 
 Last worked on:
-Pattern Scanner date-range picker.
+fixed pattern scanner logic. finished date picker including error handling
 
 Finished:
-Mobile tab layout. Passing the selected ticker from Watchlist to Stock Detail. Set up the native Date Range Picker structure with Start Date and End Date controls, including picker visibility and date-change handling.
+Mobile tab layout. Passing the selected ticker from Watchlist to Stock Detail. Native Date Range Picker has Start Date and End Date controls, picker visibility, date-change handling, and selected-date display. Web Date Range Picker is built using HTML date inputs with the same props interface as native. Finished the local formatDateForInput() helper and local date conversion to avoid timezone/UTC date-shift issues.
 
 Still working on:
-Date Range Picker for the Pattern Scanner. Native version needs selected-date display/polish; web version still needs to be built.
+Pattern Scanner page integration. The Date Range Picker components are built, but I cannot properly view/test them yet because existing Pattern Scanner logic needs to be fixed first.
 
 Next thing to do:
-Finish the native Date Range Picker by displaying the selected dates, then create DateRangePicker.web.tsx using the same props/interface.
+Fix the existing Pattern Scanner logic/errors until the page renders correctly. Then test the Date Range Picker on both native and web before continuing with its visual styling.
 
 Important bug / thought:
+Do not continue designing the Date Range Picker until the Pattern Scanner page is working and the component can actually be viewed/tested. Web and native share the same Date Range Picker props/interface but use platform-specific implementations. Native uses @react-native-community/datetimepicker@8.4.4 with onChange; web uses HTML <input type="date"> with local date conversion.
+
+Web and mobile share the same feature contract (startDate, endDate, and change callbacks) but use platform-specific UI. Native uses @react-native-community/datetimepicker@8.4.4 with onChange; web uses HTML <input type="date">. Avoid UTC date-shift bugs by converting the web input to/from local calendar date parts instead of relying on new Date("YYYY-MM-DD") or toISOString().
+
 Web and mobile will share routes/features but can use platform-specific UI. Web layout direction is top navigation + left-side navigation + main content area, inspired by Codecademy’s dashboard; mobile uses bottom tabs. The installed @react-native-community/datetimepicker version is 8.4.4, so the native picker uses onChange rather than the newer onValueChange API.
+
+Note: need to include logic for making sure start date does not go past end date

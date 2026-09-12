@@ -20,21 +20,56 @@ const patternData = [
 ];
 
 export default function PatternScannerScreen() {
-    const {pattern, setPattern} = useState([]);
-    const [startDate, setStartDate] = useState();
-    const [endDate, setEndDate] = useState();
+    const [startDate, setStartDate] = useState(null);
+    const [endDate, setEndDate] = useState(null);
+    const [dateError, setDateError] = useState('')
+    
+    const handleStartDateChange = (date) => {
+        if ((date && endDate) && normalizeDate(date) > normalizeDate(endDate)){
+            setDateError("Pick a date on or before the end Date")
+            return
+        }
+
+        setDateError("")
+        return setStartDate(date)
+    }
+
+    const handleEndDateChange = (date) => {
+        if ((startDate && date) && normalizeDate(date) < normalizeDate(startDate)){
+            setDateError("Pick a date on or after the start Date.")
+            return
+        }
+        setDateError("")
+
+        return setEndDate(date)
+    }
+
+    const normalizeDate = (date) => {
+        if (date == null){
+            return ""
+        }
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+
+        return `${year}-${month}-${day}`;
+    }
+
 
     return (
         <ScrollView>
             <Text>Pattern Scanner</Text>
-            <View style={{}}>
+            <View style={styles.startingRow}>
                 <Text>Stock Ticker DropDown Menu</Text>
-                <DateRangePicker startDate={startDate} endDate={endDate} onStartDateChange={setStartDate} onEndDateChange={setEndDate}/>
+                <View>
+                    <DateRangePicker startDate={startDate} endDate={endDate} onStartDateChange={handleStartDateChange} onEndDateChange={handleEndDateChange}/>
+                    <Text>{dateError}</Text>
+                </View>
                 <Text>Pattern Type dropdown/checklist</Text>
             </View>
             <View>
                 <Text>Pattern Results</Text>
-                {patternData.map((stock) => (
+                {patternData.map((pattern) => (
                     <PatternCard key={pattern.name} pattern={pattern}/>
                 ))}
 
@@ -49,5 +84,7 @@ export default function PatternScannerScreen() {
 }
 
 const styles = StyleSheet.create({
-
+    startingRow:{
+        flexDirection: 'row',
+        },
 });
