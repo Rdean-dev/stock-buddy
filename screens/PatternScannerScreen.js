@@ -1,8 +1,12 @@
 import React from "react";
 import {useState} from 'react';
-import {Text, StyleSheet, View, ScrollView } from 'react-native';
+import {Text, StyleSheet, View, ScrollView, Pressable } from 'react-native';
 import PatternCard from '../components/PatternCard';
 import DateRangePicker from "../components/DateRangePicker";
+import data from "../data/mockDailyIBMData.json" with {type: "json"};
+
+
+
 
 const patternData = [
   {
@@ -18,6 +22,8 @@ const patternData = [
     type: "Bullish",
   },
 ];
+
+
 
 export default function PatternScannerScreen() {
     const [startDate, setStartDate] = useState(null);
@@ -44,15 +50,34 @@ export default function PatternScannerScreen() {
         return setEndDate(date)
     }
 
-    const normalizeDate = (date) => {
-        if (date == null){
-            return ""
-        }
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
+   const normalizeDate = (date) => {
+        return new Date(
+            date.getFullYear(),
+            date.getMonth(),
+            date.getDate()
+        );
+    };
+    
+    
+    const dateInterval = (numOfMonths) => {
+        setDateError("")
+        const today = new Date();
 
-        return `${year}-${month}-${day}`;
+        const backDate = new Date(today)
+
+        backDate.setMonth(today.getMonth() - numOfMonths);
+
+        if (today.getDate() !== backDate.getDate()){
+            backDate.setDate(0)
+        }
+
+
+        setStartDate(backDate);
+        setEndDate(today);
+    };
+
+    const scanPatterns = (startDate, endDate, selectedPatterns, stockData) => {
+        
     }
 
 
@@ -60,12 +85,20 @@ export default function PatternScannerScreen() {
         <ScrollView>
             <Text>Pattern Scanner</Text>
             <View style={styles.startingRow}>
-                <Text>Stock Ticker DropDown Menu</Text>
-                <View>
+                <Text>S</Text>
+                <View style={{flexDirection: 'column',}}>
                     <DateRangePicker startDate={startDate} endDate={endDate} onStartDateChange={handleStartDateChange} onEndDateChange={handleEndDateChange}/>
+                    <View style={styles.dateSection}>
+                        <Pressable onPress={() => dateInterval(1)} >{({ hovered, pressed }) => (<Text style={[styles.dateText, (hovered || pressed) && styles.dateTextActive]}>[1m]</Text>)}</Pressable>
+                        <Pressable onPress={() => dateInterval(3)} >{({ hovered, pressed }) => (<Text style={[styles.dateText, (hovered || pressed) && styles.dateTextActive]}>[3m]</Text>)}</Pressable>
+                        <Pressable onPress={() => dateInterval(6)} >{({ hovered, pressed }) => (<Text style={[styles.dateText, (hovered || pressed) && styles.dateTextActive]}>[6m]</Text>)}</Pressable>
+                        <Pressable onPress={() => dateInterval(12)} >{({ hovered, pressed }) => (<Text style={[styles.dateText, (hovered || pressed) && styles.dateTextActive]}>[1Y]</Text>)}</Pressable>
+                       <Pressable>{({ hovered, pressed }) => (<Text style={[styles.dateText, (hovered || pressed) && styles.dateTextActive]}>[Custom]</Text>)}</Pressable>
+                    </View>
+                    
                     <Text>{dateError}</Text>
                 </View>
-                <Text>Pattern Type dropdown/checklist</Text>
+                <Text>checkbox</Text>
             </View>
             <View>
                 <Text>Pattern Results</Text>
@@ -87,4 +120,19 @@ const styles = StyleSheet.create({
     startingRow:{
         flexDirection: 'row',
         },
+    dateSection:{
+        paddingHorizontal: 5,
+        paddingVertical: 5,
+        flexDirection: 'row',
+        gap: 20
+
+    },
+    dateText:{
+        fontSize: 17
+    },
+    dateTextActive:{
+        fontSize: 18,
+        color: 'blue',
+
+    }
 });

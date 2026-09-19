@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { StyleSheet} from "react-native";
+import { StyleSheet, Pressable} from "react-native";
 
 type DateRangePickerProps = {
   startDate: Date | null;
@@ -54,7 +54,7 @@ export default function DateRangePicker({startDate, endDate, onStartDateChange, 
         <div style={styles.dateRow}>
             <div style={styles.dateSection}>
                 <label htmlFor='startDate' style={styles.title}>Start Date</label>
-                <input id='startDate' type="date" style={styles.date} onChange={handleStartDateChange} value={formatDateForInput(startDate)} max={(endDate) ? formatDateForInput(endDate) : ""}/>
+                <Pressable><input id='startDate' type="date" style={styles.date} onChange={handleStartDateChange} value={formatDateForInput(startDate)} max={(endDate) ? formatDateForInput(endDate) : ""}/></Pressable>
             </div>
             <div style={styles.dateSection}>
                 <label htmlFor='endDate' style={styles.title}>End Date</label>

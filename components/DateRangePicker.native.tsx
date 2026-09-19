@@ -34,12 +34,12 @@ export default function DateRangePicker({startDate, endDate, onStartDateChange, 
     return(
         <View style={styles.dateRow}>
             <View style={styles.dateSection}>
-                <Pressable style={styles.date} onPress={() => setShowStartPicker(!showStartPicker)}><Text>Start Date</Text><Text>{(startDate) ? startDate.toLocaleDateString() : "Select a date"}</Text></Pressable>
+                <Pressable style={styles.date} onPress={() => setShowStartPicker(!showStartPicker)}><Text style={styles.title}>Start Date</Text><Text>{(startDate) ? startDate.toLocaleDateString() : "Select a date"}</Text></Pressable>
                 {showStartPicker && (<DateTimePicker 
                     mode="date" onChange={handleStartDateChange} value={startDate ?? new Date()}/>)}
             </View>
             <View style={styles.dateSection}>
-                <Pressable style={styles.date} onPress={() => setShowEndPicker(!showEndPicker)}><Text>End Date</Text><Text>{(endDate) ? endDate.toLocaleDateString() : " Select a date"}</Text></Pressable>
+                <Pressable style={styles.date} onPress={() => setShowEndPicker(!showEndPicker)}><Text style={styles.title}>End Date</Text><Text>{(endDate) ? endDate.toLocaleDateString() : " Select a date"}</Text></Pressable>
                 {showEndPicker && (<DateTimePicker 
                     mode="date" onChange={handleEndDateChange} value={endDate ?? new Date()}/>)}
             </View>   
@@ -54,21 +54,25 @@ export default function DateRangePicker({startDate, endDate, onStartDateChange, 
 const styles = StyleSheet.create({
 
     dateRow: {
-        
         flexDirection: 'row',
-        gap: 10,
+        gap: 16,
+    },                                                                                                                        
+
+    title:{
+        fontSize: 20
     },
 
     dateSection: {
+        flexDirection: "column",
         flex: 1,
+        gap: 6,
     },
     
     date: {
         backgroundColor: 'white',
-        borderWidth: 4,
-        borderStyle: 'solid',
+        borderWidth: 2,
         borderColor: 'blue',
-        padding: 8
-
+        padding: 8,
+        borderRadius: 6,
     },
 })

@@ -257,22 +257,36 @@ Rough order:
 # Before I Stop Working
 
 Last worked on:
-fixed pattern scanner logic. finished date picker including error handling
+
+Pattern Scanner page integration and testing on mobile.
 
 Finished:
-Mobile tab layout. Passing the selected ticker from Watchlist to Stock Detail. Native Date Range Picker has Start Date and End Date controls, picker visibility, date-change handling, and selected-date display. Web Date Range Picker is built using HTML date inputs with the same props interface as native. Finished the local formatDateForInput() helper and local date conversion to avoid timezone/UTC date-shift issues.
+
+- Pattern Scanner page renders correctly.
+- PatternCard mock results work.
+- Native DateRangePicker works and has been tested on physical Android.
+- Start/end date validation works so start date cannot go past end date.
+- Fixed mobile DateRangePicker being squeezed by the Pattern Scanner row layout.
+- Decided on search component for ticker selection.
+- Web/native DateRangePicker share the same props/interface but use platform-specific implementations.
 
 Still working on:
-Pattern Scanner page integration. The Date Range Picker components are built, but I cannot properly view/test them yet because existing Pattern Scanner logic needs to be fixed first.
+
+- Responsive Pattern Scanner layout. Mobile needs stacked controls while web should keep the wider row layout.
+- Date range options such as 1 month, 3 months, 6 months, and Custom still need to be coded.
+- Ticker search and pattern selection are still placeholders.
+- Web DateRangePicker still needs testing.
 
 Next thing to do:
-Fix the existing Pattern Scanner logic/errors until the page renders correctly. Then test the Date Range Picker on both native and web before continuing with its visual styling.
+
+Make the Pattern Scanner controls responsive using `useWindowDimensions()` so mobile and web can use different layouts based on screen width.
+
+After that, code the date range preset options.
 
 Important bug / thought:
-Do not continue designing the Date Range Picker until the Pattern Scanner page is working and the component can actually be viewed/tested. Web and native share the same Date Range Picker props/interface but use platform-specific implementations. Native uses @react-native-community/datetimepicker@8.4.4 with onChange; web uses HTML <input type="date"> with local date conversion.
 
-Web and mobile share the same feature contract (startDate, endDate, and change callbacks) but use platform-specific UI. Native uses @react-native-community/datetimepicker@8.4.4 with onChange; web uses HTML <input type="date">. Avoid UTC date-shift bugs by converting the web input to/from local calendar date parts instead of relying on new Date("YYYY-MM-DD") or toISOString().
+Do not change the DateRangePicker itself to fix the mobile compression issue. The problem was the parent Pattern Scanner row squeezing it between the ticker and pattern controls.
 
-Web and mobile will share routes/features but can use platform-specific UI. Web layout direction is top navigation + left-side navigation + main content area, inspired by Codecademy’s dashboard; mobile uses bottom tabs. The installed @react-native-community/datetimepicker version is 8.4.4, so the native picker uses onChange rather than the newer onValueChange API.
+Web and mobile share the same DateRangePicker feature contract (startDate, endDate, and change callbacks) but use platform-specific UI. Native uses @react-native-community/datetimepicker@8.4.4 with onChange; web uses HTML <input type="date"> with local date conversion to avoid UTC date-shift bugs.
 
-Note: need to include logic for making sure start date does not go past end date
+Web layout direction is top navigation + left-side navigation + main content area. Mobile uses bottom tabs.
