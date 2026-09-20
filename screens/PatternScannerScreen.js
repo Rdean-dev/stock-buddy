@@ -1,34 +1,18 @@
-import React from "react";
-import {useState} from 'react';
-import {Text, StyleSheet, View, ScrollView, Pressable } from 'react-native';
-import PatternCard from '../components/PatternCard';
+import React, { useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import DateRangePicker from "../components/DateRangePicker";
-import data from "../data/mockDailyIBMData.json" with {type: "json"};
-
-
-
-
-const patternData = [
-  {
-    name: "Doji",
-    count: 3,
-    dates: ["May 20", "May 24", "May 28"],
-    type: "Neutral",
-  },
-  {
-    name: "Bullish Engulfing",
-    count: 1,
-    dates: ["May 26"],
-    type: "Bullish",
-  },
-];
-
+import PatternCard from '../components/PatternCard';
+import data from '../data/mockDailyIBMData.json';
+import { formatDateAsISODate as formatDate } from "../utils/formatDate";
+import scanPatterns from '../utils/patternScanner';
 
 
 export default function PatternScannerScreen() {
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
-    const [dateError, setDateError] = useState('')
+    const [dateError, setDateError] = useState('');
+    const [selectedPatterns, setSelectedPatterns] = useState(['Doji']);
+    //const [patternData, setPatternData] = useState([]);
     
     const handleStartDateChange = (date) => {
         if ((date && endDate) && normalizeDate(date) > normalizeDate(endDate)){
@@ -76,11 +60,12 @@ export default function PatternScannerScreen() {
         setEndDate(today);
     };
 
-    const scanPatterns = (startDate, endDate, selectedPatterns, stockData) => {
-        
-    }
+    const patternResults = startDate && endDate ? scanPatterns(formatDate(startDate), formatDate(endDate), selectedPatterns, data) : {};
+    
+    const allDatesArray = Object.values(patternResults).flatMap(array => array.map(candle => candle.date));
 
-
+    patternData[0].dates = allDatesArray;
+    patternData[0].count = allDatesArray.length
     return (
         <ScrollView>
             <Text>Pattern Scanner</Text>

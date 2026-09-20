@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { StyleSheet, Pressable} from "react-native";
+import { Pressable, StyleSheet } from "react-native";
+import { formatDateAsISODate } from '../utils/formatDate';
 
 type DateRangePickerProps = {
   startDate: Date | null;
@@ -9,18 +10,10 @@ type DateRangePickerProps = {
   onEndDateChange: (date: Date | null) => void;
 };
 
+
 export default function DateRangePicker({startDate, endDate, onStartDateChange, onEndDateChange}: DateRangePickerProps) {
 
-    const formatDateForInput = (date: Date | null) => {
-        if (date == null){
-            return ""
-        }
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
 
-        return `${year}-${month}-${day}`;
-    }
 
     const handleStartDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.value){
@@ -54,11 +47,11 @@ export default function DateRangePicker({startDate, endDate, onStartDateChange, 
         <div style={styles.dateRow}>
             <div style={styles.dateSection}>
                 <label htmlFor='startDate' style={styles.title}>Start Date</label>
-                <Pressable><input id='startDate' type="date" style={styles.date} onChange={handleStartDateChange} value={formatDateForInput(startDate)} max={(endDate) ? formatDateForInput(endDate) : ""}/></Pressable>
+                <Pressable><input id='startDate' type="date" style={styles.date} onChange={handleStartDateChange} value={formatDateAsISODate(startDate)} max={(endDate) ? formatDateAsISODate(endDate) : ""}/></Pressable>
             </div>
             <div style={styles.dateSection}>
                 <label htmlFor='endDate' style={styles.title}>End Date</label>
-                <input id='endDate' type='date' style={styles.date} onChange={handleEndDateChange} value={formatDateForInput(endDate)} min={(startDate) ? formatDateForInput(startDate) : ""}/>
+                <input id='endDate' type='date' style={styles.date} onChange={handleEndDateChange} value={formatDateAsISODate(endDate)} min={(startDate) ? formatDateAsISODate(startDate) : ""}/>
             </div>   
         </div>
         

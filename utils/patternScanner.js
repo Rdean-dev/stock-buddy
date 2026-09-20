@@ -1,9 +1,10 @@
-import data from "../data/mockDailyIBMData.json" with {type: "json"};
+import { isDoji, isHammer } from './patternCalculations.js';
 
-const scanPatterns = (startDate, endDate, selectedPatterns, stockData) => {
-    const initalData = stockData["Time Series (Daily)"];
+export default function scanPatterns (startDate, endDate, selectedPatterns, stockData) {
+    
+    const initialData = stockData["Time Series (Daily)"];
 
-    const arrayOfCandlestickObjects = Object.entries(initalData);
+    const arrayOfCandlestickObjects = Object.entries(initialData);
 
     const filteredArrayOfCandlestickObjects = [];
 
@@ -21,18 +22,29 @@ const scanPatterns = (startDate, endDate, selectedPatterns, stockData) => {
         
     });
 
-    const results = [];
+    const patternDetectors = {
+        Doji: isDoji,
+        Hammer: isHammer,
+    };
 
-    filteredArrayOfCandlestickObjects.forEach((candle, index) => {
+    const results = {};
+
+    selectedPatterns.forEach((pattern) => {
+        results[pattern] = [];
+    });
+
+    filteredArrayOfCandlestickObjects.forEach((candle) => {
         selectedPatterns.forEach((pattern) => {
-            if (pattern === "Doji") {
-                if (isDoji(candle)) {
-                    results.push(candle);
-                }
+            const detector = patternDetectors[pattern];
+
+            if (detector(candle)) {
+                results[pattern].push(candle);
             }
+            
         });
     });
 
+    console.log(results);
     return results;
     
     
@@ -47,10 +59,3 @@ const scanPatterns = (startDate, endDate, selectedPatterns, stockData) => {
 
 }
 
-const startDate = "2026-06-16";
-
-const endDate = '2026-09-15';
-
-const selectedPatterns = ['Doji']
-
-scanPatterns(startDate, endDate, selectedPatterns, data);

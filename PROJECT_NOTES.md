@@ -258,35 +258,76 @@ Rough order:
 
 Last worked on:
 
-Pattern Scanner page integration and testing on mobile.
+Building the Pattern Scanner logic using saved Alpha Vantage IBM data.
 
 Finished:
 
-- Pattern Scanner page renders correctly.
+- Pattern Scanner page renders correctly on web and physical Android.
 - PatternCard mock results work.
-- Native DateRangePicker works and has been tested on physical Android.
-- Start/end date validation works so start date cannot go past end date.
-- Fixed mobile DateRangePicker being squeezed by the Pattern Scanner row layout.
-- Decided on search component for ticker selection.
-- Web/native DateRangePicker share the same props/interface but use platform-specific implementations.
+- Native DateRangePicker works on physical Android.
+- Start/end date validation works.
+- Fixed mobile DateRangePicker layout issue.
+- Added date range preset controls.
+- Pattern Scanner date controls are responsive between mobile and web.
+- Saved Alpha Vantage IBM daily data locally for development/testing.
+- Started `patternScanner.js`.
+- Scanner extracts `"Time Series (Daily)"` from Alpha Vantage data.
+- Converts Alpha Vantage data into an array using `Object.entries()`.
+- Reverses candle data into oldest → newest chronological order.
+- Converts open/high/low/close/volume strings into numbers.
+- Filters candles using the selected start and end dates.
+- Converts Alpha Vantage entries into clean candle objects:
+  `{ date, open, high, low, close, volume }`
+- Scanner loops through the filtered candles and selected patterns.
+- Added the initial connection for calling a pattern detector such as `isDoji(candle)`.
 
 Still working on:
 
-- Responsive Pattern Scanner layout. Mobile needs stacked controls while web should keep the wider row layout.
-- Date range options such as 1 month, 3 months, 6 months, and Custom still need to be coded.
-- Ticker search and pattern selection are still placeholders.
-- Web DateRangePicker still needs testing.
+- Actual candlestick pattern calculations have not been implemented yet.
+- Ticker search is still a placeholder.
+- Pattern checkbox/multi-select UI is still a placeholder.
+- Scanner results still need to be connected to the PatternCard UI.
+- Live Alpha Vantage API integration has not been added yet; scanner currently uses saved mock data.
 
 Next thing to do:
 
-Make the Pattern Scanner controls responsive using `useWindowDimensions()` so mobile and web can use different layouts based on screen width.
+Create `patternCalculations.js`.
 
-After that, code the date range preset options.
+Start with:
 
-Important bug / thought:
+`isDoji(candle)`
 
-Do not change the DateRangePicker itself to fix the mobile compression issue. The problem was the parent Pattern Scanner row squeezing it between the ticker and pattern controls.
+The function should receive one clean candle object and return `true` or `false`.
 
-Web and mobile share the same DateRangePicker feature contract (startDate, endDate, and change callbacks) but use platform-specific UI. Native uses @react-native-community/datetimepicker@8.4.4 with onChange; web uses HTML <input type="date"> with local date conversion to avoid UTC date-shift bugs.
+Then import `isDoji` into `patternScanner.js` and test the scanner using the saved IBM data.
+
+After Doji works:
+- Add additional single-candle patterns.
+- Add multi-candle patterns such as Bullish Engulfing using the candle index to access the previous candle.
+- Build the pattern checkbox/multi-select UI and pass the selected patterns into the scanner.
+- Connect scanner results to PatternCard.
+
+Important architecture:
+
+`PatternScannerScreen`
+→ owns user selections/state
+→ calls scanner
+
+`patternScanner.js`
+→ prepares/filter candle data
+→ coordinates selected pattern detection
+→ returns results
+
+`patternCalculations.js`
+→ contains the actual mathematical definitions for candlestick patterns
+→ examples: `isDoji`, `isHammer`, `isBullishEngulfing`
+
+`PatternCard`
+→ presentation only
+→ displays scanner results
+
+Alpha Vantage returns daily data newest → oldest. The scanner reverses it so the clean candle array is oldest → newest. This is important for multi-candle patterns because `index - 1` can represent the previous trading candle.
+
+Web and mobile share the same DateRangePicker feature contract but use platform-specific UI. Native uses `@react-native-community/datetimepicker@8.4.4` with `onChange`; web uses HTML `<input type="date">` with local date conversion to avoid UTC date-shift bugs.
 
 Web layout direction is top navigation + left-side navigation + main content area. Mobile uses bottom tabs.
