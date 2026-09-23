@@ -1,50 +1,103 @@
-# Welcome to your Expo app 👋
+# Stock Buddy 
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Stock Buddy is a cross-platform stock tracking and technical analysis application built with React Native and TypeScript. The project is designed to help users monitor stocks, explore historical market data, and identify common candlestick patterns through an interactive mobile interface.
 
-## Get started
+> **Status:**  In active development
 
-1. Install dependencies
+## Features
 
-   ```bash
-   npm install
-   ```
+### Currently Implemented
 
-2. Start the app
+* Cross-platform interface built with React Native and Expo
+* Watchlist with reusable stock card components
+* Stock detail navigation using Expo Router
+* Responsive layouts for mobile and web
+* Pattern Scanner interface for analyzing historical stock data
+* Custom date range selection with 1M, 3M, 6M, and 1Y presets
+* Processing and normalization of Alpha Vantage-formatted OHLC market data
+* Multi-pattern candlestick scanning
+* Doji and Hammer pattern detection
+* Display of detected patterns and corresponding dates
 
-   ```bash
-   npx expo start
-   ```
+### In Development
 
-In the output, you'll find options to open the app in a
+* Live Alpha Vantage API integration
+* Stock ticker search
+* Additional candlestick pattern recognition
+* Expanded stock detail information
+* Daily market reporting and insights
+* Watchlist management and persistence
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Pattern Scanner
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+The Pattern Scanner analyzes historical OHLC (Open, High, Low, Close) market data within a user-selected date range.
 
-## Get a fresh project
+Market data is transformed from the Alpha Vantage response format into structured candle objects:
 
-When you're ready, run:
-
-```bash
-npm run reset-project
+```text
+{
+  date,
+  open,
+  high,
+  low,
+  close,
+  volume
+}
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+The scanner processes candles chronologically and evaluates each candle against the patterns selected by the user. Pattern calculations are separated from the scanner logic to keep the analysis system modular and extensible.
 
-## Learn more
+Currently supported patterns include:
 
-To learn more about developing your project with Expo, look at the following resources:
+* Doji
+* Hammer
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Additional candlestick patterns are being added as development continues.
 
-## Join the community
+## Tech Stack
 
-Join our community of developers creating universal apps.
+* React Native
+* TypeScript
+* JavaScript
+* Expo
+* Expo Router
+* REST API integration
+* Git / GitHub
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Data
+
+Stock Buddy is being developed for integration with the Alpha Vantage market data API.
+
+During development, the Pattern Scanner currently uses locally stored sample Alpha Vantage daily market data. This allows the parsing, filtering, and pattern-recognition logic to be developed and tested before live API integration.
+
+## Running the Project
+
+### Install dependencies
+
+```bash
+npm install
+```
+
+### Start the development server
+
+```bash
+npx expo start
+```
+
+The application can then be run through Expo Go, an Android/iOS development environment, or the web.
+
+## Project Goals
+
+Stock Buddy is an ongoing personal software development project focused on building experience with:
+
+* Cross-platform application development
+* TypeScript and React Native
+* Component-based application architecture
+* REST API integration
+* Financial market data processing
+* Algorithmic candlestick pattern recognition
+* Responsive mobile and web interfaces
+
+## Roadmap
+
+Future development includes live market data integration, additional candlestick patterns, improved watchlist functionality, expanded stock information, and market analysis features.
