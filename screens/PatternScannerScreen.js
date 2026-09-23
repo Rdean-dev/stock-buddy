@@ -3,7 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import DateRangePicker from "../components/DateRangePicker";
 import PatternCard from '../components/PatternCard';
 import data from '../data/mockDailyIBMData.json';
-import { formatDateAsISODate as formatDate } from "../utils/formatDate";
+import { formatDateAsISODate as formatDate, formatDisplayDate } from "../utils/formatDate";
 import scanPatterns from '../utils/patternScanner';
 import Checkbox from 'expo-checkbox';
 import { Dropdown, MultiSelect } from 'react-native-element-dropdown';
@@ -13,9 +13,13 @@ export default function PatternScannerScreen() {
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [dateError, setDateError] = useState('');
-    const [selectedPatterns, setSelectedPatterns] = useState(['Doji', 'Hammer']);
+    const [selectedPatterns, setSelectedPatterns] = useState([]);
     //const [patternData, setPatternData] = useState([]);
-    const availablePatterns = [{label: "Doji", value: "Doji"}, {label: "Hammer", value: "Hammer"}];
+    const availablePatterns = [{label: "Doji", value: "Doji"}, 
+        {label: "Hammer", value: "Hammer"}, 
+        {label: "Bullish Engulfing", value: "Bullish Engulfing"}, 
+        {label: "Bearish Engulfing", value: "Bearish Engulfing"}, 
+        {label: "Morning Star", value: "Morning Star"}];
 
     const handleStartDateChange = (date) => {
         if ((date && endDate) && normalizeDate(date) > normalizeDate(endDate)){
@@ -78,7 +82,7 @@ export default function PatternScannerScreen() {
     const patternResults = startDate && endDate ? scanPatterns(formatDate(startDate), formatDate(endDate), selectedPatterns, data) : {};
     
     const patternData = Object.entries(patternResults).map(([patternName, candles]) => {
-        const patternMatchDates = candles.map((candle) => candle.date);
+        const patternMatchDates = candles.map((candle) => formatDisplayDate(candle.date));
 
         return {
             name: patternName,
@@ -109,7 +113,7 @@ export default function PatternScannerScreen() {
                     <MultiSelect data={availablePatterns} labelField="label"  
                     valueField="value" value={selectedPatterns} 
                     onChange={(selected) => setSelectedPatterns(selected)}
-                    dropdownPosition="bottom"
+                    mode="auto"
                     renderItem={(pattern) => (
                         <View style={{flexDirection: 'row'}}>
                             <Text>{pattern.label}</Text>

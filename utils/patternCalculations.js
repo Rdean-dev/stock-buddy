@@ -15,3 +15,37 @@ export function isHammer(candle) {
     return lowerRange >= 2 * bodySize && upperRange <= bodySize && bodySize > 0;
 
 }
+
+export function isBullishEngulfing(previousCandle, currentCandle) {
+    
+    return ((previousCandle.close < previousCandle.open) && 
+        (currentCandle.close > currentCandle.open) && 
+        (currentCandle.open <= previousCandle.close) && 
+        (currentCandle.close >= previousCandle.open) && 
+        (currentCandle.open <= previousCandle.close || currentCandle.close >= previousCandle.open));
+}
+
+export function isBearishEngulfing(previousCandle, currentCandle) {
+    
+    return ((previousCandle.close > previousCandle.open) && 
+        (currentCandle.close < currentCandle.open) && 
+        (currentCandle.open >= previousCandle.close) && 
+        (currentCandle.close <= previousCandle.open) && 
+        (currentCandle.open >= previousCandle.close || currentCandle.close <= previousCandle.open));
+}
+
+export function isMorningStar(firstCandle, secondCandle, thirdCandle) {
+    
+    const firstBody = Math.abs(firstCandle.close - firstCandle.open);
+    const secondBody = Math.abs(secondCandle.close - secondCandle.open);
+    
+    const midpoint = (firstCandle.open + firstCandle.close) / 2;
+
+    
+    return (
+        (firstCandle.close < firstCandle.open) && 
+        (secondBody <= 0.3 * firstBody) && 
+        (thirdCandle.close > thirdCandle.open) &&
+        (thirdCandle.close > midpoint) 
+    );
+}

@@ -8,3 +8,14 @@ export function formatDateAsISODate(date: Date | null){
 
     return `${year}-${month}-${day}`;
 }
+
+export function formatDisplayDate(dateString: string) {
+    const convertedDate = new Date(`${dateString}T00:00:00`);
+    
+    const formattedDate = convertedDate.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric'
+    });
+
+    return formattedDate;
+}

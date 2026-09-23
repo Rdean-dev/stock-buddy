@@ -9,7 +9,6 @@ export default function PatternCard({pattern}){
         <View style={styles.patternCard}>
             <Text style={styles.header}>{pattern.name}</Text>
             <Text style={styles.patternText}>{pattern.count} found</Text>
-            <Text style={styles.patternText}>Type: {pattern.type}</Text>
             <Text style={styles.patternText}>Dates: {pattern.dates.join(', ')}</Text>
         </View>
     );

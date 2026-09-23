@@ -258,231 +258,101 @@ Rough order:
 
 Last worked on:
 
-Building the Pattern Scanner logic and connecting scanner results to the Pattern Scanner UI using saved Alpha Vantage IBM data.
+Connecting multi-pattern selection to the Pattern Scanner and displaying real scanner results.
 
-## Finished
+Finished:
 
-* Pattern Scanner page renders correctly on web and physical Android.
-
-* PatternCard mock results work.
-
-* Native DateRangePicker works on physical Android.
-
-* Start/end date validation works.
-
-* Fixed mobile DateRangePicker layout issue.
-
-* Added date range preset controls.
-
-* Pattern Scanner date controls are responsive between mobile and web.
-
-* Saved Alpha Vantage IBM daily data locally for development/testing.
-
-* Built `patternScanner.js`.
-
-* Scanner extracts `"Time Series (Daily)"` from Alpha Vantage data.
-
-* Converts Alpha Vantage data into an array using `Object.entries()`.
-
-* Reverses candle data into oldest → newest chronological order.
-
-* Converts open/high/low/close/volume strings into numbers.
-
-* Filters candles using the selected start and end dates.
-
-* Converts Alpha Vantage entries into clean candle objects:
-
+- Pattern Scanner page renders correctly on web and physical Android.
+- Native DateRangePicker works on physical Android.
+- Start/end date validation works.
+- Date range preset controls work for 1M, 3M, 6M, and 1Y.
+- Pattern Scanner date controls are responsive between mobile and web.
+- Saved Alpha Vantage IBM daily data locally for development/testing.
+- `patternScanner.js` extracts `"Time Series (Daily)"` from Alpha Vantage data.
+- Converts Alpha Vantage data into an array using `Object.entries()`.
+- Reverses candle data into oldest → newest chronological order.
+- Converts open/high/low/close/volume strings into numbers.
+- Filters candles using the selected start and end dates.
+- Converts Alpha Vantage entries into clean candle objects:
   `{ date, open, high, low, close, volume }`
+- Scanner loops through the filtered candles and selected patterns.
+- Created `patternCalculations.js`.
+- Implemented Doji detection.
+- Implemented Hammer detection.
+- Scanner returns results grouped by pattern.
+- Scanner results are transformed into data for `PatternCard`.
+- PatternCard now displays real scanner counts and matching dates.
+- Added `react-native-element-dropdown`.
+- Added `expo-checkbox`.
+- Added a MultiSelect pattern selector.
+- Pattern selector supports multiple selected patterns.
+- Custom dropdown items display checkboxes.
+- `selectedPatterns` updates when patterns are selected/deselected.
+- Pattern selections automatically update scanner results.
+- Verified Doji and Hammer can be selected simultaneously and produce separate result cards.
 
-* Scanner loops through the filtered candles and selected patterns.
+Current working flow:
 
-* Created `patternCalculations.js`.
+`Date Range + Selected Patterns`
+→ `scanPatterns()`
+→ filter/clean Alpha Vantage candles
+→ run selected pattern detectors
+→ return results grouped by pattern
+→ transform results into PatternCard data
+→ display separate result cards
 
-* Implemented `isDoji(candle)`.
+Still working on:
 
-* Implemented `isHammer(candle)`.
+- Pattern selector/dropdown needs visual styling.
+- PatternCard `Type:` is currently empty.
+- Pattern metadata such as Bullish / Bearish / Neutral still needs to be added.
+- Only Doji and Hammer detection are currently implemented.
+- Additional one-, two-, and three-candle pattern algorithms still need to be added.
+- Ticker search is still a placeholder.
+- Annotated chart is still a placeholder.
+- Live Alpha Vantage API integration has not been added yet; scanner currently uses saved IBM data.
 
-* Doji and Hammer calculations return `true` / `false`.
+Next thing to do:
 
-* Imported the pattern calculation functions into `patternScanner.js`.
+Continue the Pattern Scanner feature.
 
-* Added a scalable detector mapping:
+Recommended next steps:
 
-```js
-const patternDetectors = {
-    Doji: isDoji,
-    Hammer: isHammer
-};
-```
+1. Clean up/style the pattern MultiSelect dropdown.
+2. Add pattern metadata for Bullish / Bearish / Neutral types.
+3. Implement a two-candle pattern such as Bullish Engulfing.
+4. Implement a three-candle pattern such as Morning Star.
+5. Verify the scanner architecture works correctly with single-, two-, and three-candle patterns.
+6. Add the remaining supported candlestick patterns incrementally.
+7. Build the ticker search/selection component.
+8. Continue toward the annotated chart.
 
-* Scanner now uses the selected pattern name to retrieve and execute the appropriate detector instead of using a growing `if / else if` chain.
-* Scanner can produce separate results for multiple selected patterns.
-
-Example scanner result structure:
-
-```js
-{
-    Doji: [
-        { date, open, high, low, close, volume },
-        { date, open, high, low, close, volume }
-    ],
-
-    Hammer: [
-        { date, open, high, low, close, volume }
-    ]
-}
-```
-
-## Still Working On
-
-The immediate problem is **transforming `patternResults` into data that can be rendered as separate PatternCards.**
-
-The scanner itself already keeps patterns separated correctly.
-
-The problem is currently inside `PatternScannerScreen`.
-
-Current code does:
-
-```js
-const allDatesArray = Object.values(patternResults)
-    .flatMap(array => array.map(candle => candle.date));
-```
-
-This flattens all detected dates from every pattern into one array.
-
-For example:
-
-```js
-{
-    Doji: [
-        { date: "2026-08-01" },
-        { date: "2026-08-05" }
-    ],
-
-    Hammer: [
-        { date: "2026-08-10" }
-    ]
-}
-```
-
-becomes:
-
-```js
-[
-    "2026-08-01",
-    "2026-08-05",
-    "2026-08-10"
-]
-```
-
-This loses the association between each pattern and its own results.
-
-The goal instead is to transform the scanner results into PatternCard-friendly data while preserving each pattern separately.
-
-Conceptually:
-
-```text
-patternResults
-
-{
-    Doji: [candle, candle],
-    Hammer: [candle]
-}
-
-        ↓ transform
-
-patternData
-
-[
-    {
-        name: "Doji",
-        count: 2,
-        dates: [...]
-    },
-    {
-        name: "Hammer",
-        count: 1,
-        dates: [...]
-    }
-]
-
-        ↓
-
-patternData.map(...)
-
-        ↓
-
-Doji PatternCard
-Hammer PatternCard
-```
-
-Do **not** flatten all pattern results together.
-
-## NEXT THING TO DO
-
-Fix the transformation between:
-
-```js
-patternResults
-```
-
-and:
-
-```js
-patternData
-```
-
-inside `PatternScannerScreen`.
-
-The transformation needs to preserve:
-
-* Pattern name
-* Count for that specific pattern
-* Dates for that specific pattern
-* Any other PatternCard fields such as pattern type
-
-Then render one `PatternCard` for each selected/detected pattern.
-
-After that:
-
-* Build the pattern checkbox/multi-select UI.
-* Connect the checkbox UI to `selectedPatterns`.
-* Add additional single-candle pattern calculations.
-* Add multi-candle patterns such as Bullish Engulfing.
-* Build ticker search.
-* Add live Alpha Vantage API integration.
-* Connect pattern results to the annotated chart.
-
-## Important Architecture
+Important architecture:
 
 `PatternScannerScreen`
-
-→ owns user selections/state
+→ owns date range and `selectedPatterns`
 → calls scanner
 → transforms scanner results for display
-→ renders PatternCards
 
 `patternScanner.js`
-
-→ prepares/filters candle data
+→ prepares and filters candle data
 → coordinates selected pattern detection
-→ uses `patternDetectors` mapping
 → returns results grouped by pattern
 
 `patternCalculations.js`
-
-→ contains actual mathematical definitions
+→ contains mathematical definitions for candlestick patterns
 → currently includes Doji and Hammer
-→ future examples: Bullish Engulfing, Shooting Star, etc.
+
+`MultiSelect`
+→ controls which patterns are selected
+→ updates `selectedPatterns`
 
 `PatternCard`
-
 → presentation only
-→ receives one pattern's result data
-→ displays pattern name, count, type, and dates
+→ displays pattern name, count, dates, and eventually pattern type
 
-Alpha Vantage returns daily data newest → oldest. The scanner reverses it so the clean candle array is oldest → newest. This will be important for multi-candle patterns because `index - 1` can represent the previous trading candle.
+Important:
 
-Web and mobile share the same DateRangePicker feature contract but use platform-specific UI. Native uses `@react-native-community/datetimepicker@8.4.4` with `onChange`; web uses HTML `<input type="date">` with local date conversion to avoid UTC date-shift bugs.
+Alpha Vantage daily data arrives newest → oldest. The scanner reverses it so the clean candle array is oldest → newest. This will allow multi-candle detectors to use indexes such as `index - 1` for the previous trading candle.
 
-Web layout direction is top navigation + left-side navigation + main content area. Mobile uses bottom tabs.
+Do not redesign the core scanner unless a problem is discovered. The basic scanner pipeline and multi-pattern architecture are now working.
