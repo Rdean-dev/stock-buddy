@@ -6,7 +6,8 @@ import data from '../data/mockDailyIBMData.json';
 import { formatDateAsISODate as formatDate, formatDisplayDate } from "../utils/formatDate";
 import scanPatterns from '../utils/patternScanner';
 import Checkbox from 'expo-checkbox';
-import { Dropdown, MultiSelect } from 'react-native-element-dropdown';
+import { MultiSelect } from 'react-native-element-dropdown';
+import { Searchbar } from "react-native-paper";
 
 
 export default function PatternScannerScreen() {
@@ -15,11 +16,21 @@ export default function PatternScannerScreen() {
     const [dateError, setDateError] = useState('');
     const [selectedPatterns, setSelectedPatterns] = useState([]);
     //const [patternData, setPatternData] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
     const availablePatterns = [{label: "Doji", value: "Doji"}, 
         {label: "Hammer", value: "Hammer"}, 
+        {label: "Shooting Star", value: "Shooting Star"},
+        {label: "Inverted Hammer", value: "Inverted Hammer"},
+        {label: "Hanging Man", value: "Hanging Man"},
         {label: "Bullish Engulfing", value: "Bullish Engulfing"}, 
-        {label: "Bearish Engulfing", value: "Bearish Engulfing"}, 
-        {label: "Morning Star", value: "Morning Star"}];
+        {label: "Bearish Engulfing", value: "Bearish Engulfing"},
+        {label: "Bullish Harami", value: "Bullish Harami"},
+        {label: "Bearish Harami", value: "Bearish Harami"},
+        {label: "Piercing Line", value: "Piercing Line"},
+        {label: "Dark Cloud Cover", value: "Dark Cloud Cover"},
+        {label: "Morning Star", value: "Morning Star"},
+        {label: "Three White Soldiers", value: "Three White Soldiers"},
+        {label: "Three Black Crows", value: "Three Black Crows"}];
 
     const handleStartDateChange = (date) => {
         if ((date && endDate) && normalizeDate(date) > normalizeDate(endDate)){
@@ -96,7 +107,14 @@ export default function PatternScannerScreen() {
         <ScrollView>
             <Text>Pattern Scanner</Text>
             <View style={styles.startingRow}>
-                <Text>S</Text>
+                <Searchbar
+                    placeholder="Search Ticker or Company"
+                    onChangeText={setSearchQuery}
+                    value={searchQuery}
+                    rippleColor={'blue'}
+                    style={styles.searchbarStyle}
+                    
+                />
                 <View style={{flexDirection: 'column',}}>
                     <DateRangePicker startDate={startDate} endDate={endDate} onStartDateChange={handleStartDateChange} onEndDateChange={handleEndDateChange}/>
                     <View style={styles.dateSection}>
@@ -110,20 +128,23 @@ export default function PatternScannerScreen() {
                     <Text>{dateError}</Text>
                 </View>
                 <View style={{flexDirection: 'column'}}>
-                    <MultiSelect data={availablePatterns} labelField="label"  
-                    valueField="value" value={selectedPatterns} 
-                    onChange={(selected) => setSelectedPatterns(selected)}
-                    mode="auto"
-                    renderItem={(pattern) => (
-                        <View style={{flexDirection: 'row'}}>
-                            <Text>{pattern.label}</Text>
-                        </View>
-                        )}
+                    <MultiSelect data={availablePatterns} 
+                        labelField="label"  
+                        valueField="value" value={selectedPatterns} 
+                        onChange={(selected) => setSelectedPatterns(selected)}
+                        mode="auto"
+                        placeholder="Select Patterns"
+                        style={styles.containerStyle}
+                        itemContainerStyle={{padding: 5}}
+                        renderItem={(pattern) => (
+                            <View style={{flexDirection: 'row'}}>
+                                <Text>{pattern.label}</Text>
+                            </View>
+                            )}
                     />
                 </View>
             </View>
             <View>
-                <Text>Pattern Results</Text>
                 {patternData.map((pattern) => (
                     <PatternCard key={pattern.name} pattern={pattern}/>
                 ))}
@@ -141,6 +162,7 @@ export default function PatternScannerScreen() {
 const styles = StyleSheet.create({
     startingRow:{
         flexDirection: 'row',
+        gap: 40,
         },
     dateSection:{
         paddingHorizontal: 5,
@@ -156,5 +178,15 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: 'blue',
 
-    }
+    },
+
+    containerStyle: {
+        width: 160,
+    },
+    searchbarStyle:{
+        width: 300,
+        height: 50,
+        borderRadius: 10,
+        marginTop: 25,
+    },
 });

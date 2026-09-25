@@ -1,0 +1,37 @@
+{
+    "bestMatches": [
+        {
+            "1. symbol": "SAIC",
+            "2. name": "Science Applications International Corp",
+            "3. type": "Equity",
+            "4. region": "United States",
+            "5. marketOpen": "09:30",
+            "6. marketClose": "16:00",
+            "7. timezone": "UTC-04",
+            "8. currency": "USD",
+            "9. matchScore": "1.0000"
+        },
+        {
+            "1. symbol": "SAICAPI.BSE",
+            "2. name": "SAI CAPITAL LTD.",
+            "3. type": "Equity",
+            "4. region": "India/Bombay",
+            "5. marketOpen": "09:15",
+            "6. marketClose": "15:30",
+            "7. timezone": "UTC+5.5",
+            "8. currency": "INR",
+            "9. matchScore": "0.5714"
+        },
+        {
+            "1. symbol": "600104.SHH",
+            "2. name": "SAIC Motor Corporation Ltd",
+            "3. type": "Equity",
+            "4. region": "Shanghai",
+            "5. marketOpen": "09:30",
+            "6. marketClose": "15:00",
+            "7. timezone": "UTC+08",
+            "8. currency": "CNY",
+            "9. matchScore": "0.2667"
+        }
+    ]
+}
