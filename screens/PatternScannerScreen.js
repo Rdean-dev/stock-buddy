@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import React, { useState} from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import DateRangePicker from "../components/DateRangePicker";
+import StockSearchbar from "../components/StockSearchbar";
 import PatternCard from '../components/PatternCard';
 import data from '../data/mockDailyIBMData.json';
 import { formatDateAsISODate as formatDate, formatDisplayDate } from "../utils/formatDate";
 import scanPatterns from '../utils/patternScanner';
 import Checkbox from 'expo-checkbox';
 import { MultiSelect } from 'react-native-element-dropdown';
-import { Searchbar } from "react-native-paper";
 
 
 export default function PatternScannerScreen() {
@@ -16,7 +16,8 @@ export default function PatternScannerScreen() {
     const [dateError, setDateError] = useState('');
     const [selectedPatterns, setSelectedPatterns] = useState([]);
     //const [patternData, setPatternData] = useState([]);
-    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedStock, setSelectedStock] = useState(null);
+
     const availablePatterns = [{label: "Doji", value: "Doji"}, 
         {label: "Hammer", value: "Hammer"}, 
         {label: "Shooting Star", value: "Shooting Star"},
@@ -31,6 +32,8 @@ export default function PatternScannerScreen() {
         {label: "Morning Star", value: "Morning Star"},
         {label: "Three White Soldiers", value: "Three White Soldiers"},
         {label: "Three Black Crows", value: "Three Black Crows"}];
+
+
 
     const handleStartDateChange = (date) => {
         if ((date && endDate) && normalizeDate(date) > normalizeDate(endDate)){
@@ -102,19 +105,12 @@ export default function PatternScannerScreen() {
         };
     })
     
-
+    console.log(selectedStock);
     return (
         <ScrollView>
             <Text>Pattern Scanner</Text>
             <View style={styles.startingRow}>
-                <Searchbar
-                    placeholder="Search Ticker or Company"
-                    onChangeText={setSearchQuery}
-                    value={searchQuery}
-                    rippleColor={'blue'}
-                    style={styles.searchbarStyle}
-                    
-                />
+                <StockSearchbar selectedStock={selectedStock} onSelectedStockChange={setSelectedStock}/>
                 <View style={{flexDirection: 'column',}}>
                     <DateRangePicker startDate={startDate} endDate={endDate} onStartDateChange={handleStartDateChange} onEndDateChange={handleEndDateChange}/>
                     <View style={styles.dateSection}>
@@ -182,11 +178,5 @@ const styles = StyleSheet.create({
 
     containerStyle: {
         width: 160,
-    },
-    searchbarStyle:{
-        width: 300,
-        height: 50,
-        borderRadius: 10,
-        marginTop: 25,
     },
 });
