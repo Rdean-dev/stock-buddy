@@ -1,5 +1,5 @@
-
-
+import datas from '../data/mockDailyIBMData.json';
+import data from '../data/mockSearchDataBA.json';
 const apiKey = process.env.EXPO_PUBLIC_ALPHA_VANTAGE_API_KEY;
 
 export async function searchStocksData(searchKeyword) {
@@ -9,9 +9,9 @@ export async function searchStocksData(searchKeyword) {
 
 
     try {
-        const response = await fetch(apiUrl);
+        //const response = await fetch(apiUrl);
 
-        const data = await response.json();
+        //const data = await response.json();
         console.log("Alpha Vantage response:", data);
         const filteredArrayOfMatches = data["bestMatches"].map((matchEntry) => {
             return {symbol: matchEntry["1. symbol"], name: matchEntry["2. name"]}
@@ -20,7 +20,33 @@ export async function searchStocksData(searchKeyword) {
         return filteredArrayOfMatches;
     } catch (error) {
         console.error('Error fetching data:', error);
+        return [];
     }
 
 
+}
+
+export async function getStockData(company) {
+    const encodedCompany= encodeURIComponent(company.symbol);
+    const apiUrl =`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${encodedCompany}&apikey=${apiKey}`;
+
+
+
+    try {
+        //const response = await fetch(apiUrl);
+
+        //const data = await response.json();
+        console.log("Alpha Vantage stock response:", datas);
+
+        if (datas["Time Series (Daily)"]){
+            return datas;
+        }
+        else{
+            console.log("Alpha Vantage incorrect response:", datas);
+            return null;
+        }
+    } catch (error) {
+        console.error('Error fetching company data:', error);
+        return null;
+    }
 }

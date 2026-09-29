@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     },
 
     title:{
-        fontSize: 20
+        fontSize: 25
     },
 
     dateSection: {
@@ -88,6 +88,7 @@ const styles = StyleSheet.create({
         padding: 8,
         borderRadius: 6,
         height: 20,
+        width: 200,
 
     },
 });

@@ -33,16 +33,22 @@ export default function StockSearchbar({selectedStock, onSelectedStockChange}){
                 value={searchQuery}
                 rippleColor={'blue'}
                 style={styles.searchbarStyle}
+                inputStyle={{fontSize: 20,}}
                 
             />
-            {searchResults.map((result) => (
-                <Pressable key={result.symbol} onPress={() => onSelectedStockChange(result)}>
-                    <View>
-                        <Text>{result.symbol}</Text>
-                        <Text>{result.name}</Text>
-                    </View>
-                </Pressable>
-            ))}
+            <View style={styles.searchResultsStyle}>
+                {searchResults.length > 0 && searchResults.map((result) => (
+                    <Pressable key={result.symbol} 
+                        onPress={() => {onSelectedStockChange(result);  setSearchResults([]);} }>
+                        {({hovered, pressed}) => (
+                            <View style={[styles.searchResultItem, (hovered || pressed) && styles.itemHovered]}>
+                                <Text style={[styles.searchResultText, styles.symbolText]}> {result.symbol}</Text>
+                                <Text style={[styles.searchResultText, styles.companyText]} numberOfLines={1} ellipsizeMode="tail">{result.name}</Text>
+                            </View>
+                        )}
+                    </Pressable>
+                ))}
+            </View>
         </View>
 
     );
@@ -51,9 +57,39 @@ export default function StockSearchbar({selectedStock, onSelectedStockChange}){
 
 const styles = StyleSheet.create({
     searchbarStyle:{
-        width: 300,
-        height: 50,
+        width: 400,
+        height: 60,
         borderRadius: 10,
-        marginTop: 25,
+        marginTop: 8,
+    },
+    searchResultsStyle:{
+        position: 'absolute',
+        top: 70,
+        left: 0, 
+        width: 400,
+        zIndex: 1,
+        flex: 1,
+    },
+    searchResultItem:{
+        backgroundColor: "white",
+        flexDirection: 'row',
+        width: '100%', 
+        paddingHorizontal: 15, 
+        paddingVertical: 10, 
+        gap: 40
+    },
+    searchResultText:{
+        fontSize: 18,
+        fontWeight: '600', 
+    },
+    itemHovered:{
+        backgroundColor: 'grey',
+    },
+    symbolText: {
+        width: 120,
+    },
+
+    companyText: {
+        flex: 1,
     },
 });

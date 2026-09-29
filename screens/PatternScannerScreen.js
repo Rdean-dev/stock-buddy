@@ -1,13 +1,14 @@
-import React, { useState} from "react";
+import React, { useState, useEffect} from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import DateRangePicker from "../components/DateRangePicker";
 import StockSearchbar from "../components/StockSearchbar";
 import PatternCard from '../components/PatternCard';
-import data from '../data/mockDailyIBMData.json';
 import { formatDateAsISODate as formatDate, formatDisplayDate } from "../utils/formatDate";
 import scanPatterns from '../utils/patternScanner';
 import Checkbox from 'expo-checkbox';
 import { MultiSelect } from 'react-native-element-dropdown';
+//import StockChart from '../components/StockChart';
+import { getStockData } from "../services/stockService";
 
 
 export default function PatternScannerScreen() {
@@ -17,6 +18,7 @@ export default function PatternScannerScreen() {
     const [selectedPatterns, setSelectedPatterns] = useState([]);
     //const [patternData, setPatternData] = useState([]);
     const [selectedStock, setSelectedStock] = useState(null);
+    const [selectedStockData, setSelectedStockData] = useState(null);
 
     const availablePatterns = [{label: "Doji", value: "Doji"}, 
         {label: "Hammer", value: "Hammer"}, 
@@ -34,7 +36,20 @@ export default function PatternScannerScreen() {
         {label: "Three Black Crows", value: "Three Black Crows"}];
 
 
+    useEffect(() => {
 
+        if (selectedStock === null) {
+            return;
+        }
+        const getData = async (stock) => {
+            const result = await getStockData(stock);
+            setSelectedStockData(result);
+
+
+        }
+
+        getData(selectedStock);
+    }, [selectedStock]);
     const handleStartDateChange = (date) => {
         if ((date && endDate) && normalizeDate(date) > normalizeDate(endDate)){
             setDateError("Pick a date on or before the end Date")
@@ -90,10 +105,8 @@ export default function PatternScannerScreen() {
         
     }
    
-    
-    
 
-    const patternResults = startDate && endDate ? scanPatterns(formatDate(startDate), formatDate(endDate), selectedPatterns, data) : {};
+    const patternResults = startDate && endDate && selectedStockData? scanPatterns(formatDate(startDate), formatDate(endDate), selectedPatterns, selectedStockData) : {};
     
     const patternData = Object.entries(patternResults).map(([patternName, candles]) => {
         const patternMatchDates = candles.map((candle) => formatDisplayDate(candle.date));
@@ -105,12 +118,16 @@ export default function PatternScannerScreen() {
         };
     })
     
-    console.log(selectedStock);
+    console.log("Selected stock:", selectedStock);
+    console.log("Selected stock data:", selectedStockData);
     return (
         <ScrollView>
-            <Text>Pattern Scanner</Text>
+
             <View style={styles.startingRow}>
-                <StockSearchbar selectedStock={selectedStock} onSelectedStockChange={setSelectedStock}/>
+                <View style={{flexDirection: 'column',}}>
+                    <Text style={styles.sectionTitle}>Search Stock</Text>
+                    <StockSearchbar selectedStock={selectedStock} onSelectedStockChange={setSelectedStock}/>
+                </View>
                 <View style={{flexDirection: 'column',}}>
                     <DateRangePicker startDate={startDate} endDate={endDate} onStartDateChange={handleStartDateChange} onEndDateChange={handleEndDateChange}/>
                     <View style={styles.dateSection}>
@@ -129,12 +146,13 @@ export default function PatternScannerScreen() {
                         valueField="value" value={selectedPatterns} 
                         onChange={(selected) => setSelectedPatterns(selected)}
                         mode="auto"
-                        placeholder="Select Patterns"
+                        placeholder="Select Pattern(s)"
+                        placeholderStyle={{fontSize: 25, fontFamily: 'Times New Roman',}}
                         style={styles.containerStyle}
                         itemContainerStyle={{padding: 5}}
                         renderItem={(pattern) => (
                             <View style={{flexDirection: 'row'}}>
-                                <Text>{pattern.label}</Text>
+                                <Text style={{fontSize: 20, fontFamily: 'Times New Roman',}}>{pattern.label}</Text>
                             </View>
                             )}
                     />
@@ -148,7 +166,7 @@ export default function PatternScannerScreen() {
             </View>
 
             <View>
-                <Text>Annotated Chart Placeholder</Text>
+                <StockChart startDate={startDate} endDate={endDate} stockData={selectedStockData} patternResults={patternResults}/>
             </View>
 
         </ScrollView>
@@ -158,17 +176,21 @@ export default function PatternScannerScreen() {
 const styles = StyleSheet.create({
     startingRow:{
         flexDirection: 'row',
-        gap: 40,
+        justifyContent: 'space-evenly',
+        zIndex: 1,
+        paddingHorizontal: 50,
+        paddingVertical: 30,
         },
     dateSection:{
         paddingHorizontal: 5,
-        paddingVertical: 5,
+        paddingVertical: 6,
         flexDirection: 'row',
-        gap: 20
+        gap: 20,
+        justifyContent: 'space-evenly',
 
     },
     dateText:{
-        fontSize: 17
+        fontSize: 20
     },
     dateTextActive:{
         fontSize: 18,
@@ -177,6 +199,14 @@ const styles = StyleSheet.create({
     },
 
     containerStyle: {
-        width: 160,
+        width: 250,
+        fontSize: 20,
+    },
+    pageStyle: {
+        paddingHorizontal: 50
+    },
+    sectionTitle: {
+        fontSize: 25,
+        fontFamily: 'Times New Roman',
     },
 });

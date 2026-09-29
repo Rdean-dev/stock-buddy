@@ -255,22 +255,23 @@ Rough order:
 ---
 
 Before I Stop Working
-Last worked on: Ticker/company search for Pattern Scanner.
+
+Last worked on: Connecting selected stocks to live historical Alpha Vantage data.
 Finished:
-- Extracted search into StockSearchbar.
-- Added 500ms debounce.
-- Connected Alpha Vantage SYMBOL_SEARCH.
-- Created stockService.js.
-- API key moved to .env.
-- Converted Alpha Vantage results to { symbol, name }.
-- Stored results in searchResults.
-- Rendered live search suggestions.
-- Made results pressable.
-- Added callback to send selected stock to PatternScannerScreen.
-- Found API edge case: bestMatches can sometimes be missing.
-Next:
-1. Verify clicking a result updates selectedStock.
-2. Clear/hide suggestions after selection.
-3. Show selected stock in the search field/UI.
-4. Handle missing bestMatches safely.
-5. Then connect the selected ticker to historical stock data.
+- Stock search works with live Alpha Vantage data.
+- Selected stock flows from StockSearchbar → PatternScannerScreen.
+- Added selectedStockData state.
+- Added useEffect to fetch historical data when the selected stock changes.
+- Fixed async issue where a Promise was being passed into scanPatterns().
+- Scanner waits until historical data exists before running.
+- Reconnected TIME_SERIES_DAILY API.
+- Confirmed live AAPL historical data reaches the scanner.
+- Confirmed scanner successfully detected 7 Dojis from live AAPL data. 🎯
+
+
+Next time:
+- Add protection for Alpha Vantage responses missing "Time Series (Daily)".
+- Clean up temporary console logs/mock imports.
+- Continue responsive Pattern Scanner layout.
+- Then keep building toward the annotated chart.
+Do not redesign: The scanner pipeline is working. Build on it.
