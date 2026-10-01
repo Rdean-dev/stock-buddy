@@ -19,6 +19,7 @@ export default function normalizeCandleData(stockData, startDate, endDate) {
         }
         
     });
-
+    console.log(filteredArrayOfCandlestickObjects)
     return filteredArrayOfCandlestickObjects;
+
 }

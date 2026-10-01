@@ -7,7 +7,7 @@ import { formatDateAsISODate as formatDate, formatDisplayDate } from "../utils/f
 import scanPatterns from '../utils/patternScanner';
 import Checkbox from 'expo-checkbox';
 import { MultiSelect } from 'react-native-element-dropdown';
-//import StockChart from '../components/StockChart';
+import StockChart from '../components/StockChart';
 import { getStockData } from "../services/stockService";
 
 
@@ -119,7 +119,7 @@ export default function PatternScannerScreen() {
     })
     
     console.log("Selected stock:", selectedStock);
-    console.log("Selected stock data:", selectedStockData);
+   
     return (
         <ScrollView>
 
@@ -166,7 +166,7 @@ export default function PatternScannerScreen() {
             </View>
 
             <View>
-                <StockChart startDate={startDate} endDate={endDate} stockData={selectedStockData} patternResults={patternResults}/>
+                <StockChart startDate={startDate} endDate={endDate} stockData={selectedStockData} patternResults={patternResults} selectedStock={selectedStock} dateInterval={dateInterval}/>
             </View>
 
         </ScrollView>

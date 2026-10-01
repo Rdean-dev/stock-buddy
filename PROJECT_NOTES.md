@@ -254,24 +254,74 @@ Rough order:
 10. web layout
 ---
 
-Before I Stop Working
-
-Last worked on: Connecting selected stocks to live historical Alpha Vantage data.
+Before I Stop Working — Stock Buddy
+Last worked on:
+Building and styling the Pattern Scanner candlestick chart.
 Finished:
-- Stock search works with live Alpha Vantage data.
-- Selected stock flows from StockSearchbar → PatternScannerScreen.
-- Added selectedStockData state.
-- Added useEffect to fetch historical data when the selected stock changes.
-- Fixed async issue where a Promise was being passed into scanPatterns().
-- Scanner waits until historical data exists before running.
-- Reconnected TIME_SERIES_DAILY API.
-- Confirmed live AAPL historical data reaches the scanner.
-- Confirmed scanner successfully detected 7 Dojis from live AAPL data. 🎯
+- Created reusable StockChart component.
+- Integrated react-native-wagmi-charts.
+- Connected the chart to normalized Alpha Vantage candle data.
+- Chart responds to selected stock and selected date range.
+- Added responsive chart sizing using useWindowDimensions().
+- Added selected ticker symbol to chart header.
+- Added chart range controls:
+  - 1m
+  - 3m
+  - 6m
+  - 1Y
+- Connected range controls to existing dateInterval() behavior.
+- Added candlestick crosshair and tooltip.
+- Added interactive OHLC information:
+  - Open
+  - High
+  - Low
+  - Close
+- Confirmed PriceText values populate when a candle is selected with the crosshair.
+- Added interactive candle date using DatetimeText.
+- Created a separate inspection/footer section for date + OHLC information.
+- Added divider between chart and OHLC information.
+- Improved chart card styling:
+  - White card
+  - Rounded corners
+  - Shadow/elevation
+  - Better spacing
+  - Modernized ticker typography
+  - Muted OHLC labels
+- Tested WAGMI startup performance. Cold Expo Web startup is slower with the library, but chart functionality is working; no library change made yet.
+- Identified how pattern annotations will work conceptually:
+  - filteredArrayOfCandlestickObjects determines all candles displayed.
+  - patternResults determines which candles should be marked.
+  - Candle dates can be matched against pattern-result dates.
+Important architecture:
+Alpha Vantage stock data
+        ↓
+normalizeCandleData()
+        ↓
+normalized candle array
+        ↓
+     StockChart
+        ↓
+CandlestickChart.Provider
 
+Chart needs two different datasets/responsibilities:
+normalized candles → draw the chart
+patternResults      → annotate detected patterns
 
 Next time:
-- Add protection for Alpha Vantage responses missing "Time Series (Daily)".
-- Clean up temporary console logs/mock imports.
-- Continue responsive Pattern Scanner layout.
-- Then keep building toward the annotated chart.
-Do not redesign: The scanner pipeline is working. Build on it.
+Continue adding pattern detection markers to the candlestick chart.
+First problem to solve:
+patternResults
+{
+    Doji: [...],
+    Hammer: [...],
+    ...
+}
+
+Need to iterate through the pattern names/results and associate each match with its chart candle using:
+candle.date === patternMatch.date
+
+We stopped right before reviewing how Object.entries() can help iterate through patternResults.
+After that:
+- Decide how detected patterns should visually appear on candles.
+- Implement annotations/markers without changing the underlying candle data.
+- Then continue overall Pattern Scanner styling/responsiveness.

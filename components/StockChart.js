@@ -1,29 +1,166 @@
-//import {CandlestickChart} from 'react-native-wagmi-charts';
+import {CandlestickChart} from 'react-native-wagmi-charts';
 import normalizeCandleData from '../utils/normalizeCandleData';
 import { formatDateAsISODate } from '../utils/formatDate';
+import { StyleSheet, View, useWindowDimensions, Text, Pressable } from 'react-native';
 
 
-export default function StockChart({startDate, endDate, stockData, patternResults}) {
+export default function StockChart({startDate, endDate, stockData, patternResults, dateInterval,selectedStock}) {
     if (!stockData?.["Time Series (Daily)"] || !startDate || !endDate) {
         return null;
     }
 
     const filteredArrayOfCandlestickObjects = normalizeCandleData(stockData, formatDateAsISODate(startDate), formatDateAsISODate(endDate));
+    const { width } = useWindowDimensions();
+    const chartWidth = Math.min(width - 600, 1400);
 
     if (filteredArrayOfCandlestickObjects.length === 0) {
         return null;
     }
+
+
+    
     return (
-        <CandlestickChart.Provider data={filteredArrayOfCandlestickObjects}>
-            <CandlestickChart>
-                <CandlestickChart.Candles/>
-                <CandlestickChart.Crosshair/>
-            </CandlestickChart>
-            <CandlestickChart.PriceText type="open" />
-            <CandlestickChart.PriceText type="high" />
-            <CandlestickChart.PriceText type="low" />
-            <CandlestickChart.PriceText type="close" />
-            <CandlestickChart.DatetimeText />
-        </CandlestickChart.Provider>
+        <View style={[styles.chartContainer, {width: chartWidth}]}>
+            <Text style={styles.chartHeader}>{selectedStock.symbol}</Text>
+            <View style={styles.dateSection}>
+                <Pressable onPress={() => dateInterval(1)}>{({ hovered, pressed }) => (<View style={[styles.dateButton,(hovered || pressed) && styles.dateButtonActive]}><Text style={styles.dateText}>1m</Text></View>)}</Pressable>
+                <Pressable onPress={() => dateInterval(3)}>{({ hovered, pressed }) => (<View style={[styles.dateButton,(hovered || pressed) && styles.dateButtonActive]}><Text style={styles.dateText}>3m</Text></View>)}</Pressable>
+                <Pressable onPress={() => dateInterval(6)}>{({ hovered, pressed }) => (<View style={[styles.dateButton,(hovered || pressed) && styles.dateButtonActive]}><Text style={styles.dateText}>6m</Text></View>)}</Pressable>
+                <Pressable onPress={() => dateInterval(12)}>{({ hovered, pressed }) => (<View style={[styles.dateButton,(hovered || pressed) && styles.dateButtonActive]}><Text style={styles.dateText}>1Y</Text></View>)}</Pressable>
+            </View>
+            <CandlestickChart.Provider data={filteredArrayOfCandlestickObjects}>
+                <CandlestickChart width={chartWidth - 50} height={350} style={styles.chart}>
+                    <CandlestickChart.Candles/>
+                    <CandlestickChart.Crosshair>
+                        <CandlestickChart.Tooltip/>
+                    </CandlestickChart.Crosshair>
+                    
+                </CandlestickChart>
+                <View style={styles.inspectionSection}>
+
+                    <CandlestickChart.DatetimeText
+                        options={{
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                        }}
+                        style={styles.dateValue}
+                    />
+                    <View style={styles.priceRow}>
+                        <View style={styles.priceItem}>
+                            <Text style={styles.priceLabel}>Open</Text>
+                            <CandlestickChart.PriceText type="open" style={styles.priceValue}/>
+                        </View>
+
+                        <View style={styles.priceItem}>
+                            <Text style={styles.priceLabel}>High</Text>
+                            <CandlestickChart.PriceText type="high" style={styles.priceValue}/>
+                        </View>
+
+                        <View style={styles.priceItem}>
+                            <Text style={styles.priceLabel}>Low</Text>
+                            <CandlestickChart.PriceText type="low" style={styles.priceValue}/>
+                        </View>
+
+                        <View style={styles.priceItem}>
+                            <Text style={styles.priceLabel}>Close</Text>
+                            <CandlestickChart.PriceText type="close" style={styles.priceValue}/>
+                        </View>
+                    </View>
+                </View>
+                
+            </CandlestickChart.Provider >
+        </View>
+        
+       
     );
 }
+
+const styles = StyleSheet.create({
+    inspectionSection: {
+        width: '90%',
+        borderTopWidth: 1,
+        borderTopColor: '#e5e5e5',
+        paddingTop: 12,
+        marginTop: 10,
+    },
+
+    dateValue: {
+        fontSize: 13,
+        color: '#777',
+        marginBottom: 12,
+    },
+
+    dateSection:{
+        paddingHorizontal: 5,
+        paddingVertical: 6,
+        flexDirection: 'row',
+        gap: 20,
+        alignSelf: 'flex-start',
+
+    },
+    dateButton: {
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 6,
+    },
+
+    dateButtonActive: {
+        backgroundColor: '#eeeeee',
+    },
+
+    dateText: {
+        fontSize: 14,
+        fontWeight: '500',
+        color: '#555',
+    },
+
+    
+    chartContainer: {
+        alignSelf: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'white',
+        borderRadius: 12,
+        marginVertical: 30,
+        padding: 20,
+
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.12,
+        shadowRadius: 10,
+        elevation: 4,
+    },
+
+    chartHeader: {
+        alignSelf: 'flex-start',
+        fontSize: 28,
+        fontWeight: '700',
+        paddingBottom: 4,
+    },
+
+    priceRow: {
+        flexDirection: 'row',
+        width: '100%',
+    },
+    priceItem: {
+        alignItems: 'center',
+        flex: 1,
+    },
+
+    priceLabel: {
+        fontSize: 13,
+        color: '#777',
+        marginBottom: 4,
+    },
+
+    priceValue: {
+        width: '100%',
+        textAlign: 'center',
+        fontSize: 17,
+        fontWeight: '600',
+    },
+});
