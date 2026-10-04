@@ -254,74 +254,66 @@ Rough order:
 10. web layout
 ---
 
-Before I Stop Working — Stock Buddy
-Last worked on:
-Building and styling the Pattern Scanner candlestick chart.
-Finished:
-- Created reusable StockChart component.
-- Integrated react-native-wagmi-charts.
-- Connected the chart to normalized Alpha Vantage candle data.
-- Chart responds to selected stock and selected date range.
-- Added responsive chart sizing using useWindowDimensions().
-- Added selected ticker symbol to chart header.
-- Added chart range controls:
-  - 1m
-  - 3m
-  - 6m
-  - 1Y
-- Connected range controls to existing dateInterval() behavior.
-- Added candlestick crosshair and tooltip.
-- Added interactive OHLC information:
-  - Open
-  - High
-  - Low
-  - Close
-- Confirmed PriceText values populate when a candle is selected with the crosshair.
-- Added interactive candle date using DatetimeText.
-- Created a separate inspection/footer section for date + OHLC information.
-- Added divider between chart and OHLC information.
-- Improved chart card styling:
-  - White card
-  - Rounded corners
-  - Shadow/elevation
-  - Better spacing
-  - Modernized ticker typography
-  - Muted OHLC labels
-- Tested WAGMI startup performance. Cold Expo Web startup is slower with the library, but chart functionality is working; no library change made yet.
-- Identified how pattern annotations will work conceptually:
-  - filteredArrayOfCandlestickObjects determines all candles displayed.
-  - patternResults determines which candles should be marked.
-  - Candle dates can be matched against pattern-result dates.
-Important architecture:
-Alpha Vantage stock data
-        ↓
-normalizeCandleData()
-        ↓
-normalized candle array
-        ↓
-     StockChart
-        ↓
-CandlestickChart.Provider
+# Before I Stop Working — Stock Buddy
 
-Chart needs two different datasets/responsibilities:
-normalized candles → draw the chart
-patternResults      → annotate detected patterns
+## Last worked on
+Adding visual pattern annotations and a legend to the Pattern Scanner candlestick chart.
 
-Next time:
-Continue adding pattern detection markers to the candlestick chart.
-First problem to solve:
+## Finished
+- Fixed responsive chart sizing across desktop and smaller screen widths.
+- Added `patternAnnotationVisuals` configuration for all 15 supported candlestick patterns.
+- Each pattern now has an assigned color and marker shape.
+- Created reusable `Marker` component using `react-native-svg`.
+- Added SVG marker shapes:
+  - Circle
+  - Triangle
+  - Diamond
+  - Square
+  - Star
+- Connected detected patterns to their configured marker color and shape.
+- Pattern annotations now render the correct SVG marker above the corresponding candle.
+- Marker positioning continues to respond correctly when chart width changes.
+- Created `PatternLegend` component.
+- Legend maps through selected patterns and displays:
+  - Pattern marker
+  - Pattern name
+- Legend uses the same `patternAnnotationVisuals` configuration as chart annotations.
+- Legend wraps responsively across multiple rows.
+- Tested displaying all 15 patterns simultaneously.
+- Confirmed different pattern types can be visually identified directly on the chart.
+
+## Current annotation architecture
+
 patternResults
-{
-    Doji: [...],
-    Hammer: [...],
-    ...
-}
+↓
+match pattern dates to candle indexes
+↓
+calculate annotation X/Y positions
+↓
+patternAnnotationVisuals
+↓
+get pattern color + shape
+↓
+Marker
+↓
+SVG marker rendered above candle
 
-Need to iterate through the pattern names/results and associate each match with its chart candle using:
-candle.date === patternMatch.date
+The same `patternAnnotationVisuals` configuration is also used by `PatternLegend`, keeping chart markers and legend markers consistent.
 
-We stopped right before reviewing how Object.entries() can help iterate through patternResults.
-After that:
-- Decide how detected patterns should visually appear on candles.
-- Implement annotations/markers without changing the underlying candle data.
-- Then continue overall Pattern Scanner styling/responsiveness.
+## Next time
+- Handle multiple patterns detected on the same candle.
+  - Currently markers for patterns sharing a candle can overlap.
+  - This is a visualization/layout issue, not a pattern detection issue.
+  - Decide how multiple markers should be offset or stacked while remaining associated with the same candle.
+- Test overlapping annotations with different pattern combinations.
+- Review marker colors for readability and uniqueness.
+- Improve any markers that are difficult to distinguish against the white chart background.
+- Continue chart labeling:
+  - Y-axis price labels
+  - X-axis date labels
+- Continue responsive testing on web and Android.
+
+## Later polish
+- Fine-tune marker sizing and spacing.
+- Refine legend spacing/styling if needed.
+- Consider interaction with legend/markers later.

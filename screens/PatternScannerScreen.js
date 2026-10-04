@@ -166,7 +166,7 @@ export default function PatternScannerScreen() {
             </View>
 
             <View>
-                <StockChart startDate={startDate} endDate={endDate} stockData={selectedStockData} patternResults={patternResults} selectedStock={selectedStock} dateInterval={dateInterval}/>
+                <StockChart startDate={startDate} endDate={endDate} stockData={selectedStockData} patternResults={patternResults} selectedStock={selectedStock} dateInterval={dateInterval} selectedPatterns={selectedPatterns}/>
             </View>
 
         </ScrollView>
