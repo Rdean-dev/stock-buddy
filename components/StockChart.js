@@ -1,21 +1,76 @@
-import {CandlestickChart} from 'react-native-wagmi-charts';
+import {CandlestickChart, useCandlestickChart} from 'react-native-wagmi-charts';
 import normalizeCandleData from '../utils/normalizeCandleData';
 import { formatDateAsISODate } from '../utils/formatDate';
 import { StyleSheet, View, useWindowDimensions, Text, Pressable } from 'react-native';
 
+function PatternAnnotations({matchResults}) {
+    const {step, domain, data, height} = useCandlestickChart();
+
+    const annotationsArray = matchResults.map((match) => {
+        const candle = data[match.matchIndex];
+        const index = match.matchIndex ?? null;
+        const xPosition = step * index;
+        const maxPrice = domain[1];
+        const minPrice = domain[0];
+        const priceRange = maxPrice - minPrice;
+        const distanceFromTop = maxPrice - candle.high;
+
+        const percentageDownChart = distanceFromTop / priceRange;
+        const yPosition = percentageDownChart  * height;
+
+        return {date:match.date, pattern:match.pattern, matchIndex: match.matchIndex, xPosition, yPosition};
+
+    });
+
+    console.log("aaArray",annotationsArray);
+
+    return(
+        <View pointerEvents="none" style={styles.outerAnnotation}>
+            {annotationsArray.map((annotation) => (<View key={annotation.date} style={[styles.annotation, {left: annotation.xPosition, top: annotation.yPosition}]}/>))}
+        </View>
+    );
+
+    
+}
+
 
 export default function StockChart({startDate, endDate, stockData, patternResults, dateInterval,selectedStock}) {
+    
+    const { width } = useWindowDimensions();
+    
     if (!stockData?.["Time Series (Daily)"] || !startDate || !endDate) {
         return null;
     }
 
+
     const filteredArrayOfCandlestickObjects = normalizeCandleData(stockData, formatDateAsISODate(startDate), formatDateAsISODate(endDate));
-    const { width } = useWindowDimensions();
-    const chartWidth = Math.min(width - 600, 1400);
+    
+    const chartWidth = Math.min(Math.max(width - 600, 350), 1400);
+    
 
     if (filteredArrayOfCandlestickObjects.length === 0) {
         return null;
     }
+
+    const matchesArray = [];
+
+    for (const [patternName, matches] of Object.entries(patternResults ?? {}) ){
+        const mappedMatches = matches.map((match) => {
+            return {
+                date: match.date,
+                pattern: patternName,
+            };
+        });
+
+        matchesArray.push(...mappedMatches);
+    }
+    console.log("Matches Array", matchesArray);
+
+    const matchResults = matchesArray.map((match) =>{
+        const matchIndex = filteredArrayOfCandlestickObjects.findIndex((candle) => match.date === candle.date);
+        return {date:match.date, pattern:match.pattern, matchIndex};
+    });
+    console.log("Match Results", matchResults);
 
 
     
@@ -34,6 +89,7 @@ export default function StockChart({startDate, endDate, stockData, patternResult
                     <CandlestickChart.Crosshair>
                         <CandlestickChart.Tooltip/>
                     </CandlestickChart.Crosshair>
+                    <PatternAnnotations matchResults={matchResults}/>
                     
                 </CandlestickChart>
                 <View style={styles.inspectionSection}>
@@ -162,5 +218,19 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 17,
         fontWeight: '600',
+    },
+    annotation: {
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: 'blue',
+        position: 'absolute'
+    },
+    outerAnnotation: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0
     },
 });
