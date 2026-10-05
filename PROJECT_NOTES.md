@@ -257,63 +257,51 @@ Rough order:
 # Before I Stop Working — Stock Buddy
 
 ## Last worked on
-Adding visual pattern annotations and a legend to the Pattern Scanner candlestick chart.
+Improving Pattern Scanner chart annotations and adding a custom Y-axis.
 
 ## Finished
-- Fixed responsive chart sizing across desktop and smaller screen widths.
-- Added `patternAnnotationVisuals` configuration for all 15 supported candlestick patterns.
-- Each pattern now has an assigned color and marker shape.
-- Created reusable `Marker` component using `react-native-svg`.
-- Added SVG marker shapes:
-  - Circle
-  - Triangle
-  - Diamond
-  - Square
-  - Star
-- Connected detected patterns to their configured marker color and shape.
-- Pattern annotations now render the correct SVG marker above the corresponding candle.
-- Marker positioning continues to respond correctly when chart width changes.
-- Created `PatternLegend` component.
-- Legend maps through selected patterns and displays:
-  - Pattern marker
-  - Pattern name
-- Legend uses the same `patternAnnotationVisuals` configuration as chart annotations.
-- Legend wraps responsively across multiple rows.
-- Tested displaying all 15 patterns simultaneously.
-- Confirmed different pattern types can be visually identified directly on the chart.
+- Improved pattern annotation color palette for better contrast and readability.
+- Kept shared pattern visual configuration for both chart markers and legend.
+- Fixed overlapping annotations when multiple patterns are detected on the same candle.
+- Added date occurrence tracking using an object.
+- Multiple markers on the same candle now stack vertically instead of overlapping.
+- Added custom Y-axis using Wagmi's chart `domain`.
+- Y-axis dynamically calculates:
+  - Rounded minimum price
+  - Rounded maximum price
+  - Price range
+  - Five intervals / six price labels
+- Changed Y-axis generation to calculate exactly six ticks instead of relying on floating-point loop boundaries.
+- Y-axis displays prices from highest at the top to lowest at the bottom.
+- Price calculations remain numeric and `.toFixed(2)` is only used for display formatting.
+- Styled Y-axis labels and distributed them evenly across the 350px chart height.
+- Reserved dedicated width for the Y-axis so the chart and axis stay contained inside the chart card.
+- Y-axis automatically responds to Wagmi's current price domain.
 
-## Current annotation architecture
-
-patternResults
-↓
-match pattern dates to candle indexes
-↓
-calculate annotation X/Y positions
-↓
-patternAnnotationVisuals
-↓
-get pattern color + shape
-↓
-Marker
-↓
-SVG marker rendered above candle
-
-The same `patternAnnotationVisuals` configuration is also used by `PatternLegend`, keeping chart markers and legend markers consistent.
+## Current chart features
+- Responsive candlestick chart
+- Date-range presets: 1M / 3M / 6M / 1Y
+- Crosshair and tooltip
+- Interactive OHLC values
+- Interactive date
+- Pattern annotations
+- Multiple annotation shapes and colors
+- Overlapping-pattern stacking
+- Pattern legend
+- Dynamic Y-axis price labels
 
 ## Next time
-- Handle multiple patterns detected on the same candle.
-  - Currently markers for patterns sharing a candle can overlap.
-  - This is a visualization/layout issue, not a pattern detection issue.
-  - Decide how multiple markers should be offset or stacked while remaining associated with the same candle.
-- Test overlapping annotations with different pattern combinations.
-- Review marker colors for readability and uniqueness.
-- Improve any markers that are difficult to distinguish against the white chart background.
-- Continue chart labeling:
-  - Y-axis price labels
-  - X-axis date labels
-- Continue responsive testing on web and Android.
+- Build X-axis date labels.
+- Investigate Wagmi Crosshair/Tooltip behavior and determine whether the crosshair can be extended.
+- Test chart and custom axes across different:
+  - Stocks
+  - Price ranges
+  - Date ranges
+  - Screen widths
+- Test final chart behavior on physical Android.
 
 ## Later polish
-- Fine-tune marker sizing and spacing.
-- Refine legend spacing/styling if needed.
-- Consider interaction with legend/markers later.
+- Fine-tune annotations if needed after mobile testing.
+- Review axis spacing on smaller screens.
+- Remove development console logs.
+- General chart styling/responsive cleanup.

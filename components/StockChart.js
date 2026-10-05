@@ -6,71 +6,71 @@ import Svg, { Circle, Rect, Polygon } from 'react-native-svg';
 
 const patternAnnotationVisuals = {
     Doji: {
-        color: 'blue',
+        color: '#2563EB', // blue
         shape: 'circle',
     },
     Hammer: {
-        color: 'green',
+        color: '#059669', // emerald
         shape: 'triangle',
     },
     'Shooting Star': {
-        color: 'gold',
+        color: '#7C3AED', // violet
         shape: 'star'
     },
     'Inverted Hammer': {
-        color: 'orange',
+        color: '#EA580C', // burnt orange
         shape: 'circle'
     },
     'Hanging Man': {
-        color: 'blue',
+        color: '#0891B2', // cyan/teal
         shape: 'triangle'
     },
     'Bullish Engulfing': {
-        color: 'black',
+        color: '#16A34A', // strong green
         shape: 'square'
     },
     'Bearish Engulfing': {
-        color: 'green',
+        color: '#DC2626', // strong red
         shape: 'diamond'
     },
     'Bullish Harami': {
-        color: 'indigo',
+        color: '#4F46E5', // indigo
         shape: 'square'
     },
     'Bearish Harami': {
-        color: 'purple',
+        color: '#C026D3', // magenta
         shape: 'triangle'
     },
     'Piercing Line': {
-        color: 'purple',
+        color: '#0D9488', // teal
         shape: 'diamond'
     },
     'Dark Cloud Cover': {
-        color: 'black',
+        color: '#475569', // slate
         shape: 'circle'
     },
     'Morning Star': {
-        color: 'yellow',
+        color: '#D97706', // amber
         shape: 'star'
     },
     'Evening Star': {
-        color: 'navy',
+        color: '#9333EA', // purple
         shape: 'star'
     },
-
     'Three White Soldiers': {
-        color: 'gray',
+        color: '#64748B', // blue-gray
         shape: 'diamond'
     },
     'Three Black Crows': {
-        color: 'black',
+        color: '#1E293B', // dark slate
         shape: 'diamond'
     }
 };
 
 function PatternAnnotations({matchResults}) {
     const {step, domain, data, height} = useCandlestickChart();
-
+    console.log('domain: ', domain);
+    const countOfDatesSeen = {};
     const annotationsArray = matchResults.map((match) => {
         const candle = data[match.matchIndex];
         const index = match.matchIndex ?? null;
@@ -79,11 +79,21 @@ function PatternAnnotations({matchResults}) {
         const minPrice = domain[0];
         const priceRange = maxPrice - minPrice;
         const distanceFromTop = maxPrice - candle.high;
-
         const percentageDownChart = distanceFromTop / priceRange;
-        const yPosition = (percentageDownChart  * height) - 15;
 
-        return {date:match.date, pattern:match.pattern, matchIndex: match.matchIndex, xPosition, yPosition};
+        const yPosition = (percentageDownChart  * height) - 15;
+        let finalYPosition = yPosition;
+        const markerSpacing = -15;
+
+        if (match.date in countOfDatesSeen) {
+            finalYPosition = yPosition + (markerSpacing * countOfDatesSeen[match.date])
+            countOfDatesSeen[match.date] += 1;
+        }else{
+            countOfDatesSeen[match.date] = 1;
+        }
+
+
+        return {date:match.date, pattern:match.pattern, matchIndex: match.matchIndex, xPosition, yPosition: finalYPosition};
 
     });
 
@@ -149,6 +159,39 @@ function PatternLegend({selectedPatterns}) {
     );
 }
 
+function YAxis() {
+    const yAxisArray = [];
+    const {domain} = useCandlestickChart();
+    const maxPrice = Math.ceil(domain[1]);
+    const minPrice = Math.floor(domain[0]);
+
+    const range = maxPrice - minPrice;
+    const interval = Math.ceil(range / 5);
+
+    for (let i = 0; i <= 5; i++) {
+        const axisNumber = maxPrice - (interval * i);
+        yAxisArray.push(axisNumber);
+    }
+
+    console.log("Axis Array",yAxisArray);
+
+    return(
+        <View style={styles.yAxis}>
+            {yAxisArray.map((axisNumber, index) => (
+                <Text 
+                    key={index}
+                    style={styles.yAxisLabel}
+                >
+                    {axisNumber.toFixed(2)}
+                </Text>
+            ))}
+        </View>
+    );
+
+
+
+}
+
 
 export default function StockChart({startDate, endDate, stockData, patternResults, dateInterval,selectedStock, selectedPatterns}) {
     
@@ -164,9 +207,10 @@ export default function StockChart({startDate, endDate, stockData, patternResult
     
     const screenPadding = 32;
     const maxChartWidth = 1000;
+    const yAxisWidth = 60;
 
     const chartWidth = Math.min(width - screenPadding, maxChartWidth);
-    const candleChartWidth = chartWidth - 40;
+    const candleChartWidth = chartWidth - 40 - yAxisWidth;
     
 
     if (filteredArrayOfCandlestickObjects.length === 0) {
@@ -205,14 +249,18 @@ export default function StockChart({startDate, endDate, stockData, patternResult
                 <Pressable onPress={() => dateInterval(12)}>{({ hovered, pressed }) => (<View style={[styles.dateButton,(hovered || pressed) && styles.dateButtonActive]}><Text style={styles.dateText}>1Y</Text></View>)}</Pressable>
             </View>
             <CandlestickChart.Provider data={filteredArrayOfCandlestickObjects}>
+            <View style={styles.chartStyle}>
                 <CandlestickChart width={candleChartWidth} height={350} style={styles.chart}>
                     <CandlestickChart.Candles/>
                     <CandlestickChart.Crosshair>
                         <CandlestickChart.Tooltip/>
                     </CandlestickChart.Crosshair>
                     <PatternAnnotations matchResults={matchResults}/>
-                    
                 </CandlestickChart>
+                
+                <YAxis />
+                
+            </View>
                 <View style={styles.inspectionSection}>
 
                     <CandlestickChart.DatetimeText
@@ -297,6 +345,9 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         color: '#555',
     },
+    chartStyle: {
+        flexDirection: 'row',
+    },
 
     
     chartContainer: {
@@ -327,6 +378,7 @@ const styles = StyleSheet.create({
     priceRow: {
         flexDirection: 'row',
         width: '100%',
+        marginBottom: 20
     },
     priceItem: {
         alignItems: 'center',
@@ -368,5 +420,17 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         gap: 20,
 
+    },
+    yAxis: {
+        width: 60,
+        height: 350,
+        justifyContent: 'space-between',
+        paddingLeft: 8,
+    },
+
+    yAxisLabel: {
+        fontSize: 12,
+        color: '#777',
+        textAlign: 'right',
     },
 });
