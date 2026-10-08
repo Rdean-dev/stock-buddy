@@ -256,52 +256,58 @@ Rough order:
 
 # Before I Stop Working — Stock Buddy
 
-## Last worked on
-Improving Pattern Scanner chart annotations and adding a custom Y-axis.
+**Date:** October 8, 2026
 
-## Finished
-- Improved pattern annotation color palette for better contrast and readability.
-- Kept shared pattern visual configuration for both chart markers and legend.
-- Fixed overlapping annotations when multiple patterns are detected on the same candle.
-- Added date occurrence tracking using an object.
-- Multiple markers on the same candle now stack vertically instead of overlapping.
-- Added custom Y-axis using Wagmi's chart `domain`.
-- Y-axis dynamically calculates:
-  - Rounded minimum price
-  - Rounded maximum price
-  - Price range
-  - Five intervals / six price labels
-- Changed Y-axis generation to calculate exactly six ticks instead of relying on floating-point loop boundaries.
-- Y-axis displays prices from highest at the top to lowest at the bottom.
-- Price calculations remain numeric and `.toFixed(2)` is only used for display formatting.
-- Styled Y-axis labels and distributed them evenly across the 350px chart height.
-- Reserved dedicated width for the Y-axis so the chart and axis stay contained inside the chart card.
-- Y-axis automatically responds to Wagmi's current price domain.
+## Last Worked On
+Improving the Pattern Scanner UI to match the desktop and mobile mockup, focusing on date-range controls and pattern selection.
 
-## Current chart features
-- Responsive candlestick chart
-- Date-range presets: 1M / 3M / 6M / 1Y
-- Crosshair and tooltip
-- Interactive OHLC values
-- Interactive date
-- Pattern annotations
-- Multiple annotation shapes and colors
-- Overlapping-pattern stacking
-- Pattern legend
-- Dynamic Y-axis price labels
+## Completed
 
-## Next time
-- Build X-axis date labels.
-- Investigate Wagmi Crosshair/Tooltip behavior and determine whether the crosshair can be extended.
-- Test chart and custom axes across different:
-  - Stocks
-  - Price ranges
-  - Date ranges
-  - Screen widths
-- Test final chart behavior on physical Android.
+### Date Range Presets
+- Created a `datePresets` array for 1M, 3M, 6M, and 1Y.
+- Rendered preset buttons dynamically using `.map()`.
+- Added active and hover styling.
+- Connected buttons to the existing `dateInterval()` function.
+- Updated manual date selection to clear the active preset.
+- Adjusted spacing to create a compact, left-aligned layout.
 
-## Later polish
-- Fine-tune annotations if needed after mobile testing.
-- Review axis spacing on smaller screens.
-- Remove development console logs.
-- General chart styling/responsive cleanup.
+### Pattern Selection Dropdown
+- Updated `MultiSelect` styling, including borders, colors, typography, and spacing.
+- Customized dropdown options using `renderItem`.
+- Added pattern-specific colored markers beside pattern names.
+- Confirmed markers display correctly in the dropdown.
+
+### Reusable Components
+- Extracted `Marker` for reuse outside the chart.
+- Separated `patternAnnotationVisuals` into shared configuration.
+- Reused the existing shape and color definitions instead of duplicating them.
+
+### Selected Pattern Chips
+- Developed a custom `renderSelectedItem` implementation.
+- Designed chips with a white background, subtle border, pattern marker, label, and remove button.
+- Used the library's `unSelect` callback for individual pattern removal.
+
+*Note: Final implementation and testing of the selected chips were not explicitly confirmed.*
+
+## Concepts Practiced
+- Component reusability and separation of responsibilities.
+- Sharing configuration across UI components.
+- Custom rendering through library callbacks.
+- Conditional styling and interactive states.
+- React Native flexbox layouts.
+
+## Next Session
+
+**Priority: Finish the Pattern Scanner UI styling.**
+
+1. Verify selected chips render and can be removed correctly.
+2. Confirm the chart legend still works after extracting `Marker`.
+3. Update Start Date and End Date typography to match the rest of the interface.
+4. Style `PatternCard` components to match the mockup.
+5. Review mobile responsiveness after the styling changes.
+
+## Current Status
+
+The Pattern Scanner's date controls and pattern dropdown have received significant visual improvements. Pattern markers are now reusable across the interface.
+
+**Next focus:** Pattern result cards and final UI consistency.

@@ -12,7 +12,6 @@ export async function searchStocksData(searchKeyword) {
         //const response = await fetch(apiUrl);
 
         //const data = await response.json();
-        console.log("Alpha Vantage response:", data);
         const filteredArrayOfMatches = data["bestMatches"].map((matchEntry) => {
             return {symbol: matchEntry["1. symbol"], name: matchEntry["2. name"]}
         });
@@ -36,7 +35,7 @@ export async function getStockData(company) {
         //const response = await fetch(apiUrl);
 
         //const data = await response.json();
-        console.log("Alpha Vantage stock response:", datas);
+        
 
         if (datas["Time Series (Daily)"]){
             return datas;

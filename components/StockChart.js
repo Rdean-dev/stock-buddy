@@ -1,75 +1,14 @@
 import {CandlestickChart, useCandlestickChart} from 'react-native-wagmi-charts';
 import normalizeCandleData from '../utils/normalizeCandleData';
-import { formatDateAsISODate } from '../utils/formatDate';
+import { formatDateAsISODate, formatDisplayDate} from '../utils/formatDate';
 import { StyleSheet, View, useWindowDimensions, Text, Pressable } from 'react-native';
-import Svg, { Circle, Rect, Polygon } from 'react-native-svg';
+import  Marker  from "../components/Marker";
+import { patternAnnotationVisuals } from "../constants/patternAnnotationVisuals";
 
-const patternAnnotationVisuals = {
-    Doji: {
-        color: '#2563EB', // blue
-        shape: 'circle',
-    },
-    Hammer: {
-        color: '#059669', // emerald
-        shape: 'triangle',
-    },
-    'Shooting Star': {
-        color: '#7C3AED', // violet
-        shape: 'star'
-    },
-    'Inverted Hammer': {
-        color: '#EA580C', // burnt orange
-        shape: 'circle'
-    },
-    'Hanging Man': {
-        color: '#0891B2', // cyan/teal
-        shape: 'triangle'
-    },
-    'Bullish Engulfing': {
-        color: '#16A34A', // strong green
-        shape: 'square'
-    },
-    'Bearish Engulfing': {
-        color: '#DC2626', // strong red
-        shape: 'diamond'
-    },
-    'Bullish Harami': {
-        color: '#4F46E5', // indigo
-        shape: 'square'
-    },
-    'Bearish Harami': {
-        color: '#C026D3', // magenta
-        shape: 'triangle'
-    },
-    'Piercing Line': {
-        color: '#0D9488', // teal
-        shape: 'diamond'
-    },
-    'Dark Cloud Cover': {
-        color: '#475569', // slate
-        shape: 'circle'
-    },
-    'Morning Star': {
-        color: '#D97706', // amber
-        shape: 'star'
-    },
-    'Evening Star': {
-        color: '#9333EA', // purple
-        shape: 'star'
-    },
-    'Three White Soldiers': {
-        color: '#64748B', // blue-gray
-        shape: 'diamond'
-    },
-    'Three Black Crows': {
-        color: '#1E293B', // dark slate
-        shape: 'diamond'
-    }
-};
 
 function PatternAnnotations({matchResults}) {
     const {step, domain, data, height} = useCandlestickChart();
-    console.log('domain: ', domain);
+    
     const countOfDatesSeen = {};
     const annotationsArray = matchResults.map((match) => {
         const candle = data[match.matchIndex];
@@ -97,7 +36,7 @@ function PatternAnnotations({matchResults}) {
 
     });
 
-    console.log("aaArray",annotationsArray);
+    
 
     return(
         <View pointerEvents="none" style={styles.outerAnnotation}>
@@ -108,48 +47,7 @@ function PatternAnnotations({matchResults}) {
     
 }
 
-function Marker({shape, color}) {
-    if (shape === 'circle'){
-        return (
-            <Svg height="10" width="10">
-                <Circle cx='5' cy='5' r='5' fill={color}/>
-            </Svg>
-        )
-    }else if(shape === 'triangle'){
-        return (
-            <Svg height="10" width="10">
-                <Polygon points="5,0 10,10 0,10" fill={color}/>
-            </Svg>
 
-        )
-    }else if(shape === 'diamond'){
-    return (
-        <Svg height="10" width="10">
-            <Polygon points="5,0 0,5 5,10 10,5" fill={color}/>
-        </Svg>
-
-    )
-    }else if(shape === 'square'){
-    return (
-        <Svg height="10" width="10">
-            <Rect x='0' y="0" width='10' height='10' fill={color}/>
-        </Svg>
-
-    )
-    }else if(shape === 'star'){
-    return (
-        <Svg height="10" width="10">
-            <Polygon
-                points="5,0 6.2,3.5 10,3.5 7,5.8 8.2,10 5,7.5 1.8,10 3,5.8 0,3.5 3.8,3.5"
-                fill={color}/>
-        </Svg>
-
-    )
-    }else{
-        return null
-    }
-
-}
 
 function PatternLegend({selectedPatterns}) {
     return(
@@ -173,8 +71,6 @@ function YAxis() {
         yAxisArray.push(axisNumber);
     }
 
-    console.log("Axis Array",yAxisArray);
-
     return(
         <View style={styles.yAxis}>
             {yAxisArray.map((axisNumber, index) => (
@@ -189,6 +85,48 @@ function YAxis() {
     );
 
 
+
+}
+
+function XAxis({candlestickData, width}) {
+    const {step, data} = useCandlestickChart();
+    const labelWidth = 50;
+    
+    const xAxisArray = [];
+    const xAxisLabels = candlestickData.map(candle => {
+        const date = new Date(candle.date);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC',});
+    });
+
+    
+
+    if (candlestickData.length > 30){
+        const interval = (candlestickData.length - 1) / 5
+        for (let i = 0; i <= 5; i ++) {
+            const index = Math.round(i * interval);
+            xAxisArray.push({label: xAxisLabels[index], candleIndex: index});
+            
+        }
+    }else{
+        xAxisArray.push(...xAxisLabels.map((label, index) => (
+            {label, candleIndex: index}
+        )));
+    }
+    return(
+        <View style={[styles.xAxis,{width}, {padding: 20}]}>
+            {xAxisArray.map((label) => {
+                const xPosition = step * label.candleIndex + step / 2;
+                return (
+                    <Text 
+                        key={label.candleIndex}
+                        style={[styles.xAxisLabel, {position: 'absolute', left: xPosition - labelWidth / 2, width: labelWidth, textAlign: 'center',}]}
+                    >
+                        {label.label}
+                    </Text>
+                );
+            })}
+        </View>
+    );
 
 }
 
@@ -229,13 +167,12 @@ export default function StockChart({startDate, endDate, stockData, patternResult
 
         matchesArray.push(...mappedMatches);
     }
-    console.log("Matches Array", matchesArray);
-
+    
     const matchResults = matchesArray.map((match) =>{
         const matchIndex = filteredArrayOfCandlestickObjects.findIndex((candle) => match.date === candle.date);
         return {date:match.date, pattern:match.pattern, matchIndex};
     });
-    console.log("Match Results", matchResults);
+
 
 
     
@@ -250,13 +187,18 @@ export default function StockChart({startDate, endDate, stockData, patternResult
             </View>
             <CandlestickChart.Provider data={filteredArrayOfCandlestickObjects}>
             <View style={styles.chartStyle}>
-                <CandlestickChart width={candleChartWidth} height={350} style={styles.chart}>
-                    <CandlestickChart.Candles/>
-                    <CandlestickChart.Crosshair>
-                        <CandlestickChart.Tooltip/>
-                    </CandlestickChart.Crosshair>
-                    <PatternAnnotations matchResults={matchResults}/>
-                </CandlestickChart>
+                <View style={{flexDirection: 'column'}}>
+                    <CandlestickChart width={candleChartWidth} height={350} style={styles.chart}>
+                        <CandlestickChart.Candles/>
+                        <CandlestickChart.Crosshair>
+                            <CandlestickChart.Tooltip/>
+                        </CandlestickChart.Crosshair>
+                        <PatternAnnotations matchResults={matchResults}/>
+                    </CandlestickChart>
+                    
+                    <XAxis candlestickData={filteredArrayOfCandlestickObjects}  width={candleChartWidth}/>
+                    
+                </View>
                 
                 <YAxis />
                 
@@ -432,5 +374,15 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: '#777',
         textAlign: 'right',
+    },
+
+    xAxisLabel: {
+        fontSize: 12,
+        color: '#777',
+    },
+    xAxis: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        height: 25,
     },
 });

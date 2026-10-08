@@ -97,7 +97,6 @@ export default function scanPatterns (startDate, endDate, selectedPatterns, stoc
         });
     });
 
-    console.log(results);
     return results;
     
     

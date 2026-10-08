@@ -56,6 +56,8 @@ const styles = StyleSheet.create({
     dateRow: {
         flexDirection: 'row',
         gap: 16,
+        paddingTop: 20,
+        
     },                                                                                                                        
 
     title:{

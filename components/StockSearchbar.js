@@ -16,7 +16,7 @@ export default function StockSearchbar({selectedStock, onSelectedStockChange}){
         const timer =  setTimeout(async () => {
             const results = await searchStocksData(searchQuery)
             setSearchResults(results);
-            console.log(results);
+            
         }, 500);
 
         return () => {
@@ -24,7 +24,7 @@ export default function StockSearchbar({selectedStock, onSelectedStockChange}){
         };
     }, [searchQuery]);
 
-    console.log("searchResults:", searchResults);
+    
     return(
         <View>
             <Searchbar
