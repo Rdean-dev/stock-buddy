@@ -44,14 +44,14 @@ export default function DateRangePicker({startDate, endDate, onStartDateChange, 
 
 
     return(
-        <div style={styles.dateRow}>
-            <div style={styles.dateSection}>
-                <label htmlFor='startDate' style={styles.title}>Start Date</label>
-                <Pressable><input id='startDate' type="date" style={styles.date} onChange={handleStartDateChange} value={formatDateAsISODate(startDate)} max={(endDate) ? formatDateAsISODate(endDate) : ""}/></Pressable>
+        <div style={dateRow}>
+            <div style={dateSection}>
+                <label htmlFor='startDate' style={title}>Start date</label>
+                <input id='startDate' type="date" style={date} onChange={handleStartDateChange} value={formatDateAsISODate(startDate)} max={(endDate) ? formatDateAsISODate(endDate) : ""}/>
             </div>
-            <div style={styles.dateSection}>
-                <label htmlFor='endDate' style={styles.title}>End Date</label>
-                <input id='endDate' type='date' style={styles.date} onChange={handleEndDateChange} value={formatDateAsISODate(endDate)} min={(startDate) ? formatDateAsISODate(startDate) : ""}/>
+            <div style={dateSection}>
+                <label htmlFor='endDate' style={title}>End date</label>
+                <input id='endDate' type='date' style={date} onChange={handleEndDateChange} value={formatDateAsISODate(endDate)} min={(startDate) ? formatDateAsISODate(startDate) : ""}/>
             </div>   
         </div>
         
@@ -61,34 +61,45 @@ export default function DateRangePicker({startDate, endDate, onStartDateChange, 
 
 }
 
-const styles = StyleSheet.create({
 
-    dateRow: {
+
+    const dateRow: React.CSSProperties = {
         display: 'flex',
         flexDirection: 'row',
-        gap: 16,
-    },
+        width: '100%',
+        gap: 20,
+    };
 
-    title:{
-        fontSize: 25
-    },
+    const title: React.CSSProperties = {
+        fontSize: 14,
+        lineHeight: '20px',
+        fontFamily: 'Arial, sans-serif',
+        fontWeight: 400,
+        color: '#475569',
 
-    dateSection: {
+    };
+
+    const dateSection: React.CSSProperties = {
         display: 'flex',
         flexDirection: "column",
         flex: 1,
         gap: 6,
-    },
+        minWidth: 0,
+    };
     
-    date: {
-        backgroundColor: 'white',
-        borderWidth: 2,
+    const date: React.CSSProperties = {
+        boxSizing: 'border-box',
+        backgroundColor: '#ffffff',
+        borderWidth: 1,
         borderStyle: 'solid',
-        borderColor: 'blue',
-        padding: 8,
-        borderRadius: 6,
-        height: 20,
-        width: 200,
+        borderColor: '#D9E1EA',
+        padding: '0 12px',
+        borderRadius: 8,
+        height: 48,
+        width: '100%',
+        minWidth: 0,
+        fontFamily: 'Arial, sans-serif',
+        fontSize: 14,
+        color: '#0F172A',
 
-    },
-});
+    };

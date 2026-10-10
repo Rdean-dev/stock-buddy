@@ -4,7 +4,7 @@ import { Searchbar } from "react-native-paper";
 import {Pressable, StyleSheet, View, Text} from "react-native";
 import { searchStocksData } from "../services/stockService";
 
-export default function StockSearchbar({onSelectedStockChange, variant, placeholder}){
+export default function StockSearchbar({onSelectedStockChange, variant, placeholder, style, inputStyle}){
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
 
@@ -27,16 +27,20 @@ export default function StockSearchbar({onSelectedStockChange, variant, placehol
     console.log('Search Result', searchResults)
     
     return(
-        <View>
+        <View style={{alignSelf: 'stretch'}}>
             <Searchbar
                 placeholder={placeholder}
                 onChangeText={setSearchQuery}
                 value={searchQuery}
-                style={[styles.searchbarStyle, variant === 'global' ? styles.globalStyle : styles.scannerStyle]}
-                inputStyle={{fontSize: 16, fontWeight: 400, color: '#0F172A'}}
+                placeholderTextColor= '#64748B'
+                iconColor='#475569'
+                iconSize='20'
+                elevation='0'
+                style={[styles.searchbarStyle, variant === 'global' ? styles.globalStyle : styles.scannerStyle, style]}
+                inputStyle={[variant === 'global' ? styles.globalInputStyle : styles.scannerInputStyle, { fontWeight: '400', color: '#0F172A' }, inputStyle]}
                 
             />
-            <View style={styles.searchResultsStyle}>
+            <View style={[styles.searchResultsStyle, {top: variant === 'global' ? 46 : 60}]}>
                 {searchResults.length > 0 && searchResults.map((result) => (
                     <Pressable key={result.symbol} 
                         onPress={() => {onSelectedStockChange(result);  setSearchResults([]);} }>
@@ -60,15 +64,13 @@ const styles = StyleSheet.create({
         width: 400,
         height: 60,
         borderRadius: 10,
-        marginTop: 8,
+        
     },
     searchResultsStyle:{
         position: 'absolute',
-        top: 70,
         left: 0, 
-        width: 400,
+        width: '100%',
         zIndex: 1,
-        flex: 1,
     },
     searchResultItem:{
         backgroundColor: "white",
@@ -93,15 +95,30 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     globalStyle:{
-        backgroundColor: "#F1F5F9",
-        borderRadius: 12,
-
+        backgroundColor: "#FFFFFF",
+        width: 280,
+        height: 46,
+        borderWidth: 1,
+        borderColor: '#D9E1EA',
+        borderRadius: 9,
+        minHeight: 0,
     },
     scannerStyle:{
         backgroundColor: "#FFFFFF",
         borderWidth: 1,
         borderColor: '#CBD5E1',
         borderRadius: 8,
+    },
+
+    globalInputStyle:{
+        fontSize:14,
+        minHeight: 0,
+        height: 46,
+        paddingVertical: 0,
+    },
+    
+    scannerInputStyle:{
+        fontSize:16,
     },
 
 });

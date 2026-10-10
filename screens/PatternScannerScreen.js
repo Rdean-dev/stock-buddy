@@ -134,7 +134,7 @@ export default function PatternScannerScreen() {
     }
    
 
-    const patternResults = startDate && endDate && selectedStockData? scanPatterns(formatDate(startDate), formatDate(endDate), selectedPatterns, selectedStockData) : {};
+    const patternResults = () => (startDate && endDate && selectedStockData? scanPatterns(formatDate(startDate), formatDate(endDate), selectedPatterns, selectedStockData) : {});
     
     const patternData = Object.entries(patternResults).map(([patternName, candles]) => {
         const patternMatchDates = candles.map((candle) => formatDisplayDate(candle.date));
@@ -149,63 +149,75 @@ export default function PatternScannerScreen() {
    
     return (
         <ScrollView>
-            <Text style={{fontSize: 16, fontWeight: 400, color: '#64748B',}}>Explore candlestick patterns in historical stock data</Text>
-            <View style={[styles.startingRow, {flexDirection: isMobile ? 'column': 'row', paddingHorizontal: isMobile ? 16: 50}]}>
-                <View style={{flexDirection: 'column'}}>
-                    <Text style={styles.sectionTitle}>Stock to Analyze</Text>
-                    <StockSearchbar onSelectedStockChange={setSelectedStock} variant="scanner" placeholder='Select a stock to scan'/>
-                </View>
-                <View style={{flexDirection: 'column',}}>
-                    <DateRangePicker startDate={startDate} endDate={endDate} onStartDateChange={handleStartDateChange} onEndDateChange={handleEndDateChange}/>
-                    <View style={styles.dateSection}>
-                        {datePresets.map((preset) => {
-                            const isSelected = selectedInterval === preset.months;
-                            return (<Pressable 
-                                key={preset.months}  
-                                onPress={() => dateInterval(preset.months)} 
-                                style={({hovered}) => [styles.dateButton, isSelected ? styles.dateButtonActive : styles.dateButtonBackground, hovered && !isSelected && styles.dateButtonHovered]}>
-                                {({ hovered}) => (<Text style={[isSelected ? styles.dateTextActive : styles.dateText, hovered && !isSelected && {color: '#1D4ED8'}]}>{preset.label}</Text>)}
-                            </Pressable>
-                            )
-                        })}
-                    </View>
-                    <Text>{dateError}</Text>
-                </View>
-                <View style={{flexDirection: 'column'}}>
-                    <MultiSelect data={availablePatterns} 
-                        labelField="label"  
-                        valueField="value" value={selectedPatterns} 
-                        onChange={(selected) => setSelectedPatterns(selected)}
-                        mode="auto"
-                        placeholder="Select Pattern(s)"
-                        placeholderStyle={styles.placeholderStyle}
-                        style={styles.containerStyle}
-                        itemContainerStyle={{padding: 5}}
-                        selectedTextStyle={styles.selectedTextStyle}
-                        selectedStyle={styles.selectedStyle}
-                        renderItem={(pattern) => (
-                            <View style={{flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 8, paddingHorizontal: 10}}>
-                                <Marker shape={patternAnnotationVisuals[pattern.value].shape} color={patternAnnotationVisuals[pattern.value].color}/><Text style={styles.dropdownTextStyle}>{pattern.label}</Text>
-                            </View>
-                            )}
-                        renderSelectedItem={(pattern, unSelect) => (
-                            <View style={styles.selectedChip}>
-                                <Marker
-                                    shape={patternAnnotationVisuals[pattern.value].shape}
-                                    color={patternAnnotationVisuals[pattern.value].color}
-                                />
-
-                                <Text style={styles.selectedChipText}>
-                                    {pattern.label}
-                                </Text>
-
-                                <Pressable onPress={() => unSelect(pattern)}>
-                                    <Text style={styles.removeChip}>x</Text>
+            <Text style={{lineHeight: 22, fontSize: 16, fontWeight: 400, color: '#64748B', paddingHorizontal: 24, paddingTop: 0, paddingBottom: 20,}}>{!isMobile && 'Explore candlestick patterns in historical stock data.'}</Text>
+            <View style={styles.card}>
+                <Text style={styles.heading}>Scan settings</Text>
+                <View style={[styles.startingRow, {flexDirection: isMobile ? 'column': 'row',}]}>
+                    
+                    <View style={{flexDirection: 'column', flex: 1, minWidth: 0,}}>
+                        <Text style={styles.fieldLabel}>Stock to analyze</Text>
+                        <StockSearchbar onSelectedStockChange={setSelectedStock} variant="scanner" placeholder='Select a stock to scan' style={{width: '100%', height: 48, borderRadius: 8, borderColor: '#D9E1EA'}} inputStyle={{fontSize: 14, height: 48, minHeight: 0, paddingVertical: 0}}/>
+                        <View style={styles.dateSection}>
+                            {datePresets.map((preset) => {
+                                const isSelected = selectedInterval === preset.months;
+                                return (<Pressable 
+                                    key={preset.months}  
+                                    onPress={() => dateInterval(preset.months)} 
+                                    style={({hovered}) => [styles.dateButton, isSelected ? styles.dateButtonActive : styles.dateButtonBackground, hovered && !isSelected && styles.dateButtonHovered]}>
+                                    {({ hovered}) => (<Text style={[isSelected ? styles.dateTextActive : styles.dateText, hovered && !isSelected && {color: '#1D4ED8'}]}>{preset.label}</Text>)}
                                 </Pressable>
-                            </View>
-                        )}
-                    />
+                                )
+                            })}
+                        </View>
+                    </View>
+                    <View style={{flexDirection: 'column',flex: 2, minWidth: 0,}}>
+                        <DateRangePicker startDate={startDate} endDate={endDate} onStartDateChange={handleStartDateChange} onEndDateChange={handleEndDateChange}/>
+                        <Text>{dateError}</Text>
+                    </View>
+            
+                    <View style={{flexDirection: 'column', flex: 1, minWidth: 0,}}>
+                        <Text style={styles.fieldLabel}>Patterns</Text>
+                        <MultiSelect data={availablePatterns} 
+                            labelField="label"  
+                            valueField="value" value={selectedPatterns} 
+                            onChange={(selected) => setSelectedPatterns(selected)}
+                            mode="auto"
+                            placeholder={selectedPatterns?.length > 0 ? `${selectedPatterns.length} pattern(s) selected` : "Select Patterns"}
+                            placeholderStyle={styles.placeholderStyle}
+                            style={styles.containerStyle}
+                            itemContainerStyle={{padding: 5}}
+                            selectedTextStyle={styles.selectedTextStyle}
+                            selectedStyle={styles.selectedStyle}
+                            renderItem={(pattern) => (
+                                <View style={{flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 8, paddingHorizontal: 10}}>
+                                    <Marker shape={patternAnnotationVisuals[pattern.value].shape} color={patternAnnotationVisuals[pattern.value].color}/><Text style={styles.dropdownTextStyle}>{pattern.label}</Text>
+                                </View>
+                                )}
+                            renderSelectedItem={(pattern, unSelect) => (
+                                <View style={styles.selectedChip}>
+                                    <Marker
+                                        shape={patternAnnotationVisuals[pattern.value].shape}
+                                        color={patternAnnotationVisuals[pattern.value].color}
+                                    />
+
+                                    <Text style={styles.selectedChipText}>
+                                        {pattern.label}
+                                    </Text>
+
+                                    <Pressable onPress={() => unSelect(pattern)}>
+                                        <Text style={styles.removeChip}>x</Text>
+                                    </Pressable>
+                                </View>
+                            )}
+                        />
+
+                    </View>
                 </View>
+                <Pressable onPress={() => patternResults} style={styles.scanButton}>
+                    <Text style={{fontSize: 15, fontWeight: '600', color: '#FFFFFF'}}>
+                        Scan Patterns
+                    </Text>
+                </Pressable>
             </View>
             <View>
                 {patternData.map((pattern) => (
@@ -223,50 +235,83 @@ export default function PatternScannerScreen() {
 }
 
 const styles = StyleSheet.create({
+    card: {
+        marginHorizontal: 24,
+        padding: 24,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 14,
+        borderWidth: 1,
+        borderColor: '#E2E8F0',
+
+    },
+    heading: {
+        fontSize: 23,
+        lineHeight: 26,
+        fontWeight: 700,
+        color: '#0F172A',
+        marginBottom: 20,
+    },
     startingRow:{
-        justifyContent: 'space-evenly',
+        justifyContent: 'flex-start',
         zIndex: 1,
-        paddingVertical: 30,
-        },
+        alignItems: 'flex-start',
+        gap: 20,
+    },
+    fieldLabel:{
+        fontSize: 14,
+        lineHeight: 20,
+        fontWeight: 400,
+        color: '#475569',
+        marginBottom: 6,
+        fontFamily: 'Arial',
+    },
     dateSection:{
+        width: '100%',
         paddingHorizontal: 0,
-        paddingVertical: 8,
+        paddingVertical: 0,
+        marginTop: 12,
         flexDirection: 'row',
         gap: 8,
         justifyContent: 'flex-start',
-        alignItems: 'center'
+        alignItems: 'flex-end',
 
     },
     dateText:{
-        fontSize: 15,
-        color: '#334155',
+        fontSize: 14,
+        color: '#475569',
+        fontWeight: '600',
     },
     dateTextActive:{
-        fontSize: 15,
-        color: '#FFFFFF',
+        fontSize: 14,
+        color: '#059669',
+        fontWeight: '600',
     },
     dateButton: {
-        paddingHorizontal: 12,
-        paddingVertical: 8,
+        flex: 1,
+        height: 36,
+        paddingHorizontal: 16,
+        paddingVertical: 0,
+        justifyContent: 'center',
         borderRadius: 8,
-        borderWidth: 2,
+        borderWidth: 1,
+        alignItems: 'center',
     },
     dateButtonBackground: {
-        backgroundColor: '#F1F5F9',
+        backgroundColor: '#F8FAFC',
         borderColor: '#E2E8F0',
     },
     dateButtonActive: {
-        backgroundColor: '#2563EB',
-        borderColor: '#2563EB',
+        backgroundColor: '#DDF5EC',
+        borderColor: '#DDF5EC',
     },
     dateButtonHovered:{
         backgroundColor: '#DBEAFE',
     },
     containerStyle: {
-        width: 250,
-        height: 44,
+        width: '100%',
+        height: 48,
         backgroundColor: '#FFFFFF',
-        borderColor: '#CBD5E1',
+        borderColor: '#D9E1EA',
         borderWidth: 1,
         borderRadius: 8,
         paddingHorizontal: 12,
@@ -281,9 +326,10 @@ const styles = StyleSheet.create({
         color: '#1E293B',
     },
     placeholderStyle:{
-        fontSize: 18,
+        fontSize: 14,
         color: '#64748B',
         fontWeight: '400',
+        fontFamily: 'Arial',
     },
     dropdownTextStyle:{
         fontSize: 15,
@@ -317,7 +363,7 @@ const styles = StyleSheet.create({
         gap: 8,
         backgroundColor: '#FFFFFF',
         borderColor: '#E2E8F0',
-        borderWidth: 1,
+        borderWidth: 0,
         borderRadius: 8,
         paddingHorizontal: 10,
         paddingVertical: 6,
@@ -335,5 +381,18 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: '#94A3B8',
         marginLeft: 4,
+    },
+    scanButton:{
+        height: 48,
+        width: 180,
+        alignSelf: 'flex-end', 
+        marginTop: 16, 
+        height: 40, 
+        paddingHorizontal: 20, 
+        justifyContent: 'center', 
+        borderRadius: 8,
+        backgroundColor: '#059669',
+        alignItems: 'center',
+
     },
 });

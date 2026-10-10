@@ -35,7 +35,12 @@ export default function TabLayout() {
       </View>
     ) : (
       <BottomTabBar {...props} />
-    )} screenOptions={{header: (props) => <AppHeader {...props} />, tabBarStyle: isLargeScreen ? {width: 240, minWidth: 0,} : {},tabBarActiveTintColor: '#059669', tabBarPosition: isLargeScreen ? 'left' : 'bottom', tabBarVariant: isLargeScreen ? 'material' : 'uikit'}}>
+    )} screenOptions={{header: (props) => <AppHeader {...props} />, 
+                      tabBarStyle: isLargeScreen ? {width: 240, minWidth: 0,} : {},
+                      tabBarActiveTintColor: '#059669', 
+                      tabBarPosition: isLargeScreen ? 'left' : 'bottom', 
+                      tabBarVariant: isLargeScreen ? 'material' : 'uikit', 
+                      sceneStyle: { backgroundColor: '#F5F7FA' }}}>
       
       <Tabs.Screen 
         name="index"
