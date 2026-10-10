@@ -149,11 +149,11 @@ export default function PatternScannerScreen() {
    
     return (
         <ScrollView>
-
+            <Text style={{fontSize: 16, fontWeight: 400, color: '#64748B',}}>Explore candlestick patterns in historical stock data</Text>
             <View style={[styles.startingRow, {flexDirection: isMobile ? 'column': 'row', paddingHorizontal: isMobile ? 16: 50}]}>
                 <View style={{flexDirection: 'column'}}>
-                    <Text style={styles.sectionTitle}>Search Stock</Text>
-                    <StockSearchbar selectedStock={selectedStock} onSelectedStockChange={setSelectedStock}/>
+                    <Text style={styles.sectionTitle}>Stock to Analyze</Text>
+                    <StockSearchbar onSelectedStockChange={setSelectedStock} variant="scanner" placeholder='Select a stock to scan'/>
                 </View>
                 <View style={{flexDirection: 'column',}}>
                     <DateRangePicker startDate={startDate} endDate={endDate} onStartDateChange={handleStartDateChange} onEndDateChange={handleEndDateChange}/>

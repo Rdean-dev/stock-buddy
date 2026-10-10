@@ -4,13 +4,14 @@ import { Searchbar } from "react-native-paper";
 import {Pressable, StyleSheet, View, Text} from "react-native";
 import { searchStocksData } from "../services/stockService";
 
-export default function StockSearchbar({selectedStock, onSelectedStockChange}){
+export default function StockSearchbar({onSelectedStockChange, variant, placeholder}){
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
 
     useEffect(() => {
 
         if (searchQuery === '') {
+            setSearchResults([]);
             return;
         }
         const timer =  setTimeout(async () => {
@@ -23,17 +24,16 @@ export default function StockSearchbar({selectedStock, onSelectedStockChange}){
             clearTimeout(timer);
         };
     }, [searchQuery]);
-
+    console.log('Search Result', searchResults)
     
     return(
         <View>
             <Searchbar
-                placeholder="Search Ticker or Company"
+                placeholder={placeholder}
                 onChangeText={setSearchQuery}
                 value={searchQuery}
-                rippleColor={'blue'}
-                style={styles.searchbarStyle}
-                inputStyle={{fontSize: 20,}}
+                style={[styles.searchbarStyle, variant === 'global' ? styles.globalStyle : styles.scannerStyle]}
+                inputStyle={{fontSize: 16, fontWeight: 400, color: '#0F172A'}}
                 
             />
             <View style={styles.searchResultsStyle}>
@@ -92,4 +92,16 @@ const styles = StyleSheet.create({
     companyText: {
         flex: 1,
     },
+    globalStyle:{
+        backgroundColor: "#F1F5F9",
+        borderRadius: 12,
+
+    },
+    scannerStyle:{
+        backgroundColor: "#FFFFFF",
+        borderWidth: 1,
+        borderColor: '#CBD5E1',
+        borderRadius: 8,
+    },
+
 });
