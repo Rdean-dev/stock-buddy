@@ -27,7 +27,7 @@ export default function StockSearchbar({onSelectedStockChange, variant, placehol
     console.log('Search Result', searchResults)
     
     return(
-        <View style={{alignSelf: 'stretch'}}>
+        <View style={{alignSelf: 'stretch', position: 'relative', zIndex: 20,}}>
             <Searchbar
                 placeholder={placeholder}
                 onChangeText={setSearchQuery}
@@ -40,7 +40,7 @@ export default function StockSearchbar({onSelectedStockChange, variant, placehol
                 inputStyle={[variant === 'global' ? styles.globalInputStyle : styles.scannerInputStyle, { fontWeight: '400', color: '#0F172A' }, inputStyle]}
                 
             />
-            <View style={[styles.searchResultsStyle, {top: variant === 'global' ? 46 : 60}]}>
+            <View style={[styles.searchResultsStyle, {top: '100%'}]}>
                 {searchResults.length > 0 && searchResults.map((result) => (
                     <Pressable key={result.symbol} 
                         onPress={() => {onSelectedStockChange(result);  setSearchResults([]);} }>
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         left: 0, 
         width: '100%',
-        zIndex: 1,
+        zIndex: 30,
     },
     searchResultItem:{
         backgroundColor: "white",
@@ -102,12 +102,14 @@ const styles = StyleSheet.create({
         borderColor: '#D9E1EA',
         borderRadius: 9,
         minHeight: 0,
+        
     },
     scannerStyle:{
         backgroundColor: "#FFFFFF",
         borderWidth: 1,
         borderColor: '#CBD5E1',
         borderRadius: 8,
+        
     },
 
     globalInputStyle:{

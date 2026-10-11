@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     },
     titleStyle:{
         flex: 1, 
-        fontSize: 35, 
+        fontSize: 33, 
         lineHeight: 35, 
         letterSpacing: -0.8, 
         fontWeight: 700, 

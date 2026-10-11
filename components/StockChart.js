@@ -1,10 +1,10 @@
 import {CandlestickChart, useCandlestickChart} from 'react-native-wagmi-charts';
 import normalizeCandleData from '../utils/normalizeCandleData';
 import { formatDateAsISODate, formatDisplayDate} from '../utils/formatDate';
-import { StyleSheet, View, useWindowDimensions, Text, Pressable } from 'react-native';
+import { StyleSheet, View, Text, Pressable} from 'react-native';
 import  Marker  from "../components/Marker";
 import { patternAnnotationVisuals } from "../constants/patternAnnotationVisuals";
-
+import {useState} from 'react';
 
 function PatternAnnotations({matchResults}) {
     const {step, domain, data, height} = useCandlestickChart();
@@ -132,8 +132,7 @@ function XAxis({candlestickData, width}) {
 
 
 export default function StockChart({startDate, endDate, stockData, patternResults, dateInterval,selectedStock, selectedPatterns}) {
-    
-    const { width } = useWindowDimensions();
+    const [innerWidth, setInnerWidth] = useState(0);
     
     if (!stockData?.["Time Series (Daily)"] || !startDate || !endDate) {
         return null;
@@ -143,12 +142,9 @@ export default function StockChart({startDate, endDate, stockData, patternResult
     const filteredArrayOfCandlestickObjects = normalizeCandleData(stockData, formatDateAsISODate(startDate), formatDateAsISODate(endDate));
     
     
-    const screenPadding = 32;
-    const maxChartWidth = 1000;
+    
     const yAxisWidth = 60;
-
-    const chartWidth = Math.min(width - screenPadding, maxChartWidth);
-    const candleChartWidth = chartWidth - 40 - yAxisWidth;
+    const candleChartWidth = innerWidth - yAxisWidth;
     
 
     if (filteredArrayOfCandlestickObjects.length === 0) {
@@ -177,7 +173,7 @@ export default function StockChart({startDate, endDate, stockData, patternResult
 
     
     return (
-        <View style={[styles.chartContainer, {width: chartWidth}]}>
+        <View style={styles.chartContainer}>
             <Text style={styles.chartHeader}>{selectedStock.symbol}</Text>
             <View style={styles.dateSection}>
                 <Pressable onPress={() => dateInterval(1)}>{({ hovered, pressed }) => (<View style={[styles.dateButton,(hovered || pressed) && styles.dateButtonActive]}><Text style={styles.dateText}>1m</Text></View>)}</Pressable>
@@ -186,8 +182,10 @@ export default function StockChart({startDate, endDate, stockData, patternResult
                 <Pressable onPress={() => dateInterval(12)}>{({ hovered, pressed }) => (<View style={[styles.dateButton,(hovered || pressed) && styles.dateButtonActive]}><Text style={styles.dateText}>1Y</Text></View>)}</Pressable>
             </View>
             <CandlestickChart.Provider data={filteredArrayOfCandlestickObjects}>
-            <View style={styles.chartStyle}>
-                <View style={{flexDirection: 'column'}}>
+            <View style={styles.chartStyle} onLayout={(event) => setInnerWidth(event.nativeEvent.layout.width)}>
+                {candleChartWidth > 0 &&
+                <>
+                    <View style={{flexDirection: 'column'}}>
                     <CandlestickChart width={candleChartWidth} height={350} style={styles.chart}>
                         <CandlestickChart.Candles/>
                         <CandlestickChart.Crosshair>
@@ -201,6 +199,8 @@ export default function StockChart({startDate, endDate, stockData, patternResult
                 </View>
                 
                 <YAxis />
+                </>
+                }
                 
             </View>
                 <View style={styles.inspectionSection}>
@@ -251,7 +251,7 @@ export default function StockChart({startDate, endDate, stockData, patternResult
 
 const styles = StyleSheet.create({
     inspectionSection: {
-        width: '90%',
+        width: '100%',
         borderTopWidth: 1,
         borderTopColor: '#e5e5e5',
         paddingTop: 12,
@@ -289,6 +289,7 @@ const styles = StyleSheet.create({
     },
     chartStyle: {
         flexDirection: 'row',
+        width: '100%',
     },
 
     
@@ -297,17 +298,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: 'white',
-        borderRadius: 12,
-        marginVertical: 30,
+        borderRadius: 14,
+        borderWidth: 1,
+        borderColor: '#E2E8F0',
         padding: 20,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 4,
-        },
-        shadowOpacity: 0.12,
-        shadowRadius: 10,
-        elevation: 4,
+        elevation: 1,
+        width: '100%',
     },
 
     chartHeader: {

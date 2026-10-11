@@ -46,6 +46,7 @@ export default function PatternScannerScreen() {
     const [selectedStock, setSelectedStock] = useState(null);
     const [selectedStockData, setSelectedStockData] = useState(null);
     const [selectedInterval, setSelectedInterval] = useState(null);
+    const [hasScanned, setHasScanned] = useState(false);
 
     const availablePatterns = [{label: "Doji", value: "Doji"}, 
         {label: "Hammer", value: "Hammer"}, 
@@ -64,18 +65,28 @@ export default function PatternScannerScreen() {
 
 
     useEffect(() => {
+        let ignore = false;
 
+        setSelectedStockData(null);
+        setHasScanned(false);
         if (selectedStock === null) {
             return;
         }
         const getData = async (stock) => {
             const result = await getStockData(stock);
-            setSelectedStockData(result);
+            if (!ignore){ 
+                setSelectedStockData(result)
+            };
 
 
         }
 
+
         getData(selectedStock);
+        
+        return () => {
+            ignore = true;
+        };
     }, [selectedStock]);
     const handleStartDateChange = (date) => {
         if ((date && endDate) && normalizeDate(date) > normalizeDate(endDate)){
@@ -131,11 +142,31 @@ export default function PatternScannerScreen() {
             : [...previous, pattern]
         );
         
-    }
+    };
    
+    const handleScan = () => {
+        if (!startDate || !endDate ){
+            setDateError('Select both dates')
+            return
+        }else if (!selectedStock){
+            setDateError('Select a Stock');
+            return
 
-    const patternResults = () => (startDate && endDate && selectedStockData? scanPatterns(formatDate(startDate), formatDate(endDate), selectedPatterns, selectedStockData) : {});
-    
+        }else if (!selectedStockData){
+            setDateError('Stock data is still loading or unavailable');
+            return
+
+        }else if (selectedPatterns.length === 0){
+            setDateError('Select at least one pattern');
+            return
+        }
+        setDateError('')
+        setHasScanned(true);
+        
+        
+    };
+
+    const patternResults = hasScanned && startDate && endDate && selectedStockData && selectedStock && selectedPatterns.length > 0? scanPatterns(formatDate(startDate), formatDate(endDate), selectedPatterns, selectedStockData) : {};
     const patternData = Object.entries(patternResults).map(([patternName, candles]) => {
         const patternMatchDates = candles.map((candle) => formatDisplayDate(candle.date));
 
@@ -149,14 +180,18 @@ export default function PatternScannerScreen() {
    
     return (
         <ScrollView>
-            <Text style={{lineHeight: 22, fontSize: 16, fontWeight: 400, color: '#64748B', paddingHorizontal: 24, paddingTop: 0, paddingBottom: 20,}}>{!isMobile && 'Explore candlestick patterns in historical stock data.'}</Text>
-            <View style={styles.card}>
+            {!isMobile && (
+                <Text style={{lineHeight: 22, fontSize: 16, fontWeight: 400, color: '#64748B', paddingHorizontal: 24, paddingTop: 0, paddingBottom: 20,}}>
+                    Explore candlestick patterns in historical stock data.
+                </Text>
+            )}
+            <View style={[styles.card, isMobile && {marginHorizontal: 16, padding: 16, borderRadius: 12,},]}>
                 <Text style={styles.heading}>Scan settings</Text>
-                <View style={[styles.startingRow, {flexDirection: isMobile ? 'column': 'row',}]}>
+                <View style={[styles.startingRow, isMobile && styles.mobileStartingRow]}>
                     
-                    <View style={{flexDirection: 'column', flex: 1, minWidth: 0,}}>
+                    <View style={{flexDirection: 'column', flex: 1, minWidth: 0, position: 'relative', zIndex: 10,}}>
                         <Text style={styles.fieldLabel}>Stock to analyze</Text>
-                        <StockSearchbar onSelectedStockChange={setSelectedStock} variant="scanner" placeholder='Select a stock to scan' style={{width: '100%', height: 48, borderRadius: 8, borderColor: '#D9E1EA'}} inputStyle={{fontSize: 14, height: 48, minHeight: 0, paddingVertical: 0}}/>
+                        <StockSearchbar onSelectedStockChange={setSelectedStock} variant="scanner" placeholder='Select a stock to scan' style={{width: '100%', height: 42, borderRadius: 8, borderColor: '#D9E1EA'}} inputStyle={{fontSize: 14, height: 42, minHeight: 0, paddingVertical: 0}}/>
                         <View style={styles.dateSection}>
                             {datePresets.map((preset) => {
                                 const isSelected = selectedInterval === preset.months;
@@ -164,18 +199,18 @@ export default function PatternScannerScreen() {
                                     key={preset.months}  
                                     onPress={() => dateInterval(preset.months)} 
                                     style={({hovered}) => [styles.dateButton, isSelected ? styles.dateButtonActive : styles.dateButtonBackground, hovered && !isSelected && styles.dateButtonHovered]}>
-                                    {({ hovered}) => (<Text style={[isSelected ? styles.dateTextActive : styles.dateText, hovered && !isSelected && {color: '#1D4ED8'}]}>{preset.label}</Text>)}
+                                    {({ hovered}) => (<Text style={[isSelected ? styles.dateTextActive : styles.dateText, hovered && !isSelected && {color: '#059669'}]}>{preset.label}</Text>)}
                                 </Pressable>
                                 )
                             })}
                         </View>
                     </View>
-                    <View style={{flexDirection: 'column',flex: 2, minWidth: 0,}}>
+                    <View style={{width: isMobile ? '100%': undefined, flexDirection: 'column',flex: isMobile ? undefined: 2, minWidth: 0,}}>
                         <DateRangePicker startDate={startDate} endDate={endDate} onStartDateChange={handleStartDateChange} onEndDateChange={handleEndDateChange}/>
-                        <Text>{dateError}</Text>
+                        {dateError === '' ? null: <Text>{dateError}</Text>}
                     </View>
             
-                    <View style={{flexDirection: 'column', flex: 1, minWidth: 0,}}>
+                    <View style={[styles.patternSection, isMobile && styles.mobilePatternSection]}>
                         <Text style={styles.fieldLabel}>Patterns</Text>
                         <MultiSelect data={availablePatterns} 
                             labelField="label"  
@@ -194,7 +229,7 @@ export default function PatternScannerScreen() {
                                 </View>
                                 )}
                             renderSelectedItem={(pattern, unSelect) => (
-                                <View style={styles.selectedChip}>
+                                <View style={[styles.selectedChip, {borderColor: patternAnnotationVisuals[pattern.value].color, borderWidth: 1}]}>
                                     <Marker
                                         shape={patternAnnotationVisuals[pattern.value].shape}
                                         color={patternAnnotationVisuals[pattern.value].color}
@@ -213,22 +248,33 @@ export default function PatternScannerScreen() {
 
                     </View>
                 </View>
-                <Pressable onPress={() => patternResults} style={styles.scanButton}>
+                <Pressable onPress={handleScan} style={[styles.scanButton, {width: isMobile ? '100%' : 180}]}>
                     <Text style={{fontSize: 15, fontWeight: '600', color: '#FFFFFF'}}>
                         Scan Patterns
                     </Text>
                 </Pressable>
             </View>
-            <View>
+            
+            <View style={[{zIndex: 0 ,marginHorizontal: 24, marginTop: 24,}, isMobile && {marginHorizontal: 16, marginTop: 16,}]}>
+                {hasScanned && startDate 
+                    && endDate && selectedStockData 
+                    && selectedStock && selectedPatterns.length > 0 
+                    ? <StockChart startDate={startDate} endDate={endDate} stockData={selectedStockData} patternResults={patternResults} selectedStock={selectedStock} dateInterval={dateInterval} selectedPatterns={selectedPatterns}/> : null}
+            </View>
+            <View style={[{zIndex: 0 ,position: 'relative',marginHorizontal: 24, marginTop: 24, backgroundColor: 'white', borderWidth: 1, borderColor: '#E2E8F0', borderRadius: 14, padding: 16}, isMobile && {marginHorizontal: 16, marginTop: 16,}]}>
+                <Text style={{fontSize: 18, fontWeight: 700, color: '#0F172A'}}>Pattern results</Text>
+                <Text style={{fontSize: 13, color:'#64748B', marginBottom: 12,}}>{selectedPatterns.length} patterns scanned. {patternData.reduce((total, pattern) => total + pattern.count, 0)} matches</Text>
+                {!isMobile && <View style={{flexDirection: 'row', backgroundColor: '#F5F7FA', paddingHorizontal: 12, paddingVertical: 8,}}>
+                   <Text style={[styles.resultHeadingText,{width: '40%'}]}>Pattern</Text>
+                   <Text style={[styles.resultHeadingText, {width: '15%'}]}>Matches</Text> 
+                   <Text style={[styles.resultHeadingText, {width: '45%'}]}>Recent dates</Text> 
+                </View>}
                 {patternData.map((pattern) => (
                     <PatternCard key={pattern.name} pattern={pattern}/>
                 ))}
 
             </View>
-
-            <View>
-                <StockChart startDate={startDate} endDate={endDate} stockData={selectedStockData} patternResults={patternResults} selectedStock={selectedStock} dateInterval={dateInterval} selectedPatterns={selectedPatterns}/>
-            </View>
+            
 
         </ScrollView>
     );
@@ -242,6 +288,10 @@ const styles = StyleSheet.create({
         borderRadius: 14,
         borderWidth: 1,
         borderColor: '#E2E8F0',
+        position: 'relative',
+        zIndex: 20,
+        overflow: 'visible'
+
 
     },
     heading: {
@@ -249,13 +299,28 @@ const styles = StyleSheet.create({
         lineHeight: 26,
         fontWeight: 700,
         color: '#0F172A',
-        marginBottom: 20,
+        marginBottom: 16,
     },
     startingRow:{
         justifyContent: 'flex-start',
         zIndex: 1,
         alignItems: 'flex-start',
+        flexDirection: 'row',
         gap: 20,
+        flex: 1,
+    },
+    resultHeadingText:{
+        color: '#475569',
+        fontSize: 13,
+        fontWeight: 500,
+    },
+    results:{
+        marginHorizontal: 24,
+        marginTop: 24,
+        
+    },
+    mobileResults:{
+
     },
     fieldLabel:{
         fontSize: 14,
@@ -289,7 +354,7 @@ const styles = StyleSheet.create({
     dateButton: {
         flex: 1,
         height: 36,
-        paddingHorizontal: 16,
+        paddingHorizontal: 0,
         paddingVertical: 0,
         justifyContent: 'center',
         borderRadius: 8,
@@ -309,7 +374,7 @@ const styles = StyleSheet.create({
     },
     containerStyle: {
         width: '100%',
-        height: 48,
+        height: 42,
         backgroundColor: '#FFFFFF',
         borderColor: '#D9E1EA',
         borderWidth: 1,
@@ -383,11 +448,9 @@ const styles = StyleSheet.create({
         marginLeft: 4,
     },
     scanButton:{
-        height: 48,
-        width: 180,
+        height: 42,
         alignSelf: 'flex-end', 
         marginTop: 16, 
-        height: 40, 
         paddingHorizontal: 20, 
         justifyContent: 'center', 
         borderRadius: 8,
@@ -395,4 +458,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
 
     },
+    patternSection:{
+        flexDirection: 'column',
+        flex: 1,
+        minWidth: 0,
+    },
+    mobilePatternSection:{
+        width: '100%',
+        flex: undefined,
+        minWidth: 0,
+
+    },
+    mobileStartingRow:{
+        flexDirection: 'column',
+        gap: 16,
+        flex: undefined,
+        width: '100%',
+    }
 });

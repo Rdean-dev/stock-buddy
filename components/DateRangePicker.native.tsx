@@ -34,12 +34,14 @@ export default function DateRangePicker({startDate, endDate, onStartDateChange, 
     return(
         <View style={styles.dateRow}>
             <View style={styles.dateSection}>
-                <Pressable style={styles.date} onPress={() => setShowStartPicker(!showStartPicker)}><Text style={styles.title}>Start Date</Text><Text>{(startDate) ? startDate.toLocaleDateString() : "Select a date"}</Text></Pressable>
+                <Text style={styles.title}>Start Date</Text>
+                <Pressable style={styles.date} onPress={() => setShowStartPicker(!showStartPicker)}><Text style={(startDate) ? styles.dateValueText : styles.valueText}>{(startDate) ? startDate.toLocaleDateString() : "Select a date"}</Text></Pressable>
                 {showStartPicker && (<DateTimePicker 
                     mode="date" onChange={handleStartDateChange} value={startDate ?? new Date()}/>)}
             </View>
             <View style={styles.dateSection}>
-                <Pressable style={styles.date} onPress={() => setShowEndPicker(!showEndPicker)}><Text style={styles.title}>End Date</Text><Text>{(endDate) ? endDate.toLocaleDateString() : " Select a date"}</Text></Pressable>
+                <Text style={styles.title}>End Date</Text>
+                <Pressable style={styles.date} onPress={() => setShowEndPicker(!showEndPicker)}><Text style={(endDate) ? styles.dateValueText : styles.valueText}>{(endDate) ? endDate.toLocaleDateString() : "Select a date"}</Text></Pressable>
                 {showEndPicker && (<DateTimePicker 
                     mode="date" onChange={handleEndDateChange} value={endDate ?? new Date()}/>)}
             </View>   
@@ -55,26 +57,42 @@ const styles = StyleSheet.create({
 
     dateRow: {
         flexDirection: 'row',
-        gap: 16,
-        paddingTop: 20,
+        width: '100%',
+        gap: 12,
+        paddingTop: 0,
         
     },                                                                                                                        
 
     title:{
-        fontSize: 20
+        fontSize: 14,
+        lineHeight: 20,
+        fontWeight: '400',
+        color: '#475569',
     },
 
     dateSection: {
         flexDirection: "column",
         flex: 1,
         gap: 6,
+        minWidth: 0,
     },
     
     date: {
+        height: 40,
         backgroundColor: 'white',
-        borderWidth: 2,
-        borderColor: 'blue',
-        padding: 8,
-        borderRadius: 6,
+        borderWidth: 1,
+        borderColor: '#D9E1EA',
+        borderRadius: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 0,
+        justifyContent: 'center'
+    },
+    dateValueText:{
+        fontSize: 14,
+        color: '#0F172A',
+    },
+    valueText:{
+        fontSize: 14,
+        color: '#64748B',
     },
 })
