@@ -1,103 +1,94 @@
-# Stock Buddy 
+# Stock Buddy — AI Stock Watchlist Assistant
 
-Stock Buddy is a cross-platform stock tracking and technical analysis application built with React Native and TypeScript. The project is designed to help users monitor stocks, explore historical market data, and identify common candlestick patterns through an interactive mobile interface.
+Stock Buddy is an AI-focused stock research companion being built to bring stock tracking, technical analysis, and conversational market exploration into one cross-platform application.
 
-> **Status:**  In active development
+The goal is to help users move from viewing market data to understanding it: explore a stock, identify candlestick patterns, and ask an AI assistant questions grounded in the data they are examining.
 
-## Features
+> **Status:** In active development. Stock tracking and technical analysis form the current foundation; LLM integration and AI-assisted analysis are planned capabilities.
 
-### Currently Implemented
+## Product Vision
 
-* Cross-platform interface built with React Native and Expo
-* Watchlist with reusable stock card components
-* Stock detail navigation using Expo Router
-* Responsive layouts for mobile and web
-* Pattern Scanner interface for analyzing historical stock data
-* Custom date range selection with 1M, 3M, 6M, and 1Y presets
-* Processing and normalization of Alpha Vantage-formatted OHLC market data
-* Multi-pattern candlestick scanning
-* Doji and Hammer pattern detection
-* Display of detected patterns and corresponding dates
+Stock Buddy combines interactive research tools with an AI assistant designed to help users explore market information in context.
 
-### In Development
+The product direction includes:
 
-* Live Alpha Vantage API integration
-* Stock ticker search
-* Additional candlestick pattern recognition
-* Expanded stock detail information
-* Daily market reporting and insights
-* Watchlist management and persistence
+- **AI-assisted analysis:** Generate understandable explanations of market data and detected technical patterns.
+- **Conversational research:** Ask follow-up questions about a selected stock, chart, or analysis result.
+- **Connected research tools:** Bring watchlists, stock details, historical charts, and pattern scanning into a shared workflow.
+- **Daily market insights:** Develop reports that combine market information with AI-generated explanations.
+
+The intended assistant will use application data and analysis results as context, helping users investigate what they see rather than relying on disconnected, generic responses.
+
+## Current Development
+
+The technical analysis foundation includes:
+
+- Cross-platform interfaces built with React Native, TypeScript, and Expo
+- Watchlist and stock-detail screens with reusable components
+- Navigation using Expo Router
+- Responsive mobile and web layouts
+- Historical OHLC market-data normalization and date-range filtering
+- Multi-pattern candlestick scanning
+- Interactive candlestick charts with range presets, crosshair tooltips, and OHLC readouts
+- Chart annotations and a legend connecting detected patterns to their locations
+
+Development is continuing across stock information, watchlist functionality, market reporting, and the architecture needed to support AI features.
 
 ## Pattern Scanner
 
-The Pattern Scanner analyzes historical OHLC (Open, High, Low, Close) market data within a user-selected date range.
+The Pattern Scanner lets users explore historical stock data within a selected date range and choose which candlestick patterns to detect.
 
-Market data is transformed from the Alpha Vantage response format into structured candle objects:
+Market data is normalized into chronological candle records containing date, open, high, low, close, and volume values. Modular pattern-recognition functions evaluate these records, while chart annotations show where matches occur.
 
-```text
-{
-  date,
-  open,
-  high,
-  low,
-  close,
-  volume
-}
-```
+This analysis layer provides a foundation for future AI features that explain detected patterns and answer questions about the selected data.
 
-The scanner processes candles chronologically and evaluates each candle against the patterns selected by the user. Pattern calculations are separated from the scanner logic to keep the analysis system modular and extensible.
+## AI Development Direction
 
-Currently supported patterns include:
+Planned AI work includes:
 
-* Doji
-* Hammer
+- Integrating an LLM through a backend service
+- Providing selected market data and scanner results as context
+- Connecting conversational responses to stock research workflows
+- Evaluating responses for accuracy, relevance, and clear communication of uncertainty
 
-Additional candlestick patterns are being added as development continues.
+These capabilities are part of the product roadmap and are not yet implemented.
 
 ## Tech Stack
 
-* React Native
-* TypeScript
-* JavaScript
-* Expo
-* Expo Router
-* REST API integration
-* Git / GitHub
-
-## Data
-
-Stock Buddy is being developed for integration with the Alpha Vantage market data API.
-
-During development, the Pattern Scanner currently uses locally stored sample Alpha Vantage daily market data. This allows the parsing, filtering, and pattern-recognition logic to be developed and tested before live API integration.
+- React Native
+- TypeScript / JavaScript
+- Expo
+- Expo Router
+- react-native-wagmi-charts
+- react-native-svg
+- Alpha Vantage market-data formats
+- Git / GitHub
 
 ## Running the Project
 
-### Install dependencies
+Install dependencies:
 
 ```bash
 npm install
 ```
 
-### Start the development server
+Start the development server:
 
 ```bash
 npx expo start
 ```
 
-The application can then be run through Expo Go, an Android/iOS development environment, or the web.
-
-## Project Goals
-
-Stock Buddy is an ongoing personal software development project focused on building experience with:
-
-* Cross-platform application development
-* TypeScript and React Native
-* Component-based application architecture
-* REST API integration
-* Financial market data processing
-* Algorithmic candlestick pattern recognition
-* Responsive mobile and web interfaces
+Run the application using Expo Go, a compatible Android/iOS development environment, or the web. Configuration for market-data access depends on the current development setup.
 
 ## Roadmap
 
-Future development includes live market data integration, additional candlestick patterns, improved watchlist functionality, expanded stock information, and market analysis features.
+- Expand stock details and watchlist management
+- Add persistent storage and backend services
+- Develop daily market reporting
+- Integrate LLM-powered analysis and conversational assistance
+- Add automated tests for pattern recognition and data processing
+- Refine chart interactions, accessibility, and responsive layouts
+
+## About the Project
+
+Stock Buddy is an independent software engineering project exploring how cross-platform interfaces, market-data processing, technical analysis, and LLM-powered assistance can work together in a useful research experience.
