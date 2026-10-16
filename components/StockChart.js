@@ -5,6 +5,7 @@ import { StyleSheet, View, Text, Pressable} from 'react-native';
 import  Marker  from "../components/Marker";
 import { patternAnnotationVisuals } from "../constants/patternAnnotationVisuals";
 import {useState} from 'react';
+import { theme } from "../constants/theme";
 
 function PatternAnnotations({matchResults}) {
     const {step, domain, data, height} = useCandlestickChart();
@@ -268,7 +269,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 5,
         paddingVertical: 6,
         flexDirection: 'row',
-        gap: 20,
+        gap: theme.spacing.formRowgap,
         alignSelf: 'flex-start',
 
     },
@@ -300,7 +301,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderRadius: 14,
         borderWidth: 1,
-        borderColor: '#E2E8F0',
+        borderColor: theme.colors.cardBorderColor,
         padding: 20,
         elevation: 1,
         width: '100%',
@@ -356,7 +357,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'center',
-        gap: 20,
+        gap: theme.spacing.formRowgap,
 
     },
     yAxis: {

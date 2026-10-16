@@ -1,6 +1,7 @@
 import DateTimePicker, {DateTimePickerEvent}  from "@react-native-community/datetimepicker"
 import {Text, View, StyleSheet, Button, Pressable} from 'react-native';
 import {useState} from 'react';
+import { theme } from "../constants/theme";
 
 type DateRangePickerProps = {
   startDate: Date | null;
@@ -66,8 +67,8 @@ const styles = StyleSheet.create({
     title:{
         fontSize: 14,
         lineHeight: 20,
-        fontWeight: '400',
-        color: '#475569',
+        fontWeight: theme.typography.labelWeight,
+        color: theme.colors.labelColor,
     },
 
     dateSection: {
@@ -82,7 +83,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderWidth: 1,
         borderColor: '#D9E1EA',
-        borderRadius: 8,
+        borderRadius: theme.radii.controlRadius,
         paddingHorizontal: 12,
         paddingVertical: 0,
         justifyContent: 'center'

@@ -639,53 +639,25 @@ The earlier audit reported 27 transitive vulnerabilities whose available fixes r
 
 ---
 
-# 15. Before I Stop Working
-
-**Date:** October 9, 2026
-
-## Last Worked On
-
-Stock Buddy's Pattern Scanner UI, followed by broader product design and architecture planning.
-
-### Recent Development Accomplishments
-
-- Improved date-range preset controls.
-- Styled the pattern-selection dropdown.
-- Added colored markers to dropdown items.
-- Reused pattern marker visuals.
-- Developed custom selected-pattern chips.
-- Continued integrating chart and scanner presentation.
-
-### Recent Product Decisions
-
-- Use a collapsible desktop sidebar.
-- Plan a global stock-search field.
-- Add a public landing page before account registration.
-- Explore a handshake-themed money-stack logo.
-- Keep the Pattern Scanner as a central feature.
-- Add a Stock Screener to the future roadmap.
-
-## Next Development Session
-
-**Primary task: Redesign `PatternCard`.**
-
-Start by reviewing the existing component and its styles.
-
-Desired outcome:
-- Compact, modern result cards.
-- Matching pattern marker and name.
-- Clear match counts.
-- Better organization of matching dates.
-- Consistent appearance with the rest of the Pattern Scanner.
-
-Afterward:
-- Update date-picker typography.
-- Refine layout spacing.
-- Verify responsive behavior.
-- Test the complete scanner workflow.
-
-## Current Focus
-
-**Finish and polish the Pattern Scanner before expanding into major new features.**
-
-Stock Buddy now has a clearer long-term direction: a stock research and education platform with approachable design, interactive analysis tools, personalized features, and eventually multi-stock screening.
+16. Before I Stop Working
+Date: October 11, 2026
+Last Worked On
+Finished the Pattern Scanner’s desktop and mobile UI polish.
+Completed
+- Refined the responsive header, global search, and mobile safe-area spacing.
+- Styled scan settings, date fields, presets, pattern selection, and scan button.
+- Made the chart fit its container using onLayout.
+- Updated chart borders and spacing.
+- Redesigned PatternCard into compact desktop table rows and mobile stacked rows.
+- Added matching markers, counts, and zero-match placeholders.
+- Showed the three most recent dates with expandable “+N more” controls.
+- Added the total match count to the results summary.
+- Fixed search-dropdown layering above the chart and results.
+Behavior Clarified
+- Reloading clears React state; resetting inputs and results is expected.
+- After the initial scan, presets should update the analysis without another Scan click.
+Before Committing
+Verify all 15 patterns, date expansion, preset updates, dropdown layering, and phone chart-label readability.
+Suggested commit: Polish Pattern Scanner desktop and mobile layouts
+Next Development Session
+Move to the next screen’s design after those checks pass. Keep the Stock Screener and broader product plans on the future roadmap.

@@ -48,7 +48,7 @@ export const patternAnnotationVisuals = {
         shape: 'star'
     },
     'Evening Star': {
-        color: '#9333EA', // purple
+        color: 'FireBrick', // red
         shape: 'star'
     },
     'Three White Soldiers': {

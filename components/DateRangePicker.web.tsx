@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Pressable, StyleSheet } from "react-native";
 import { formatDateAsISODate } from '../utils/formatDate';
+import { theme } from "../constants/theme";
 
 type DateRangePickerProps = {
   startDate: Date | null;
@@ -67,15 +68,15 @@ export default function DateRangePicker({startDate, endDate, onStartDateChange, 
         display: 'flex',
         flexDirection: 'row',
         width: '100%',
-        gap: 20,
+        gap: theme.spacing.formRowgap,
     };
 
     const title: React.CSSProperties = {
-        fontSize: 14,
+        fontSize: theme.typography.labelSize,
         lineHeight: '20px',
         fontFamily: 'Arial, sans-serif',
-        fontWeight: 400,
-        color: '#475569',
+        fontWeight: theme.typography.labelWeight,
+        color: theme.colors.labelColor,
 
     };
 
@@ -92,14 +93,14 @@ export default function DateRangePicker({startDate, endDate, onStartDateChange, 
         backgroundColor: '#ffffff',
         borderWidth: 1,
         borderStyle: 'solid',
-        borderColor: '#D9E1EA',
+        borderColor: theme.colors.controlBorder,
         padding: '0 12px',
-        borderRadius: 8,
-        height: 48,
+        borderRadius: theme.radii.controlRadius,
+        height: theme.sizes.controlHeight,
         width: '100%',
         minWidth: 0,
         fontFamily: 'Arial, sans-serif',
-        fontSize: 14,
+        fontSize: theme.typography.labelSize,
         color: '#0F172A',
 
     };

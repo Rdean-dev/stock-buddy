@@ -3,31 +3,38 @@ import React, { useState, useEffect } from "react";
 import { Searchbar } from "react-native-paper";
 import {Pressable, StyleSheet, View, Text} from "react-native";
 import { searchStocksData } from "../services/stockService";
+import { theme } from "../constants/theme";
 
 export default function StockSearchbar({onSelectedStockChange, variant, placeholder, style, inputStyle}){
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
 
     useEffect(() => {
-
-        if (searchQuery === '') {
-            setSearchResults([]);
+        let active = true;
+        setSearchResults([]);
+        if (!searchQuery.trim()) {
+            
             return;
         }
         const timer =  setTimeout(async () => {
-            const results = await searchStocksData(searchQuery)
-            setSearchResults(results);
+            const results = await searchStocksData(searchQuery.trim())
+            if (active) {
+                setSearchResults(results);
+                
+            }
+            
             
         }, 500);
 
         return () => {
+            active = false;
             clearTimeout(timer);
         };
     }, [searchQuery]);
     console.log('Search Result', searchResults)
     
     return(
-        <View style={{alignSelf: 'stretch', position: 'relative', zIndex: 20,}}>
+        <View style={{position: 'relative', zIndex: 20,}}>
             <Searchbar
                 placeholder={placeholder}
                 onChangeText={setSearchQuery}
@@ -61,7 +68,7 @@ export default function StockSearchbar({onSelectedStockChange, variant, placehol
 
 const styles = StyleSheet.create({
     searchbarStyle:{
-        width: 400,
+        width: '100%',
         height: 60,
         borderRadius: 10,
         
@@ -96,7 +103,6 @@ const styles = StyleSheet.create({
     },
     globalStyle:{
         backgroundColor: "#FFFFFF",
-        width: 280,
         height: 46,
         borderWidth: 1,
         borderColor: '#D9E1EA',
@@ -108,7 +114,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#FFFFFF",
         borderWidth: 1,
         borderColor: '#CBD5E1',
-        borderRadius: 8,
+        borderRadius: theme.radii.controlRadius,
         
     },
 

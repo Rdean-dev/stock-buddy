@@ -12,6 +12,7 @@ import { getStockData } from "../services/stockService";
 import { Breakpoints } from '../constants/breakpoints';
 import  Marker  from "../components/Marker";
 import { patternAnnotationVisuals } from "../constants/patternAnnotationVisuals";
+import { theme } from "../constants/theme";
 
 const datePresets = [
     {
@@ -59,6 +60,7 @@ export default function PatternScannerScreen() {
         {label: "Bearish Harami", value: "Bearish Harami"},
         {label: "Piercing Line", value: "Piercing Line"},
         {label: "Dark Cloud Cover", value: "Dark Cloud Cover"},
+        {label: "Evening Star", value: "Evening Star"},
         {label: "Morning Star", value: "Morning Star"},
         {label: "Three White Soldiers", value: "Three White Soldiers"},
         {label: "Three Black Crows", value: "Three Black Crows"}];
@@ -191,7 +193,7 @@ export default function PatternScannerScreen() {
                     
                     <View style={{flexDirection: 'column', flex: 1, minWidth: 0, position: 'relative', zIndex: 10,}}>
                         <Text style={styles.fieldLabel}>Stock to analyze</Text>
-                        <StockSearchbar onSelectedStockChange={setSelectedStock} variant="scanner" placeholder='Select a stock to scan' style={{width: '100%', height: 42, borderRadius: 8, borderColor: '#D9E1EA'}} inputStyle={{fontSize: 14, height: 42, minHeight: 0, paddingVertical: 0}}/>
+                        <StockSearchbar onSelectedStockChange={setSelectedStock} variant="scanner" placeholder='Select a stock to scan' style={{width: '100%', height: theme.sizes.controlHeight, borderRadius: theme.radii.controlRadius, borderColor: '#D9E1EA'}} inputStyle={{fontSize: 14, height: theme.sizes.controlHeight, minHeight: 0, paddingVertical: 0}}/>
                         <View style={styles.dateSection}>
                             {datePresets.map((preset) => {
                                 const isSelected = selectedInterval === preset.months;
@@ -255,13 +257,13 @@ export default function PatternScannerScreen() {
                 </Pressable>
             </View>
             
-            <View style={[{zIndex: 0 ,marginHorizontal: 24, marginTop: 24,}, isMobile && {marginHorizontal: 16, marginTop: 16,}]}>
+            <View style={[{zIndex: 0 ,marginHorizontal: theme.spacing.pageHorizontalMargin, marginTop: 24,}, isMobile && {marginHorizontal: 16, marginTop: 16,}]}>
                 {hasScanned && startDate 
                     && endDate && selectedStockData 
                     && selectedStock && selectedPatterns.length > 0 
                     ? <StockChart startDate={startDate} endDate={endDate} stockData={selectedStockData} patternResults={patternResults} selectedStock={selectedStock} dateInterval={dateInterval} selectedPatterns={selectedPatterns}/> : null}
             </View>
-            <View style={[{zIndex: 0 ,position: 'relative',marginHorizontal: 24, marginTop: 24, backgroundColor: 'white', borderWidth: 1, borderColor: '#E2E8F0', borderRadius: 14, padding: 16}, isMobile && {marginHorizontal: 16, marginTop: 16,}]}>
+            <View style={[{zIndex: 0 ,position: 'relative',marginHorizontal: theme.spacing.pageHorizontalMargin, marginTop: 24, backgroundColor: 'white', borderWidth: 1, borderColor: theme.colors.cardBorderColor, borderRadius: 14, padding: 16}, isMobile && {marginHorizontal: 16, marginTop: 16,}]}>
                 <Text style={{fontSize: 18, fontWeight: 700, color: '#0F172A'}}>Pattern results</Text>
                 <Text style={{fontSize: 13, color:'#64748B', marginBottom: 12,}}>{selectedPatterns.length} patterns scanned. {patternData.reduce((total, pattern) => total + pattern.count, 0)} matches</Text>
                 {!isMobile && <View style={{flexDirection: 'row', backgroundColor: '#F5F7FA', paddingHorizontal: 12, paddingVertical: 8,}}>
@@ -282,12 +284,12 @@ export default function PatternScannerScreen() {
 
 const styles = StyleSheet.create({
     card: {
-        marginHorizontal: 24,
+        marginHorizontal: theme.spacing.pageHorizontalMargin,
         padding: 24,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: theme.colors.cardBackgroundColor,
         borderRadius: 14,
         borderWidth: 1,
-        borderColor: '#E2E8F0',
+        borderColor: theme.colors.cardBorderColor,
         position: 'relative',
         zIndex: 20,
         overflow: 'visible'
@@ -306,16 +308,16 @@ const styles = StyleSheet.create({
         zIndex: 1,
         alignItems: 'flex-start',
         flexDirection: 'row',
-        gap: 20,
+        gap: theme.spacing.formRowgap,
         flex: 1,
     },
     resultHeadingText:{
-        color: '#475569',
+        color: theme.colors.labelColor,
         fontSize: 13,
         fontWeight: 500,
     },
     results:{
-        marginHorizontal: 24,
+        marginHorizontal: theme.spacing.pageHorizontalMargin,
         marginTop: 24,
         
     },
@@ -325,8 +327,8 @@ const styles = StyleSheet.create({
     fieldLabel:{
         fontSize: 14,
         lineHeight: 20,
-        fontWeight: 400,
-        color: '#475569',
+        fontWeight: theme.typography.labelWeight,
+        color: theme.colors.labelColor,
         marginBottom: 6,
         fontFamily: 'Arial',
     },
@@ -343,7 +345,7 @@ const styles = StyleSheet.create({
     },
     dateText:{
         fontSize: 14,
-        color: '#475569',
+        color: theme.colors.labelColor,
         fontWeight: '600',
     },
     dateTextActive:{
@@ -357,13 +359,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 0,
         paddingVertical: 0,
         justifyContent: 'center',
-        borderRadius: 8,
+        borderRadius: theme.radii.controlRadius,
         borderWidth: 1,
         alignItems: 'center',
     },
     dateButtonBackground: {
         backgroundColor: '#F8FAFC',
-        borderColor: '#E2E8F0',
+        borderColor: theme.colors.cardBorderColor,
     },
     dateButtonActive: {
         backgroundColor: '#DDF5EC',
@@ -374,11 +376,11 @@ const styles = StyleSheet.create({
     },
     containerStyle: {
         width: '100%',
-        height: 42,
+        height: theme.sizes.controlHeight,
         backgroundColor: '#FFFFFF',
         borderColor: '#D9E1EA',
         borderWidth: 1,
-        borderRadius: 8,
+        borderRadius: theme.radii.controlRadius,
         paddingHorizontal: 12,
         paddingVertical: 8,
     },
@@ -393,13 +395,13 @@ const styles = StyleSheet.create({
     placeholderStyle:{
         fontSize: 14,
         color: '#64748B',
-        fontWeight: '400',
+        fontWeight: theme.typography.labelWeight,
         fontFamily: 'Arial',
     },
     dropdownTextStyle:{
         fontSize: 15,
         color: '#334155',
-        fontWeight: '400',
+        fontWeight: theme.typography.labelWeight,
     },
     selectedTextStyle:{
         fontSize: 14,
@@ -410,16 +412,16 @@ const styles = StyleSheet.create({
     selectedStyle:{
         gap: 8,
         backgroundColor: '#FFFFFF',
-        borderColor: '#E2E8F0',
+        borderColor: theme.colors.cardBorderColor,
         borderWidth: 1,
-        borderRadius: 8,
+        borderRadius: theme.radii.controlRadius,
         paddingHorizontal: 10,
         paddingVertical: 6,
     },
     itemContainerStyle: {
         backgroundColor: '#ffffff',
-        borderColor: '#E2E8F0',
-        borderRadius: 8,
+        borderColor: theme.colors.cardBorderColor,
+        borderRadius: theme.radii.controlRadius,
 
     },
     selectedChip: {
@@ -427,9 +429,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 8,
         backgroundColor: '#FFFFFF',
-        borderColor: '#E2E8F0',
+        borderColor: theme.colors.cardBorderColor,
         borderWidth: 0,
-        borderRadius: 8,
+        borderRadius: theme.radii.controlRadius,
         paddingHorizontal: 10,
         paddingVertical: 6,
         marginRight: 8,
@@ -448,12 +450,12 @@ const styles = StyleSheet.create({
         marginLeft: 4,
     },
     scanButton:{
-        height: 42,
+        height: theme.sizes.controlHeight,
         alignSelf: 'flex-end', 
         marginTop: 16, 
         paddingHorizontal: 20, 
         justifyContent: 'center', 
-        borderRadius: 8,
+        borderRadius: theme.radii.controlRadius,
         backgroundColor: '#059669',
         alignItems: 'center',
 

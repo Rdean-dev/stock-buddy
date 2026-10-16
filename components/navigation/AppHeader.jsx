@@ -6,6 +6,7 @@ import { router } from "expo-router";
 import { Breakpoints } from '../../constants/breakpoints';
 import { StyleSheet, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { theme } from "../../constants/theme";
 
 
 function navigationToStock(stock) {
@@ -29,7 +30,7 @@ export default function AppHeader(params) {
                 <FontAwesome size={25} name="bell-o" color='#475569' style={{}}/>
                 <Ionicons name="person-circle" color="#64748B" size={35} style={{marginLeft: 8}}/>
             </View>
-            <StockSearchBar onSelectedStockChange={navigationToStock} variant="global" placeholder='Search any stock...' style={{width: '100%', height: 42, borderRadius: 10,}} inputStyle={{height: 42, fontSize: 16,}}/>
+            <StockSearchBar onSelectedStockChange={navigationToStock} variant="global" placeholder='Search any stock...' style={{width: '100%', height: theme.sizes.controlHeight, borderRadius: 10,}} inputStyle={{height: theme.sizes.controlHeight, fontSize: 16,}}/>
         </View>
     ) : (
         <View style={styles.headerStyle}>

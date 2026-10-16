@@ -1,17 +1,21 @@
 import React from 'react';
-import {Text, View, StyleSheet} from 'react-native';
+import {Text, View, StyleSheet, Pressable} from 'react-native';
+import { theme } from "../constants/theme";
+import {Link } from "expo-router";
 
 
-export default function StockCard({stock}){
+export default function StockCard({stock, removeStock}){
     return (
                 
             <View style={styles.stockCard}>
-                <Text style={styles.tickerText}>Ticker Symbol - {stock.ticker}</Text>
-                <Text style={styles.stockText}>Price - {stock.price}</Text>
-                <Text style={styles.stockText}>Daily Percent Change - {stock.change}</Text>
-                <Text style={styles.stockText}>Trend - {stock.trend}</Text>
-                <Text style={styles.stockText}>Risk Category - {stock.risk}</Text>
-                <Text style={styles.stockText}>Patterns - {stock.patterns}</Text>
+                <Link key={stock} href={{
+                    pathname : "/stock-detail",
+                    params: {ticker: stock}}} asChild>
+                    <Pressable>
+                        <Text style={styles.tickerText}>Ticker Symbol - {stock}</Text>
+                    </Pressable>
+                </Link>
+                <Pressable style={styles.removeButton} onPress={() => removeStock(stock)}><Text>Remove from Watchlist</Text></Pressable>
             </View>
                 
             );
@@ -19,20 +23,24 @@ export default function StockCard({stock}){
 
 const styles = StyleSheet.create({
     stockCard: {
-        backgroundColor: "#1a1a1a",
-        margin: 8,
-        borderRadius: 15,
-        padding: 15,
+        backgroundColor: theme.colors.cardBackgroundColor,
+        borderRadius: theme.radii.cardRadius,
+        padding: 16,
+        flexDirection: 'row',
+        justifyContent: 'space-between'
     },
 
     stockText: {
-        color: "#d4d4d4",
+        color: theme.colors.labelColor,
     },
     tickerText: {
-        fontSize: 22,
-        fontWeight: "bold",
-        color: "white",
-        marginBottom: 4,
+        fontSize: theme.typography.labelSize,
+        fontWeight: theme.typography.labelWeight,
+        color: theme.colors.labelColor,
+    },
+    removeButton:{
+        paddingHorizontal: 10,
+        paddingVertical: 5,
     },
 
 })

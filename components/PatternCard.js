@@ -4,6 +4,7 @@ import {Text, StyleSheet, View, ScrollView,useWindowDimensions, Pressable } from
 import { patternAnnotationVisuals } from "../constants/patternAnnotationVisuals";
 import { Breakpoints } from '../constants/breakpoints';
 import { useState} from "react";
+import { theme } from "../constants/theme";
 
 export default function PatternCard({pattern}){
     const { width } = useWindowDimensions();
@@ -60,7 +61,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         paddingVertical: 8,
         borderBottomWidth: 1,
-        borderBottomColor: '#E2E8F0'
+        borderBottomColor: theme.colors.cardBorderColor
         
     },
 
@@ -80,7 +81,7 @@ const styles = StyleSheet.create({
     },
     dates:{
         width: '45%',
-        fontWeight: '400',
+        fontWeight: theme.typography.labelWeight,
         color: '#64748B',
     },
     patternSection:{

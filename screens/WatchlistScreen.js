@@ -1,46 +1,33 @@
-import React from "react";
-import {Pressable, Text, StyleSheet, ScrollView} from 'react-native';
+import {useState} from "react";
+import {Pressable, Text, StyleSheet, ScrollView, View} from 'react-native';
 import StockCard from "../components/StockCard";
-import {Link } from "expo-router";
 
+import  StockSearchbar  from '../components/StockSearchbar';
+import { theme } from "../constants/theme";
 
-const stockData = [
-    {
-        ticker: "BALL",
-        company: "Ball Corp",
-        price: 49.53,
-        change: "-1.2%",
-        trend: "Downtrend",
-        risk: "Conservative",
-        patterns: "3"
-    },
-    {
-        ticker: "AAPL",
-        company: "Apple Inc.",
-        price: 189.42,
-        change: "+1.2%",
-        trend: "Uptrend",
-        risk: "Moderate",
-        patterns: "2"
-    },
-];
 
 function WatchlistScreen(){
+    const [watchlistArray, setWatchlistArray] = useState([])
+    const handleWatchlistChange = (item) => {
+        
+        if (!watchlistArray.includes(item.symbol)) {
+            setWatchlistArray([...watchlistArray, item.symbol])
+        }
+        
+    };
+
+    const removeFromWatchlist = (item) => {
+        setWatchlistArray(watchlistArray.filter((stock) => stock !== item))
+    }
 
     return (
         <ScrollView style={styles.container}>
-            <Text style={styles.title}>My Watchlist</Text>
-            
-
-            {stockData.map((stock) => (
-                <Link key={stock.ticker} href={{
-                    pathname : "/stock-detail",
-                    params: {ticker: stock.ticker}}} asChild>
-                    <Pressable >
-                        <StockCard stock={stock}/>
-                    </Pressable>
-                </Link>
-            ))}
+            <StockSearchbar onSelectedStockChange={handleWatchlistChange} placeholder="Search to add to watchlist"/>
+            <View style={styles.stockSection}>
+                {watchlistArray.map((stock) => (
+                    <StockCard stock={stock} removeStock={removeFromWatchlist}/>
+                ))}
+            </View>
         </ScrollView>
     );
 };
@@ -48,13 +35,14 @@ function WatchlistScreen(){
 const styles = StyleSheet.create({
 
     container: {
-        backgroundColor: "#0a0a0a",
         flex: 1,
+        marginHorizontal: theme.spacing.pageHorizontalMargin,
+        marginTop: theme.spacing.sectionTopMargin,
     },
-    
-    title: {
-        fontSize: 80,
-        color: "white"
-    },
+
+    stockSection:{
+        gap: theme.spacing.formRowgap,
+    }
+
 })
 export default WatchlistScreen;

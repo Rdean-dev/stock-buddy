@@ -1,22 +1,26 @@
-import datas from '../data/mockDailyIBMData.json';
-import data from '../data/mockSearchDataBA.json';
+//import datas from '../data/mockDailyIBMData.json';
+//import data from '../data/mockSearchDataBA.json';
 const apiKey = process.env.EXPO_PUBLIC_ALPHA_VANTAGE_API_KEY;
+const apiKey2 = process.env.EXPO_PUBLIC_FINANCIAL_MODELING_PREP_API_KEY;
 
 export async function searchStocksData(searchKeyword) {
 
     const encodedSearchKeyword = encodeURIComponent(searchKeyword);
-    const apiUrl =`https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${encodedSearchKeyword}&apikey=${apiKey}`;
-
+    //const searchBySymbolapiUrl =`https://financialmodelingprep.com/stable/search-symbol?query=${encodedSearchKeyword}&apikey=${apiKey2}`;
+    const searchByNameapiUrl =`https://financialmodelingprep.com/stable/search-name?query=${encodedSearchKeyword}&apikey=${apiKey2}`;
+    //const apiUrl =`https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${encodedSearchKeyword}&apikey=${apiKey}`;
 
     try {
-        //const response = await fetch(apiUrl);
+        const response = await fetch(searchByNameapiUrl);
 
-        //const data = await response.json();
-        const filteredArrayOfMatches = data["bestMatches"].map((matchEntry) => {
-            return {symbol: matchEntry["1. symbol"], name: matchEntry["2. name"]}
+        const data = await response.json();
+        const filteredArrayOfMatches = data.map((matchEntry) => {
+            return {symbol: matchEntry["symbol"], name: matchEntry["name"]}
         });
-
-        return filteredArrayOfMatches;
+        console.log("FMP Response", data);
+        console.log("FMP Responsefiltered", filteredArrayOfMatches);
+        return filteredArrayOfMatches.slice(0, 10);
+        
     } catch (error) {
         console.error('Error fetching data:', error);
         return [];
@@ -32,16 +36,16 @@ export async function getStockData(company) {
 
 
     try {
-        //const response = await fetch(apiUrl);
+        const response = await fetch(apiUrl);
 
-        //const data = await response.json();
+        const data = await response.json();
         
 
-        if (datas["Time Series (Daily)"]){
-            return datas;
+        if (data["Time Series (Daily)"]){
+            return data;
         }
         else{
-            console.log("Alpha Vantage incorrect response:", datas);
+            console.log("Alpha Vantage incorrect response:", data);
             return null;
         }
     } catch (error) {
