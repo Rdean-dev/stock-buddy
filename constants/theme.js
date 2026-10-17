@@ -4,6 +4,8 @@ export const theme = {
         cardBorderColor: '#E2E8F0',
         labelColor: '#475569',
         cardBackgroundColor: '#FFFFFF',
+        positive: '#16A34A',
+        negative: '#DC2626',
 
     },
     spacing: {

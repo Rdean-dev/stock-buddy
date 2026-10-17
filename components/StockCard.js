@@ -8,11 +8,12 @@ export default function StockCard({stock, removeStock}){
     return (
                 
             <View style={styles.stockCard}>
-                <Link key={stock} href={{
+                <Link href={{
                     pathname : "/stock-detail",
-                    params: {ticker: stock}}} asChild>
+                    params: {ticker: stock.symbol}}} asChild>
                     <Pressable>
-                        <Text style={styles.tickerText}>Ticker Symbol - {stock}</Text>
+                        <Text style={styles.tickerText}>Ticker Symbol - {stock.symbol}</Text>
+                        <Text style={styles.stockText}>{stock.name}</Text>
                     </Pressable>
                 </Link>
                 <Pressable style={styles.removeButton} onPress={() => removeStock(stock)}><Text>Remove from Watchlist</Text></Pressable>

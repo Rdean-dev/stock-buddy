@@ -639,25 +639,57 @@ The earlier audit reported 27 transitive vulnerabilities whose available fixes r
 
 ---
 
-16. Before I Stop Working
-Date: October 11, 2026
-Last Worked On
-Finished the Pattern Scanner’s desktop and mobile UI polish.
-Completed
-- Refined the responsive header, global search, and mobile safe-area spacing.
-- Styled scan settings, date fields, presets, pattern selection, and scan button.
-- Made the chart fit its container using onLayout.
-- Updated chart borders and spacing.
-- Redesigned PatternCard into compact desktop table rows and mobile stacked rows.
-- Added matching markers, counts, and zero-match placeholders.
-- Showed the three most recent dates with expandable “+N more” controls.
-- Added the total match count to the results summary.
-- Fixed search-dropdown layering above the chart and results.
-Behavior Clarified
-- Reloading clears React state; resetting inputs and results is expected.
-- After the initial scan, presets should update the analysis without another Scan click.
-Before Committing
-Verify all 15 patterns, date expansion, preset updates, dropdown layering, and phone chart-label readability.
-Suggested commit: Polish Pattern Scanner desktop and mobile layouts
-Next Development Session
-Move to the next screen’s design after those checks pass. Keep the Stock Screener and broader product plans on the future roadmap.
+# Before I Stop Working — October 17, 2026
+
+## Last Worked On
+Stock Buddy's Watchlist screen, focusing on integrating company profile data, displaying stock information, and improving the table's appearance.
+
+## Previously Completed — October 16
+- Changed Watchlist state from ticker strings to stock objects containing symbols and company names.
+- Implemented duplicate prevention using `.some()`.
+- Updated removal logic to compare stock symbols.
+- Created a reusable `StockTable` component using React Native Paper.
+- Added the four main table columns.
+- Added a remove button to individual stock rows.
+- Connected Watchlist search results to the table.
+
+## Completed — October 17
+
+### API Integration and State Management
+- Integrated Financial Modeling Prep (FMP) company profile data into the Watchlist.
+- Created `profileData` state to store company profiles keyed by ticker symbol.
+- Used `useEffect` to fetch company profiles when Watchlist membership changes.
+- Used `Promise.all()` to initiate profile requests for multiple stocks.
+- Implemented a `useRef`-based `Set` to prevent repeated API requests during component re-renders.
+- Added optional chaining to handle profile data that hasn't loaded.
+
+### StockTable Improvements
+- Displayed company logos alongside ticker symbols and company names.
+- Added current stock prices.
+- Displayed daily dollar and percentage changes.
+- Applied green styling for positive changes and red for negative changes.
+- Formatted percentage changes to two decimal places.
+- Corrected logo alignment using Flexbox.
+- Improved typography, spacing, and table layout.
+- Added preliminary pagination controls.
+- Kept the 7-Day Trend column as a placeholder.
+
+## Current Status
+The Watchlist table now displays company information and market data in a clean, organized layout.
+
+The basic Watchlist functionality is implemented, and the remaining work is primarily navigation, data presentation, and additional features.
+
+## Next Steps
+- Finalize price formatting, negative dollar changes, and missing-data fallbacks.
+- Implement navigation from Watchlist rows to Stock Detail.
+- Add 7-day trend sparklines.
+- Implement an empty-watchlist state.
+- Decide whether pagination is necessary and make it functional if retained.
+- Test and refine the mobile layout.
+- Eventually persist Watchlist data using a backend and database.
+
+## Important Notes
+- Avoid unnecessary FMP requests while developing the UI. Use mock data where possible.
+- The `attemptedRef` guard prevents repeated requests during a component's mounted lifetime, but does not persist across remounts or application reloads.
+- Continue keeping Watchlist membership separate from fetched company profile data.
+- Prioritize completing functional features before spending additional time on visual polish.

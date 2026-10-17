@@ -53,3 +53,27 @@ export async function getStockData(company) {
         return null;
     }
 }
+
+export async function getStockProfile(company) {
+    const encodedCompany = encodeURIComponent(company);
+    const apiUrl = `https://financialmodelingprep.com/stable/profile?symbol=${encodedCompany}&apikey=${apiKey2}`;
+
+    try {
+        const response = await fetch(apiUrl);
+
+        const data = await response.json();
+        
+
+        if (data[0]){
+            console.log("profile:",data);
+            return data[0];
+        }
+        else{
+            console.log("FMP incorrect response:", data);
+            return null;
+        }
+    } catch (error) {
+        console.error('Error fetching company data:', error);
+        return null;
+    }
+}

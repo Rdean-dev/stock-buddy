@@ -1,14 +1,23 @@
-const patternData = [
+export const Data = [
   {
-    name: "Doji",
-    count: 3,
-    dates: ["May 20", "May 24", "May 28"],
-    type: "Neutral",
+      "symbol": "AAPL",
+      "name": "Apple Inc."
   },
   {
-    name: "Bullish Engulfing",
-    count: 1,
-    dates: ["May 26"],
-    type: "Bullish",
+      "symbol": "TSLA",
+      "name": "Tesla, Inc."
   },
+  {
+      "symbol": "AMZN",
+      "name": "Amazon.com, Inc."
+  },
+  {
+      "symbol": "MSFT",
+      "name": "Microsoft Corporation"
+  },
+  {
+      "symbol": "DELL",
+      "name": "Dell Technologies Inc."
+  }
+
 ];
