@@ -18,7 +18,11 @@ export default function StockTable({watchlistArray, removeStock, profileData}) {
 
             const profile = profileData[stock.symbol];
             const changePercentage = profile?.changePercentage;
-            const plusOrMinus = changePercentage > 0 ? '+' : '';
+            const plusOrMinus = changePercentage > 0 ? '+' : changePercentage < 0 ? '-' : '';
+            const formattedPrice = profile?.price != null ? `$${profile.price.toFixed(2)}` : '--';
+            const formattedChange = profile?.change != null ? `${plusOrMinus}$${Math.abs(profile?.change)}` : '--';
+            const formattedPercentage = changePercentage != null ? `${plusOrMinus}${Math.abs(changePercentage).toFixed(2)}%` : '--';
+            
             return (
                 <DataTable.Row key={stock.symbol}>
                     <DataTable.Cell>
@@ -33,8 +37,24 @@ export default function StockTable({watchlistArray, removeStock, profileData}) {
                             </View>
                         </View>
                     </DataTable.Cell>
-                    <DataTable.Cell ><Text style={{fontWeight: '700', fontSize: 17}}>{`$${profile?.price}` ?? '--'}</Text></DataTable.Cell>
-                    <DataTable.Cell ><View style={{flexDirection: 'row', gap: 5}}><Text style={[styles.changeText, changePercentage >= 0 ? styles.positive : styles.negative]}>{`$${profile?.change ?? '--'}`}</Text><Text style={[styles.changeText, changePercentage >= 0 ? styles.positive : styles.negative]}>({`${plusOrMinus}${profile?.changePercentage?.toFixed(2)}%` ?? '--'})</Text></View></DataTable.Cell>
+                    <DataTable.Cell>
+                        <Text style={{fontWeight: '700', fontSize: 17}}>
+                            {formattedPrice}
+                        </Text>
+                    </DataTable.Cell>
+                    <DataTable.Cell>
+                        <View style={{flexDirection: 'row', gap: 5}}>
+                            <Text 
+                                style={[styles.changeText, changePercentage >= 0 ? 
+                                    styles.positive : styles.negative]}>
+                                {formattedChange}
+                            </Text>
+                            <Text style={[styles.changeText, changePercentage >= 0 ? 
+                                styles.positive : styles.negative]}>
+                                ({formattedPercentage})
+                            </Text>
+                        </View>
+                    </DataTable.Cell>
                     <DataTable.Cell>--</DataTable.Cell>
                     <DataTable.Cell>
                         <IconButton

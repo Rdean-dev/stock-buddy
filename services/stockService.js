@@ -1,25 +1,27 @@
 //import datas from '../data/mockDailyIBMData.json';
 //import data from '../data/mockSearchDataBA.json';
-const apiKey = process.env.EXPO_PUBLIC_ALPHA_VANTAGE_API_KEY;
-const apiKey2 = process.env.EXPO_PUBLIC_FINANCIAL_MODELING_PREP_API_KEY;
+const avApiKey = process.env.EXPO_PUBLIC_ALPHA_VANTAGE_API_KEY;
+const fmpApiKey = process.env.EXPO_PUBLIC_FINANCIAL_MODELING_PREP_API_KEY;
+const tvApiKey = process.env.EXPO_PUBLIC_TWELVE_DATA_API_KEY;
 
 export async function searchStocksData(searchKeyword) {
 
     const encodedSearchKeyword = encodeURIComponent(searchKeyword);
     //const searchBySymbolapiUrl =`https://financialmodelingprep.com/stable/search-symbol?query=${encodedSearchKeyword}&apikey=${apiKey2}`;
-    const searchByNameapiUrl =`https://financialmodelingprep.com/stable/search-name?query=${encodedSearchKeyword}&apikey=${apiKey2}`;
+    //const searchByNameapiUrl =`https://financialmodelingprep.com/stable/search-name?query=${encodedSearchKeyword}&apikey=${apiKey2}`;
     //const apiUrl =`https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${encodedSearchKeyword}&apikey=${apiKey}`;
+    const tDataApiUrl = `https://api.twelvedata.com/symbol_search?symbol=${encodedSearchKeyword}&outputsize=10&apikey=${tvApiKey}`;
 
     try {
-        const response = await fetch(searchByNameapiUrl);
+        const response = await fetch(tDataApiUrl);
 
         const data = await response.json();
-        const filteredArrayOfMatches = data.map((matchEntry) => {
-            return {symbol: matchEntry["symbol"], name: matchEntry["name"]}
+        const filteredArrayOfMatches = data["data"].map((matchEntry) => {
+            return {symbol: matchEntry["symbol"], name: matchEntry["instrument_name"]}
         });
-        console.log("FMP Response", data);
-        console.log("FMP Responsefiltered", filteredArrayOfMatches);
-        return filteredArrayOfMatches.slice(0, 10);
+        console.log("TV Response", data);
+        console.log("TV Responsefiltered", filteredArrayOfMatches);
+        return filteredArrayOfMatches;
         
     } catch (error) {
         console.error('Error fetching data:', error);
@@ -31,7 +33,7 @@ export async function searchStocksData(searchKeyword) {
 
 export async function getStockData(company) {
     const encodedCompany= encodeURIComponent(company.symbol);
-    const apiUrl =`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${encodedCompany}&apikey=${apiKey}`;
+    const apiUrl =`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${encodedCompany}&apikey=${avApiKey}`;
 
 
 
@@ -56,7 +58,7 @@ export async function getStockData(company) {
 
 export async function getStockProfile(company) {
     const encodedCompany = encodeURIComponent(company);
-    const apiUrl = `https://financialmodelingprep.com/stable/profile?symbol=${encodedCompany}&apikey=${apiKey2}`;
+    const apiUrl = `https://financialmodelingprep.com/stable/profile?symbol=${encodedCompany}&apikey=${fmpApiKey}`;
 
     try {
         const response = await fetch(apiUrl);
