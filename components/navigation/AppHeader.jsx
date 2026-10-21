@@ -1,8 +1,8 @@
-import {View, Text} from 'react-native';
+import {View, Text, Pressable} from 'react-native';
 import { FontAwesome } from '@react-native-vector-icons/fontawesome';
 import { Ionicons } from '@react-native-vector-icons/ionicons';
 import StockSearchBar from "../StockSearchbar";
-import { router } from "expo-router";
+import { router, Link } from "expo-router";
 import { Breakpoints } from '../../constants/breakpoints';
 import { StyleSheet, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -29,6 +29,11 @@ export default function AppHeader(params) {
                 <Text style={styles.mobileTitle}>{params.options.title}</Text>
                 <FontAwesome size={25} name="bell-o" color='#475569' style={{}}/>
                 <Ionicons name="person-circle" color="#64748B" size={35} style={{marginLeft: 8}}/>
+                <Link href='/settings' asChild>
+                    <Pressable accessibilityLabel="Open settings" style={{padding: 8}}>
+                        <FontAwesome size={33} name="gear" color="#64748B" />
+                    </Pressable>
+                </Link>
             </View>
             <StockSearchBar onSelectedStockChange={navigationToStock} variant="global" placeholder='Search any stock...' style={{width: '100%', height: theme.sizes.controlHeight, borderRadius: 10,}} inputStyle={{height: theme.sizes.controlHeight, fontSize: 16,}}/>
         </View>
@@ -38,6 +43,11 @@ export default function AppHeader(params) {
             <StockSearchBar onSelectedStockChange={navigationToStock} variant="global" placeholder='Search any stock...'/>
             <FontAwesome size={24} name="bell-o" color='#475569' style={{}}/>
             <Ionicons name="person-circle" color="#64748B" size={40} />
+            <Link href='/settings' asChild>
+                <Pressable accessibilityLabel="Open settings" style={{padding: 8}}>
+                    <FontAwesome size={33} name="gear" color="#64748B" />
+                </Pressable>
+            </Link>
         </View>
     );
 }

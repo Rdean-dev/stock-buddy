@@ -4,7 +4,9 @@ import StockTable from "../components/StockTable";
 import { getStockProfile } from "../services/stockService";
 import  StockSearchbar  from '../components/StockSearchbar';
 import { theme } from "../constants/theme";
+import { mockWatchlist, mockProfileData } from "../utils/test";
 
+const USE_MOCK_DATA = true;
 
 function WatchlistScreen(){
     const [watchlistArray, setWatchlistArray] = useState([  
@@ -33,6 +35,7 @@ function WatchlistScreen(){
 
 
     useEffect(() => {
+        if (USE_MOCK_DATA) return;
         const getWatchlistData = async (stockSymbol) => {
         
             const profile = await getStockProfile(stockSymbol);
@@ -69,7 +72,7 @@ function WatchlistScreen(){
         <ScrollView style={styles.container}>
             <StockSearchbar onSelectedStockChange={handleWatchlistChange} placeholder="Search to add to watchlist"/>
             <View style={styles.stockSection}>
-                <StockTable watchlistArray={watchlistArray} removeStock={removeFromWatchlist} profileData={profileData}/>
+                <StockTable watchlistArray={mockWatchlist} removeStock={removeFromWatchlist} profileData={mockProfileData}/>
 
             </View>
         </ScrollView>
