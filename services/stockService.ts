@@ -1,10 +1,19 @@
 //import datas from '../data/mockDailyIBMData.json';
 //import data from '../data/mockSearchDataBA.json';
+
+import type {WatchlistStock, StockProfile, AlphaVantageDailyResponse} from '../types/stock';
+
+
 const avApiKey = process.env.EXPO_PUBLIC_ALPHA_VANTAGE_API_KEY;
 const fmpApiKey = process.env.EXPO_PUBLIC_FINANCIAL_MODELING_PREP_API_KEY;
 const tvApiKey = process.env.EXPO_PUBLIC_TWELVE_DATA_API_KEY;
 
-export async function searchStocksData(searchKeyword) {
+type TwelveDataSearchMatch = {
+    symbol: string,
+    instrument_name: string
+};
+
+export async function searchStocksData(searchKeyword: string) : Promise<WatchlistStock[]> {
 
     const encodedSearchKeyword = encodeURIComponent(searchKeyword);
     //const searchBySymbolapiUrl =`https://financialmodelingprep.com/stable/search-symbol?query=${encodedSearchKeyword}&apikey=${apiKey2}`;
@@ -16,7 +25,7 @@ export async function searchStocksData(searchKeyword) {
         const response = await fetch(tDataApiUrl);
 
         const data = await response.json();
-        const filteredArrayOfMatches = data["data"].map((matchEntry) => {
+        const filteredArrayOfMatches = data["data"].map((matchEntry: TwelveDataSearchMatch) => {
             return {symbol: matchEntry["symbol"], name: matchEntry["instrument_name"]}
         });
         console.log("TV Response", data);
@@ -31,7 +40,7 @@ export async function searchStocksData(searchKeyword) {
 
 }
 
-export async function getStockData(company) {
+export async function getStockData(company: WatchlistStock) : Promise<AlphaVantageDailyResponse | null>{
     const encodedCompany= encodeURIComponent(company.symbol);
     const apiUrl =`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${encodedCompany}&apikey=${avApiKey}`;
 
@@ -56,7 +65,7 @@ export async function getStockData(company) {
     }
 }
 
-export async function getStockProfile(company) {
+export async function getStockProfile(company: string) : Promise<StockProfile | null> {
     const encodedCompany = encodeURIComponent(company);
     const apiUrl = `https://financialmodelingprep.com/stable/profile?symbol=${encodedCompany}&apikey=${fmpApiKey}`;
 

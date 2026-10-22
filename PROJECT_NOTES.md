@@ -643,30 +643,44 @@ The earlier audit reported 27 transitive vulnerabilities whose available fixes r
 
 ---
 
-# Before I Stop Working — October 18 2026
+# Before I Stop Working — October 21, 2026
 
 ## Last Worked On
-Stock Buddy's market data integration, specifically researching and implementing Twelve Data's Symbol Search API.
+Stock Buddy’s navigation and Watchlist styling across mobile and desktop.
 
 ### Completed Today
-- Researched Twelve Data's API documentation and available endpoints.
-- Evaluated Twelve Data as an alternative market data provider.
-- Identified symbol search as a frequently used endpoint that would benefit from a larger API allowance.
-- Reviewed Twelve Data's free-tier allowance of 800 daily API credits.
-- Set up Twelve Data's `symbol_search` endpoint.
-- Corrected URL query parameters for symbol search.
-- Continued developing a strategy for distributing Stock Buddy's market data requests across providers.
+
+- Added Settings navigation through the header gear icon.
+- Refined the mobile tab bar’s alignment, spacing, icon sizes, and labels.
+- Fixed vertical alignment using `PlatformPressable`.
+- Adapted the Watchlist table for mobile:
+  - Hid the 7-Day Trend column.
+  - Stacked daily dollar and percentage changes.
+  - Adjusted column widths, typography, and row spacing.
+  - Constrained long company names with ellipses.
+- Right-aligned Price and Today headers and values.
+- Fixed desktop spacing between Today and 7-Day Trend.
+- Fixed the remove-button column using explicit flex sizing.
+- Formatted dollar changes to two decimal places.
+- Added mock stock data and a flag to skip profile requests during development.
 
 ### Architecture Decisions
-- Use Twelve Data for symbol search.
-- Continue evaluating FMP for company profiles and Alpha Vantage for historical market data.
-- Keep search results normalized so UI components remain independent of the underlying API provider.
+
+- Keep the full table on desktop and a compact version on mobile.
+- Implement the seven-day sparkline as a separate component using the existing chart library.
+- Keep historical-data fetching outside the sparkline component.
+- Derive sorted rows from a copy of the watchlist array; track the selected column and direction in state.
+- Defer broader responsive navigation changes.
 
 ### Next Steps
-- Verify that Twelve Data search results work correctly with `StockSearchbar`.
-- Confirm endpoint credit consumption and rate limits.
-- Continue Watchlist development, including navigation and 7-day trends.
-- Begin planning backend integration when the remaining core functionality is ready.
 
-### Session Summary
-Approximately four hours spent researching, evaluating, and integrating market data services.
+- Complete cleanup: remove unused styles, hide unfinished pagination, and add remove-button accessibility labels.
+- Verify mobile layout after the final exit-column fix.
+- Implement sorting for Company, Price, and Today.
+- Build the sparkline with mock historical data first.
+- Decide between seven calendar days and seven trading sessions before connecting historical data.
+- Finish Watchlist and begin the stock detail/report screen.
+
+### Session Reflection
+
+Recognized growing confidence in independently breaking down unfamiliar features, identifying reusable logic, and planning how data and components fit together.

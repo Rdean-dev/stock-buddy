@@ -1,4 +1,4 @@
-import StockDetailScreen from "../screens/StockDetailScreen.js";
+import StockDetailScreen from "../screens/StockDetailScreen.jsx";
 import { useLocalSearchParams } from 'expo-router';
 
 

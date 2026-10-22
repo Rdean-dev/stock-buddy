@@ -1,3 +1,5 @@
+import type { TextStyle } from "react-native";
+
 export const theme = {
     colors: {
         controlBorder: "#D9E1EA",
@@ -20,10 +22,20 @@ export const theme = {
     },
     typography:{
         labelSize:14,
-        /** @type {'400'} */
-        labelWeight: '400',
+        
+        labelWeight: "400" as const,
+        labelFamily: 'Arial',
     },
     sizes:{
         controlHeight: 42,
     },
+    subtitle:{
+        lineHeight: 22,
+        fontSize: 16,
+        fontWeight: "400", 
+        color: '#64748B', 
+        paddingHorizontal: 24, 
+        paddingTop: 0, 
+        paddingBottom: 20,
+    }satisfies TextStyle,
 };

@@ -2,7 +2,7 @@ import {CandlestickChart, useCandlestickChart} from 'react-native-wagmi-charts';
 import normalizeCandleData from '../utils/normalizeCandleData';
 import { formatDateAsISODate, formatDisplayDate} from '../utils/formatDate';
 import { StyleSheet, View, Text, Pressable} from 'react-native';
-import  Marker  from "../components/Marker";
+import  Marker  from "./Marker";
 import { patternAnnotationVisuals } from "../constants/patternAnnotationVisuals";
 import {useState} from 'react';
 import { theme } from "../constants/theme";

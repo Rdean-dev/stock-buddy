@@ -45,7 +45,7 @@ export default function AppHeader(params) {
             <Ionicons name="person-circle" color="#64748B" size={40} />
             <Link href='/settings' asChild>
                 <Pressable accessibilityLabel="Open settings" style={{padding: 8}}>
-                    <FontAwesome size={33} name="gear" color="#64748B" />
+                    <FontAwesome size={40} name="gear" color="#64748B" />
                 </Pressable>
             </Link>
         </View>

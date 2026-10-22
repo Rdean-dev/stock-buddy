@@ -4,10 +4,18 @@ import { Searchbar } from "react-native-paper";
 import {Pressable, StyleSheet, View, Text} from "react-native";
 import { searchStocksData } from "../services/stockService";
 import { theme } from "../constants/theme";
+import { WatchlistStock, StockProfile } from "../types/stock";
+import type {TextStyle, ViewStyle, StyleProp} from 'react-native';
 
-export default function StockSearchbar({onSelectedStockChange, variant, placeholder, style, inputStyle}){
+type StockSearchbarProps = {
+    onSelectedStockChange: (item: WatchlistStock) => void,
+    variant: 'global' | 'scanner',
+    placeholder: string,
+};
+
+export default function StockSearchbar({onSelectedStockChange, variant, placeholder} : StockSearchbarProps){
     const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState([]);
+    const [searchResults, setSearchResults] = useState<WatchlistStock[]>([]);
 
     useEffect(() => {
         let active = true;
@@ -48,10 +56,9 @@ export default function StockSearchbar({onSelectedStockChange, variant, placehol
                 value={searchQuery}
                 placeholderTextColor= '#64748B'
                 iconColor='#475569'
-                iconSize='20'
-                elevation='0'
-                style={[styles.searchbarStyle, variant === 'global' ? styles.globalStyle : styles.scannerStyle, style]}
-                inputStyle={[variant === 'global' ? styles.globalInputStyle : styles.scannerInputStyle, { fontWeight: '400', color: '#0F172A' }, inputStyle]}
+                elevation={0}
+                style={[styles.searchbarStyle, variant === 'global' ? styles.globalStyle : styles.scannerStyle]}
+                inputStyle={[variant === 'global' ? styles.globalInputStyle : styles.scannerInputStyle, { fontWeight: '400', color: '#0F172A' }]}
                 
             />
             <View style={[styles.searchResultsStyle, {top: '100%'}]}>
@@ -120,8 +127,10 @@ const styles = StyleSheet.create({
     scannerStyle:{
         backgroundColor: "#FFFFFF",
         borderWidth: 1,
-        borderColor: '#CBD5E1',
         borderRadius: theme.radii.controlRadius,
+        width: '100%',
+        height: theme.sizes.controlHeight,  
+        borderColor: theme.colors.controlBorder,
         
     },
 
@@ -133,7 +142,10 @@ const styles = StyleSheet.create({
     },
     
     scannerInputStyle:{
-        fontSize:16,
+        fontSize: 14, 
+        height: theme.sizes.controlHeight, 
+        minHeight: 0, 
+        paddingVertical: 0
     },
     searchContainer: {
         position: 'relative',

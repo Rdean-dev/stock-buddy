@@ -1,4 +1,4 @@
-import PatternScannerScreen from "../../screens/PatternScannerScreen.js";
+import PatternScannerScreen from "../../screens/PatternScannerScreen.jsx";
 
 export default function PatternScanner(){
     return <PatternScannerScreen />;

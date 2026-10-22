@@ -1,5 +1,5 @@
 import React from 'react';
-import  Marker  from "../components/Marker";
+import  Marker  from "./Marker";
 import {Text, StyleSheet, View, ScrollView,useWindowDimensions, Pressable } from 'react-native';
 import { patternAnnotationVisuals } from "../constants/patternAnnotationVisuals";
 import { Breakpoints } from '../constants/breakpoints';

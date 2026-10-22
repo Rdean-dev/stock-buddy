@@ -183,7 +183,7 @@ export default function PatternScannerScreen() {
     return (
         <ScrollView>
             {!isMobile && (
-                <Text style={{lineHeight: 22, fontSize: 16, fontWeight: 400, color: '#64748B', paddingHorizontal: 24, paddingTop: 0, paddingBottom: 20,}}>
+                <Text style={theme.subtitle}>
                     Explore candlestick patterns in historical stock data.
                 </Text>
             )}
@@ -193,7 +193,7 @@ export default function PatternScannerScreen() {
                     
                     <View style={{flexDirection: 'column', flex: 1, minWidth: 0, position: 'relative', zIndex: 10,}}>
                         <Text style={styles.fieldLabel}>Stock to analyze</Text>
-                        <StockSearchbar onSelectedStockChange={setSelectedStock} variant="scanner" placeholder='Select a stock to scan' style={{width: '100%', height: theme.sizes.controlHeight, borderRadius: theme.radii.controlRadius, borderColor: '#D9E1EA'}} inputStyle={{fontSize: 14, height: theme.sizes.controlHeight, minHeight: 0, paddingVertical: 0}}/>
+                        <StockSearchbar onSelectedStockChange={setSelectedStock} variant="scanner" placeholder='Select a stock to scan' />
                         <View style={styles.dateSection}>
                             {datePresets.map((preset) => {
                                 const isSelected = selectedInterval === preset.months;
