@@ -1,7 +1,7 @@
 //import datas from '../data/mockDailyIBMData.json';
 //import data from '../data/mockSearchDataBA.json';
 
-import type {WatchlistStock, StockProfile, AlphaVantageDailyResponse} from '../types/stock';
+import type {WatchlistStock, StockProfile, AlphaVantageDailyResponse, MarketState} from '../types/stock';
 
 
 const avApiKey = process.env.EXPO_PUBLIC_ALPHA_VANTAGE_API_KEY;
@@ -13,11 +13,6 @@ type TwelveDataSearchMatch = {
     instrument_name: string
 };
 
-type MarketState= {
-    is_market_open: boolean;
-    time_to_open: string;
-    time_to_close: string;
-}
 
 export async function searchStocksData(searchKeyword: string) : Promise<WatchlistStock[]> {
 
@@ -95,7 +90,7 @@ export async function getStockProfile(company: string) : Promise<StockProfile | 
     }
 }
 
-export async function marketStatus(): Promise<MarketState | null>{
+export async function getMarketStatus(): Promise<MarketState | null>{
 
     
     

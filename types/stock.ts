@@ -43,3 +43,9 @@ export type PatternName =
 
 
 export type ShapeName = | 'diamond' | 'square' | 'star' | 'triangle' | 'circle';
+
+export type MarketState= {
+    is_market_open: boolean;
+    time_to_open: string;
+    time_to_close: string;
+}
