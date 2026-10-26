@@ -13,6 +13,12 @@ type TwelveDataSearchMatch = {
     instrument_name: string
 };
 
+type MarketState= {
+    is_market_open: boolean;
+    time_to_open: string;
+    time_to_close: string;
+}
+
 export async function searchStocksData(searchKeyword: string) : Promise<WatchlistStock[]> {
 
     const encodedSearchKeyword = encodeURIComponent(searchKeyword);
@@ -87,4 +93,37 @@ export async function getStockProfile(company: string) : Promise<StockProfile | 
         console.error('Error fetching company data:', error);
         return null;
     }
+}
+
+export async function marketStatus(): Promise<MarketState | null>{
+
+    
+    
+    const tDataApiUrl = `https://api.twelvedata.com/market_state?exchange=NYSE&apikey=${tvApiKey}`;
+
+    try {
+        const response = await fetch(tDataApiUrl);
+
+        if (!response.ok) {
+            console.error('Market status request failed:', response.status);
+            return null;
+        }
+
+        const data = await response.json();
+        
+
+        if (typeof data?.[0]?.is_market_open === 'boolean'){
+            console.log("Market Status:",data);
+            return data[0];
+        }
+        else{
+            console.log("Twelve Data incorrect response:", data);
+            return null;
+        }
+    } catch (error) {
+        console.error('Error fetching market status:', error);
+        return null;
+    }
+
+
 }

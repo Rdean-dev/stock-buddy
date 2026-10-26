@@ -31,3 +31,15 @@ export type Candle = {
     close: number,
     volume: number,
 };
+
+export type PatternName = 
+    | 'Doji' | 'Hammer' 
+    | 'Morning Star' | 'Evening Star' 
+    | 'Bearish Engulfing' | 'Bullish Engulfing' 
+    | 'Shooting Star' | 'Hanging Man' 
+    | 'Bullish Harami' | 'Bearish Harami'
+    | 'Piercing Line' | 'Dark Cloud Cover' 
+    | 'Three White Soldiers' |'Three Black Crows' | 'Inverted Hammer';
+
+
+export type ShapeName = | 'diamond' | 'square' | 'star' | 'triangle' | 'circle';

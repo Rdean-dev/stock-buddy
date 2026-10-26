@@ -2,9 +2,13 @@ import React from 'react';
 import {Text, View, StyleSheet, Pressable} from 'react-native';
 import { theme } from "../constants/theme";
 import {Link } from "expo-router";
+import type {WatchlistStock} from '../types/stock'
+type StockCardProps = {
+    stock: WatchlistStock;
+    removeStock: (item: WatchlistStock) => {};
+};
 
-
-export default function StockCard({stock, removeStock}){
+export default function StockCard({stock, removeStock}: StockCardProps){
     return (
                 
             <View style={styles.stockCard}>

@@ -4,8 +4,7 @@ import { Searchbar } from "react-native-paper";
 import {Pressable, StyleSheet, View, Text} from "react-native";
 import { searchStocksData } from "../services/stockService";
 import { theme } from "../constants/theme";
-import { WatchlistStock, StockProfile } from "../types/stock";
-import type {TextStyle, ViewStyle, StyleProp} from 'react-native';
+import { WatchlistStock } from "../types/stock";
 
 type StockSearchbarProps = {
     onSelectedStockChange: (item: WatchlistStock) => void,

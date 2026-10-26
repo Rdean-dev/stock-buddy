@@ -1,5 +1,6 @@
+import type {Candle} from '../types/stock';
 
-export function isDoji(candle){
+export function isDoji(candle: Candle){
 
     const bodySize = Math.abs(candle.open - candle.close);
     const candleRange = candle.high - candle.low;
@@ -7,7 +8,7 @@ export function isDoji(candle){
     return candleRange > 0 && bodySize <= candleRange * 0.05;
 }
 
-export function isHammer(candle) {
+export function isHammer(candle: Candle) {
     const bodySize = Math.abs(candle.open - candle.close);
     const lowerRange = Math.min(candle.open, candle.close) - candle.low;
     const upperRange = candle.high - Math.max(candle.open, candle.close);
@@ -16,7 +17,7 @@ export function isHammer(candle) {
 
 }
 
-export function isBullishEngulfing(previousCandle, currentCandle) {
+export function isBullishEngulfing(previousCandle: Candle, currentCandle: Candle) {
     return (
         previousCandle.close < previousCandle.open &&
         currentCandle.close > currentCandle.open &&
@@ -25,7 +26,7 @@ export function isBullishEngulfing(previousCandle, currentCandle) {
     );
 }
 
-export function isBearishEngulfing(previousCandle, currentCandle) {
+export function isBearishEngulfing(previousCandle: Candle, currentCandle: Candle) {
     return (
         previousCandle.close > previousCandle.open &&
         currentCandle.close < currentCandle.open &&
@@ -34,7 +35,7 @@ export function isBearishEngulfing(previousCandle, currentCandle) {
     );
 }
 
-export function isMorningStar(firstCandle, secondCandle, thirdCandle) {
+export function isMorningStar(firstCandle: Candle, secondCandle: Candle, thirdCandle: Candle) {
     
     const firstBody = Math.abs(firstCandle.close - firstCandle.open);
     const secondBody = Math.abs(secondCandle.close - secondCandle.open);
@@ -51,7 +52,7 @@ export function isMorningStar(firstCandle, secondCandle, thirdCandle) {
 }
 
 
-export function isEveningStar(firstCandle, secondCandle, thirdCandle) {
+export function isEveningStar(firstCandle: Candle, secondCandle: Candle, thirdCandle: Candle) {
     
     const firstBody = Math.abs(firstCandle.close - firstCandle.open);
     const secondBody = Math.abs(secondCandle.close - secondCandle.open);
@@ -67,7 +68,7 @@ export function isEveningStar(firstCandle, secondCandle, thirdCandle) {
     );
 }
 
-export function isShootingStar(candle) {
+export function isShootingStar(candle: Candle) {
     
     const bodySize = Math.abs(candle.open - candle.close);
     const lowerRange = Math.min(candle.open, candle.close) - candle.low;
@@ -81,7 +82,7 @@ export function isShootingStar(candle) {
     );
 }
 
-export function isInvertedHammer(candle) {
+export function isInvertedHammer(candle: Candle) {
     
     const bodySize = Math.abs(candle.open - candle.close);
     const lowerRange = Math.min(candle.open, candle.close) - candle.low;
@@ -95,7 +96,7 @@ export function isInvertedHammer(candle) {
     );
 }
 
-export function isHangingMan(candle) {
+export function isHangingMan(candle: Candle) {
     
     const bodySize = Math.abs(candle.open - candle.close);
     const lowerRange = Math.min(candle.open, candle.close) - candle.low;
@@ -109,7 +110,7 @@ export function isHangingMan(candle) {
     );
 }
 
-export function isBearishHarami(previousCandle, currentCandle) {
+export function isBearishHarami(previousCandle: Candle, currentCandle: Candle) {
     return (
         previousCandle.close > previousCandle.open &&
         currentCandle.close < currentCandle.open &&
@@ -118,7 +119,7 @@ export function isBearishHarami(previousCandle, currentCandle) {
     );
 }
 
-export function isBullishHarami(previousCandle, currentCandle) {
+export function isBullishHarami(previousCandle: Candle, currentCandle: Candle) {
     return (
         previousCandle.close < previousCandle.open &&
         currentCandle.close > currentCandle.open &&
@@ -127,7 +128,7 @@ export function isBullishHarami(previousCandle, currentCandle) {
     );
 }
 
-export function isPiercingLine(previousCandle, currentCandle) {
+export function isPiercingLine(previousCandle: Candle, currentCandle: Candle) {
     const midpoint = (previousCandle.open + previousCandle.close) / 2;
 
     return (
@@ -138,7 +139,7 @@ export function isPiercingLine(previousCandle, currentCandle) {
     );
 }
 
-export function isDarkCloudCover(previousCandle, currentCandle) {
+export function isDarkCloudCover(previousCandle: Candle, currentCandle: Candle) {
     const midpoint = (previousCandle.open + previousCandle.close) / 2;
 
     return (
@@ -149,7 +150,7 @@ export function isDarkCloudCover(previousCandle, currentCandle) {
     );
 }
 
-export function isThreeWhiteSoldiers(firstCandle, secondCandle, thirdCandle) {
+export function isThreeWhiteSoldiers(firstCandle: Candle, secondCandle: Candle, thirdCandle: Candle) {
     const isBullish = (firstCandle.close > firstCandle.open) && (secondCandle.close > secondCandle.open) && (thirdCandle.close > thirdCandle.open);
     
     
@@ -161,7 +162,7 @@ export function isThreeWhiteSoldiers(firstCandle, secondCandle, thirdCandle) {
     );
 }
 
-export function isThreeBlackCrows(firstCandle, secondCandle, thirdCandle) {
+export function isThreeBlackCrows(firstCandle: Candle, secondCandle: Candle, thirdCandle: Candle) {
     
     const isBearish = (firstCandle.close < firstCandle.open) && (secondCandle.close < secondCandle.open) && (thirdCandle.close < thirdCandle.open);
 

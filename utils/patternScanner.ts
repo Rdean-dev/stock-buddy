@@ -1,11 +1,26 @@
-import { isDoji, isHammer, isMorningStar, isEveningStar, isBearishEngulfing, isBullishEngulfing, isShootingStar, isHangingMan, isBullishHarami, isBearishHarami, isPiercingLine, isDarkCloudCover, isThreeWhiteSoldiers, isThreeBlackCrows, isInvertedHammer } from './patternCalculations.js';
-import  normalizeCandleData  from "../utils/normalizeCandleData.js";
+import { isDoji, isHammer, isMorningStar, isEveningStar, isBearishEngulfing, isBullishEngulfing, isShootingStar, isHangingMan, isBullishHarami, isBearishHarami, isPiercingLine, isDarkCloudCover, isThreeWhiteSoldiers, isThreeBlackCrows, isInvertedHammer } from './patternCalculations';
+import  normalizeCandleData  from "./normalizeCandleData";
+import type {PatternName, AlphaVantageDailyResponse, Candle} from '../types/stock';
 
-export default function scanPatterns (startDate, endDate, selectedPatterns, stockData) {
+type PatternDetector = 
+    | {
+        candlesRequired: 1;
+        detector: (candle: Candle) => boolean;
+    }
+    | {
+        candlesRequired: 2;
+        detector: (previousCandle: Candle, currentCandle: Candle) => boolean;
+    }
+    |{
+        candlesRequired: 3;
+        detector: (firstCandle: Candle, secondCandle: Candle, thirdCandle: Candle) => boolean;
+    }
+
+export default function scanPatterns (startDate: string, endDate:string, selectedPatterns: PatternName[], stockData: AlphaVantageDailyResponse) {
     
     const filteredArrayOfCandlestickObjects = normalizeCandleData(stockData, startDate, endDate);
 
-    const patternDetectors = {
+    const patternDetectors: Record<PatternName, PatternDetector> = {
         Doji: {
             detector: isDoji,
             candlesRequired: 1
@@ -69,7 +84,7 @@ export default function scanPatterns (startDate, endDate, selectedPatterns, stoc
         }
     };
 
-    const results = {};
+    const results: Partial<Record<PatternName, Candle[]>> = {};
 
     selectedPatterns.forEach((pattern) => {
         results[pattern] = [];
@@ -77,22 +92,23 @@ export default function scanPatterns (startDate, endDate, selectedPatterns, stoc
 
     filteredArrayOfCandlestickObjects.forEach((candle, index) => {
         selectedPatterns.forEach((pattern) => {
+            const patternResults = results[pattern];
+            if (!patternResults) return;
             const patterns = patternDetectors[pattern];
-            const detector = patterns.detector;
-            const candlesRequired = patterns.candlesRequired;
             const previousCandle = filteredArrayOfCandlestickObjects[index - 1];
             const firstCandle = filteredArrayOfCandlestickObjects[index - 2];
 
 
-            if (index >= 2 && candlesRequired === 3 && detector(firstCandle, previousCandle, candle)) {
-                results[pattern].push(candle);
+            if (index >= 2 && patterns.candlesRequired === 3 && patterns.detector(firstCandle, previousCandle, candle)) {
+                patternResults.push(candle);
             }
-            else if (index >= 1 && candlesRequired === 2 && detector(previousCandle, candle)) {
-                results[pattern].push(candle);
+            else if (index >= 1 && patterns.candlesRequired === 2 && patterns.detector(previousCandle, candle)) {
+                patternResults.push(candle);
             }
-            else if (candlesRequired === 1 && detector(candle)) {
-                results[pattern].push(candle);
+            else if (patterns.candlesRequired === 1 && patterns.detector(candle)) {
+                patternResults.push(candle);
             }
+
             
         });
     });

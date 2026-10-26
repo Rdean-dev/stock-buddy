@@ -1,19 +1,47 @@
 import {CandlestickChart, useCandlestickChart} from 'react-native-wagmi-charts';
 import normalizeCandleData from '../utils/normalizeCandleData';
-import { formatDateAsISODate, formatDisplayDate} from '../utils/formatDate';
+import { formatDateAsISODate} from '../utils/formatDate';
 import { StyleSheet, View, Text, Pressable} from 'react-native';
 import  Marker  from "./Marker";
 import { patternAnnotationVisuals } from "../constants/patternAnnotationVisuals";
 import {useState} from 'react';
 import { theme } from "../constants/theme";
+import type { PatternName, Candle, AlphaVantageDailyResponse, WatchlistStock } from "../types/stock";
 
-function PatternAnnotations({matchResults}) {
+type PatternMatch = {
+    date: string;
+    pattern: PatternName;
+    matchIndex: number;
+};
+
+type PatternAnnotationsProps = {
+    matchResults: PatternMatch[];
+}
+
+type XAxisProps = {
+    candlestickData: Candle[];
+    width: number;
+}
+type PatternLegendProps = {
+    selectedPatterns: PatternName[];
+}
+type StockChartProps = {
+    startDate: Date;
+    endDate: Date;
+    stockData: AlphaVantageDailyResponse;
+    patternResults: Partial<Record<PatternName, Candle[]>>;
+    dateInterval: (months: number) => void;
+    selectedStock: WatchlistStock;
+    selectedPatterns: PatternName[];
+}
+
+function PatternAnnotations({matchResults}: PatternAnnotationsProps) {
     const {step, domain, data, height} = useCandlestickChart();
     
-    const countOfDatesSeen = {};
+    const countOfDatesSeen: Record<string, number> = {};
     const annotationsArray = matchResults.map((match) => {
         const candle = data[match.matchIndex];
-        const index = match.matchIndex ?? null;
+        const index = match.matchIndex;
         const xPosition = step * index + step / 2 - 5;
         const maxPrice = domain[1];
         const minPrice = domain[0];
@@ -50,7 +78,7 @@ function PatternAnnotations({matchResults}) {
 
 
 
-function PatternLegend({selectedPatterns}) {
+function PatternLegend({selectedPatterns}: PatternLegendProps) {
     return(
         <View style={styles.patternLegend}>
             {selectedPatterns.map((pattern) => (<View key={pattern} style={styles.legend}><Marker shape={patternAnnotationVisuals[pattern].shape} color={patternAnnotationVisuals[pattern].color}/><Text>{pattern}</Text></View>))}
@@ -89,8 +117,8 @@ function YAxis() {
 
 }
 
-function XAxis({candlestickData, width}) {
-    const {step, data} = useCandlestickChart();
+function XAxis({candlestickData, width}: XAxisProps){
+    const {step} = useCandlestickChart();
     const labelWidth = 50;
     
     const xAxisArray = [];
@@ -132,7 +160,7 @@ function XAxis({candlestickData, width}) {
 }
 
 
-export default function StockChart({startDate, endDate, stockData, patternResults, dateInterval,selectedStock, selectedPatterns}) {
+export default function StockChart({startDate, endDate, stockData, patternResults, dateInterval,selectedStock, selectedPatterns}: StockChartProps) {
     const [innerWidth, setInnerWidth] = useState(0);
     
     if (!stockData?.["Time Series (Daily)"] || !startDate || !endDate) {
@@ -154,7 +182,9 @@ export default function StockChart({startDate, endDate, stockData, patternResult
 
     const matchesArray = [];
 
-    for (const [patternName, matches] of Object.entries(patternResults ?? {}) ){
+    for (const patternName of selectedPatterns){
+        const matches = patternResults[patternName];
+        if (!matches) continue;
         const mappedMatches = matches.map((match) => {
             return {
                 date: match.date,
@@ -168,7 +198,7 @@ export default function StockChart({startDate, endDate, stockData, patternResult
     const matchResults = matchesArray.map((match) =>{
         const matchIndex = filteredArrayOfCandlestickObjects.findIndex((candle) => match.date === candle.date);
         return {date:match.date, pattern:match.pattern, matchIndex};
-    });
+    }).filter(result => result.matchIndex >= 0);
 
 
 
@@ -187,7 +217,7 @@ export default function StockChart({startDate, endDate, stockData, patternResult
                 {candleChartWidth > 0 &&
                 <>
                     <View style={{flexDirection: 'column'}}>
-                    <CandlestickChart width={candleChartWidth} height={350} style={styles.chart}>
+                    <CandlestickChart width={candleChartWidth} height={350}>
                         <CandlestickChart.Candles/>
                         <CandlestickChart.Crosshair>
                             <CandlestickChart.Tooltip/>

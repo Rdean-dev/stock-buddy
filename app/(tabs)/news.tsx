@@ -1,4 +1,4 @@
-import NewsScreen from "../../screens/NewsScreen.jsx";
+import NewsScreen from "../../screens/NewsScreen";
 
 export default function News(){
     return <NewsScreen />;

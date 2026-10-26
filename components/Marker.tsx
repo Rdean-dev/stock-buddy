@@ -1,6 +1,14 @@
 import Svg, { Circle, Rect, Polygon } from 'react-native-svg';
+import type {ShapeName} from '../types/stock'
 
-export default function Marker({shape, color}) {
+
+type MarkerProps = {
+    shape: ShapeName;
+    color: string;
+
+}
+
+export default function Marker({shape, color}: MarkerProps) {
     if (shape === 'circle'){
         return (
             <Svg height="10" width="10">

@@ -1,4 +1,11 @@
-export const patternAnnotationVisuals = {
+import type {PatternName, ShapeName} from '../types/stock';
+
+type PatternAnnotationVisual = {
+    color: string;
+    shape: ShapeName;
+}
+
+export const patternAnnotationVisuals: Record<PatternName, PatternAnnotationVisual> = {
     Doji: {
         color: '#2563EB', // blue
         shape: 'circle',

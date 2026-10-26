@@ -5,7 +5,6 @@ import StockSearchbar from "../components/StockSearchbar";
 import PatternCard from '../components/PatternCard';
 import { formatDateAsISODate as formatDate, formatDisplayDate } from "../utils/formatDate";
 import scanPatterns from '../utils/patternScanner';
-import Checkbox from 'expo-checkbox';
 import { MultiSelect } from 'react-native-element-dropdown';
 import StockChart from '../components/StockChart';
 import { getStockData } from "../services/stockService";
@@ -13,7 +12,18 @@ import { Breakpoints } from '../constants/breakpoints';
 import  Marker  from "../components/Marker";
 import { patternAnnotationVisuals } from "../constants/patternAnnotationVisuals";
 import { theme } from "../constants/theme";
+import type {AlphaVantageDailyResponse, WatchlistStock, PatternName} from "@/types/stock";
 
+type DropdownOption = {
+    label: string,
+    value: PatternName,
+};
+
+type PatternSummary = {
+    name: PatternName;
+    count: number;
+    dates: string[];
+}
 const datePresets = [
     {
         label: '1M', 
@@ -37,19 +47,18 @@ export default function PatternScannerScreen() {
     const { width } = useWindowDimensions();
 
     const isMobile = width < Breakpoints.mobile;
-    const isTablet = width >= Breakpoints.mobile &&
-                    width < Breakpoints.tablet;
-    const [startDate, setStartDate] = useState(null);
-    const [endDate, setEndDate] = useState(null);
+    const isTablet = width >= Breakpoints.mobile && width < Breakpoints.tablet;
+    const [startDate, setStartDate] = useState<Date | null>(null);
+    const [endDate, setEndDate] = useState<Date | null>(null);
     const [dateError, setDateError] = useState('');
-    const [selectedPatterns, setSelectedPatterns] = useState([]);
+    const [selectedPatterns, setSelectedPatterns] = useState<PatternName[]>([]);
     //const [patternData, setPatternData] = useState([]);
-    const [selectedStock, setSelectedStock] = useState(null);
-    const [selectedStockData, setSelectedStockData] = useState(null);
-    const [selectedInterval, setSelectedInterval] = useState(null);
+    const [selectedStock, setSelectedStock] = useState<WatchlistStock | null>(null);
+    const [selectedStockData, setSelectedStockData] = useState<AlphaVantageDailyResponse | null>(null);
+    const [selectedInterval, setSelectedInterval] = useState<number | null>(null);
     const [hasScanned, setHasScanned] = useState(false);
 
-    const availablePatterns = [{label: "Doji", value: "Doji"}, 
+    const availablePatterns: DropdownOption[] = [{label: "Doji", value: "Doji"}, 
         {label: "Hammer", value: "Hammer"}, 
         {label: "Shooting Star", value: "Shooting Star"},
         {label: "Inverted Hammer", value: "Inverted Hammer"},
@@ -74,7 +83,7 @@ export default function PatternScannerScreen() {
         if (selectedStock === null) {
             return;
         }
-        const getData = async (stock) => {
+        const getData = async (stock: WatchlistStock) => {
             const result = await getStockData(stock);
             if (!ignore){ 
                 setSelectedStockData(result)
@@ -90,7 +99,7 @@ export default function PatternScannerScreen() {
             ignore = true;
         };
     }, [selectedStock]);
-    const handleStartDateChange = (date) => {
+    const handleStartDateChange = (date: Date | null) => {
         if ((date && endDate) && normalizeDate(date) > normalizeDate(endDate)){
             setDateError("Pick a date on or before the end Date")
             return
@@ -101,7 +110,7 @@ export default function PatternScannerScreen() {
         return setStartDate(date);
     }
 
-    const handleEndDateChange = (date) => {
+    const handleEndDateChange = (date: Date | null) => {
         if ((startDate && date) && normalizeDate(date) < normalizeDate(startDate)){
             setDateError("Pick a date on or after the start Date.")
             return
@@ -111,7 +120,7 @@ export default function PatternScannerScreen() {
         return setEndDate(date)
     }
 
-   const normalizeDate = (date) => {
+   const normalizeDate = (date: Date) => {
         return new Date(
             date.getFullYear(),
             date.getMonth(),
@@ -120,7 +129,7 @@ export default function PatternScannerScreen() {
     };
     
     
-    const dateInterval = (numOfMonths) => {
+    const dateInterval = (numOfMonths: number) => {
         setDateError("")
         const today = new Date();
 
@@ -137,7 +146,7 @@ export default function PatternScannerScreen() {
         setEndDate(today);
     };
 
-    const handleCheckboxChange = (pattern) => {
+    const handleCheckboxChange = (pattern: PatternName) => {
         
         setSelectedPatterns(previous => previous.includes(pattern)
             ? previous.filter(item => item !== pattern)
@@ -169,11 +178,11 @@ export default function PatternScannerScreen() {
     };
 
     const patternResults = hasScanned && startDate && endDate && selectedStockData && selectedStock && selectedPatterns.length > 0? scanPatterns(formatDate(startDate), formatDate(endDate), selectedPatterns, selectedStockData) : {};
-    const patternData = Object.entries(patternResults).map(([patternName, candles]) => {
+    const patternData: PatternSummary[] = Object.entries(patternResults).map(([patternName, candles]) => {
         const patternMatchDates = candles.map((candle) => formatDisplayDate(candle.date));
 
         return {
-            name: patternName,
+            name: patternName as PatternName,
             count: patternMatchDates.length,
             dates: patternMatchDates,
         };
@@ -217,7 +226,9 @@ export default function PatternScannerScreen() {
                         <MultiSelect data={availablePatterns} 
                             labelField="label"  
                             valueField="value" value={selectedPatterns} 
-                            onChange={(selected) => setSelectedPatterns(selected)}
+                            onChange={(selected) => setSelectedPatterns(
+                                selected.filter((value): value is PatternName => 
+                                availablePatterns.some(availablePatterns => availablePatterns.value === value)))}
                             mode="auto"
                             placeholder={selectedPatterns?.length > 0 ? `${selectedPatterns.length} pattern(s) selected` : "Select Patterns"}
                             placeholderStyle={styles.placeholderStyle}
@@ -225,12 +236,12 @@ export default function PatternScannerScreen() {
                             itemContainerStyle={{padding: 5}}
                             selectedTextStyle={styles.selectedTextStyle}
                             selectedStyle={styles.selectedStyle}
-                            renderItem={(pattern) => (
+                            renderItem={(pattern: DropdownOption) => (
                                 <View style={{flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 8, paddingHorizontal: 10}}>
                                     <Marker shape={patternAnnotationVisuals[pattern.value].shape} color={patternAnnotationVisuals[pattern.value].color}/><Text style={styles.dropdownTextStyle}>{pattern.label}</Text>
                                 </View>
                                 )}
-                            renderSelectedItem={(pattern, unSelect) => (
+                            renderSelectedItem={(pattern: DropdownOption, unSelect) => (
                                 <View style={[styles.selectedChip, {borderColor: patternAnnotationVisuals[pattern.value].color, borderWidth: 1}]}>
                                     <Marker
                                         shape={patternAnnotationVisuals[pattern.value].shape}
@@ -241,7 +252,7 @@ export default function PatternScannerScreen() {
                                         {pattern.label}
                                     </Text>
 
-                                    <Pressable onPress={() => unSelect(pattern)}>
+                                    <Pressable onPress={() => unSelect?.(pattern)}>
                                         <Text style={styles.removeChip}>x</Text>
                                     </Pressable>
                                 </View>

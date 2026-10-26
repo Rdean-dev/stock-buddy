@@ -1,12 +1,24 @@
 import React from 'react';
 import  Marker  from "./Marker";
-import {Text, StyleSheet, View, ScrollView,useWindowDimensions, Pressable } from 'react-native';
+import {Text, StyleSheet, View, useWindowDimensions, Pressable } from 'react-native';
 import { patternAnnotationVisuals } from "../constants/patternAnnotationVisuals";
 import { Breakpoints } from '../constants/breakpoints';
 import { useState} from "react";
 import { theme } from "../constants/theme";
+import type {PatternName} from '../types/stock'
 
-export default function PatternCard({pattern}){
+
+type PatternSummary = {
+    name: PatternName;
+    count: number;
+    dates: string[];
+}
+
+type PatternCardProps = {
+    pattern: PatternSummary
+};
+
+export default function PatternCard({pattern}: PatternCardProps){
     const { width } = useWindowDimensions();
     const isMobile = width < Breakpoints.mobile;
     const [expanded, setExpanded] = useState(false);

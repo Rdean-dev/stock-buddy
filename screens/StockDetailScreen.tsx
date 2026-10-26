@@ -1,9 +1,11 @@
 import React from "react";
 import {Text, StyleSheet, View, ScrollView } from 'react-native';
+import { useLocalSearchParams } from "expo-router";
 
-
-export default function StockDetailScreen({ ticker }) {
+export default function StockDetailScreen() {
     
+    const { ticker } = useLocalSearchParams<{ ticker: string }>();
+
     return (
         <>
             <ScrollView style={styles.container}>

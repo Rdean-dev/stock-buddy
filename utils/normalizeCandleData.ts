@@ -1,12 +1,7 @@
 import type {AlphaVantageDailyResponse, Candle} from '../types/stock';
 
-type normalizeCandleDataProps = {
-    stockData: AlphaVantageDailyResponse,
-    startDate: string,
-    endDate: string,
-};
 
-export default function normalizeCandleData({stockData, startDate, endDate}: normalizeCandleDataProps): Candle[] {
+export default function normalizeCandleData(stockData: AlphaVantageDailyResponse, startDate: string, endDate: string,): Candle[] {
     const initialData = stockData["Time Series (Daily)"];
 
     const arrayOfCandlestickObjects = Object.entries(initialData);

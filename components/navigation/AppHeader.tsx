@@ -7,9 +7,10 @@ import { Breakpoints } from '../../constants/breakpoints';
 import { StyleSheet, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from "../../constants/theme";
+import { BottomTabHeaderProps } from '@react-navigation/bottom-tabs';
+import type {AlphaVantageDailyResponse, WatchlistStock, PatternName} from "@/types/stock";
 
-
-function navigationToStock(stock) {
+function navigationToStock(stock: WatchlistStock) {
 
     router.push({
         pathname: "/stock-detail",
@@ -18,7 +19,7 @@ function navigationToStock(stock) {
 
 }
 
-export default function AppHeader(params) {
+export default function AppHeader(params: BottomTabHeaderProps) {
     const insets = useSafeAreaInsets();
     const { width } = useWindowDimensions();
     const isMobile = width < Breakpoints.mobile;
@@ -35,7 +36,7 @@ export default function AppHeader(params) {
                     </Pressable>
                 </Link>
             </View>
-            <StockSearchBar onSelectedStockChange={navigationToStock} variant="global" placeholder='Search any stock...' style={{width: '100%', height: theme.sizes.controlHeight, borderRadius: 10,}} inputStyle={{height: theme.sizes.controlHeight, fontSize: 16,}}/>
+            <StockSearchBar onSelectedStockChange={navigationToStock} variant="global" placeholder='Search any stock...'/>
         </View>
     ) : (
         <View style={styles.headerStyle}>
