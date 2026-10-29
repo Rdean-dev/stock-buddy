@@ -1,16 +1,25 @@
 import {useState, useEffect, useRef} from "react";
-import {Pressable, Text, StyleSheet, ScrollView, View} from 'react-native';
+import {Pressable, Text, StyleSheet, ScrollView, View, AppState} from 'react-native';
 import StockTable from "../components/StockTable";
-import { getStockProfile, getMarketStatus } from "../services/stockService";
+import { getStockProfile, getMarketStatus, getStockData } from "../services/stockService";
 import  StockSearchbar  from '../components/StockSearchbar';
 import { theme } from "../constants/theme";
 import { mockWatchlist, mockProfileData } from "../utils/test";
-import type {WatchlistStock, StockProfile, MarketState} from '../types/stock';
+import type {WatchlistStock, StockProfile, MarketState, AlphaVantageDailyEntry, AlphaVantageDailyResponse} from '../types/stock';
 import  Marker  from "../components/Marker";
 
-const USE_MOCK_DATA = true;
+const USE_MOCK_DATA = false;
 
-function WatchlistScreen(){
+const countdownToMilliseconds = (countdown: string): number => {
+    const [hours, minutes, seconds] = countdown.split(':').map(Number);
+
+    return (hours * 3600 + minutes * 60 + seconds) * 1000
+
+
+
+}
+
+export default function WatchlistScreen(){
     const [watchlistArray, setWatchlistArray] = useState<WatchlistStock[]>([  
     {
         "symbol": "AAPL",
@@ -33,22 +42,58 @@ function WatchlistScreen(){
         "name": "Dell Technologies Inc."
     }]);
 
-    const [profileData, setProfileData] = useState<Partial<Record<string, StockProfile>>>({});
+    const [profileData, setProfileData] = useState<Partial<Record<string, StockProfile>>>(mockProfileData);
 
     const [marketState, setMarketState] = useState<MarketState | null>(null);
+
+    const [historicalData, setHistoricalData] = useState<Partial<Record<string, AlphaVantageDailyResponse>>>({});
 
     let marketStatement = '';
 
     useEffect(() => {
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        let active = true;
+        let isFetching = false;
         const getMarketStatusVisual = async () => {
-            const marketStatus = await getMarketStatus();
-            console.log("Market Status: ", marketStatus);
-            if (marketStatus) {
-                setMarketState(marketStatus);
+            if (isFetching) return;
+            isFetching = true;
+            try{
+                const marketStatus = await getMarketStatus();
+                if (!active) return;
+                console.log("Market Status: ", marketStatus);
+                if (marketStatus) {
+                    setMarketState(marketStatus);
+                    let delay = 60000;
+                    const tcORto = marketStatus.is_market_open ? marketStatus.time_to_close : marketStatus.time_to_open;
+                    if (typeof tcORto === "string") {
+                        const tcORtoValue = countdownToMilliseconds(tcORto);
+                        delay = Number.isFinite(tcORtoValue) ? Math.max(5000, tcORtoValue): 60000;
+                    }
+                    timer = setTimeout(() => {
+                        getMarketStatusVisual();
+                    }, delay);
+                    
+                }else{
+                    setMarketState(null)
+                    timer = setTimeout(() => {
+                        getMarketStatusVisual();
+                    }, 60000);
+                }
+            }finally{
+                isFetching = false;
             }
+            
         }
 
         getMarketStatusVisual();
+        const subscription = AppState.addEventListener('change', (nextState) => {
+            if (nextState === 'active') {
+                clearTimeout(timer);
+                getMarketStatusVisual();
+            }
+
+        });
+        return () => {active = false; clearTimeout(timer); subscription.remove()};
     },[])
 
     useEffect(() => {
@@ -56,10 +101,14 @@ function WatchlistScreen(){
         const getWatchlistData = async (stockSymbol: string) => {
         
             const profile = await getStockProfile(stockSymbol);
+            const hdata = await getStockData(stockSymbol);
             
             console.log("Profile Data:",profile);
             if (profile){
                 setProfileData(previous => ({...previous, [stockSymbol]: profile}));
+            }
+            if (hdata) {
+                setHistoricalData(previous => ({...previous, [stockSymbol]: hdata}))
             }
 
 
@@ -68,7 +117,7 @@ function WatchlistScreen(){
         
         Promise.all(filteredWatchlistArray.map((watchlistStock) => {attemptedRef.current.add(watchlistStock.symbol); /*fetchingRef.current.add(watchlistStock.symbol);*/ return getWatchlistData(watchlistStock.symbol)}));
         
-    },[watchlistArray, profileData])
+    },[watchlistArray, profileData, historicalData])
 
     //const fetchingRef = useRef(new Set());
     const attemptedRef = useRef(new Set<string>());
@@ -108,8 +157,7 @@ function WatchlistScreen(){
                     </View>
                 </View>
                 <View style={styles.stockSection}>
-                    <StockTable watchlistArray={mockWatchlist} removeStock={removeFromWatchlist} profileData={mockProfileData}/>
-
+                    <StockTable watchlistArray={watchlistArray} removeStock={removeFromWatchlist} profileData={profileData} historicalData={historicalData}/>
                 </View>
             </ScrollView>
         </>
@@ -137,4 +185,3 @@ const styles = StyleSheet.create({
     },
 
 })
-export default WatchlistScreen;

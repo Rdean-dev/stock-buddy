@@ -643,44 +643,20 @@ The earlier audit reported 27 transitive vulnerabilities whose available fixes r
 
 ---
 
-# Before I Stop Working — October 21, 2026
+Before I Stop Working — October 26, 2026
 
-## Last Worked On
-Stock Buddy’s navigation and Watchlist styling across mobile and desktop.
+Completed
+- Added a Twelve Data market-status service request for NYSE.
+- Added HTTP response checking and validation that is_market_open is a boolean.
+- Connected the response to watchlist state.
+- Added market-open, market-closed, and unavailable labels with a status marker.
 
-### Completed Today
+Current behavior
+- Market status is fetched when WatchlistScreen mounts.
+- Automatic refresh is still pending.
 
-- Added Settings navigation through the header gear icon.
-- Refined the mobile tab bar’s alignment, spacing, icon sizes, and labels.
-- Fixed vertical alignment using `PlatformPressable`.
-- Adapted the Watchlist table for mobile:
-  - Hid the 7-Day Trend column.
-  - Stacked daily dollar and percentage changes.
-  - Adjusted column widths, typography, and row spacing.
-  - Constrained long company names with ellipses.
-- Right-aligned Price and Today headers and values.
-- Fixed desktop spacing between Today and 7-Day Trend.
-- Fixed the remove-button column using explicit flex sizing.
-- Formatted dollar changes to two decimal places.
-- Added mock stock data and a flag to skip profile requests during development.
-
-### Architecture Decisions
-
-- Keep the full table on desktop and a compact version on mobile.
-- Implement the seven-day sparkline as a separate component using the existing chart library.
-- Keep historical-data fetching outside the sparkline component.
-- Derive sorted rows from a copy of the watchlist array; track the selected column and direction in state.
-- Defer broader responsive navigation changes.
-
-### Next Steps
-
-- Complete cleanup: remove unused styles, hide unfinished pagination, and add remove-button accessibility labels.
-- Verify mobile layout after the final exit-column fix.
-- Implement sorting for Company, Price, and Today.
-- Build the sparkline with mock historical data first.
-- Decide between seven calendar days and seven trading sessions before connecting historical data.
-- Finish Watchlist and begin the stock detail/report screen.
-
-### Session Reflection
-
-Recognized growing confidence in independently breaking down unfamiliar features, identifying reusable logic, and planning how data and components fit together.
+Next session
+- Write the countdown-to-milliseconds helper.
+- Use time_to_close when open and time_to_open when closed to schedule another request.
+- Add timer cleanup and refresh when the app returns to the foreground.
+- Give unavailable status a neutral marker color if still pending.

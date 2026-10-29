@@ -84,7 +84,7 @@ export default function PatternScannerScreen() {
             return;
         }
         const getData = async (stock: WatchlistStock) => {
-            const result = await getStockData(stock);
+            const result = await getStockData(stock.symbol);
             if (!ignore){ 
                 setSelectedStockData(result)
             };

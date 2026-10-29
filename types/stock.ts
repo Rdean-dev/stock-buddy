@@ -49,3 +49,8 @@ export type MarketState= {
     time_to_open: string;
     time_to_close: string;
 }
+
+export type LineChartPoint = {
+    timestamp: number,
+    value: number,
+};

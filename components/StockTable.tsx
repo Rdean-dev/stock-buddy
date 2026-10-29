@@ -3,51 +3,69 @@ import { theme } from "../constants/theme";
 import {StyleSheet, View, Text, Image, useWindowDimensions} from 'react-native';
 import { Breakpoints } from '../constants/breakpoints';
 import { useState } from "react";
-import type { WatchlistStock, StockProfile } from '../types/stock';
+import type { WatchlistStock, StockProfile, AlphaVantageDailyResponse } from '../types/stock';
+import Sparkline  from "../components/Sparkline";
 
 type StockTableProps = {
     watchlistArray: WatchlistStock[];
     removeStock: (item: WatchlistStock) => void;
     profileData: Partial<Record<string, StockProfile>>;
+    historicalData: Partial<Record<string, AlphaVantageDailyResponse>>;
 };
 
+type Columns = | 'company' | 'price' | 'today' | null;
 
-export default function StockTable({watchlistArray, removeStock, profileData} : StockTableProps) {
+
+export default function StockTable({watchlistArray, removeStock, profileData, historicalData} : StockTableProps) {
     const { width } = useWindowDimensions();
     
     const isMobile = width < Breakpoints.mobile;
 
     const [sortAscending, setSortAscending] = useState<boolean>(true);
-    
-    let sortedStocks = watchlistArray
-
-    const sortByPrice = () => {
-        sortedStocks = [...watchlistArray].sort((a,b) => {
+    const [sortColumn, setSortColumn] = useState<Columns>(null);
+    const sortedStocks = 
+        sortColumn == 'price' ? [...watchlistArray].sort((a,b) => {
             const priceA = profileData[a.symbol]?.price;
             const priceB = profileData[b.symbol]?.price;
 
             if (priceA == null && priceB == null) return 0;
             if (priceA == null) return 1;
             if (priceB == null) return -1;
-            return priceA - priceB
-        });
-    }
 
-    const sortByCompany = () => {
-        sortedStocks = [...watchlistArray].sort((a,b) => {
-            return a.symbol.localeCompare(b.symbol)
-        });
-    }
-    const sortByToday = () => {
-        sortedStocks = [...watchlistArray].sort((a,b) => {
+            if (sortAscending) {
+                return priceA - priceB
+            }
+            return priceB - priceA
+        }) : 
+        sortColumn === 'company' ? [...watchlistArray].sort((a,b) => {
+            if (sortAscending) {
+                return a.symbol.localeCompare(b.symbol)
+            }
+            return b.symbol.localeCompare(a.symbol)
+        }) : 
+        sortColumn === 'today' ? [...watchlistArray].sort((a,b) => {
             const changePA = profileData[a.symbol]?.changePercentage;
             const changePB = profileData[b.symbol]?.changePercentage;
 
             if (changePA == null && changePB == null) return 0;
             if (changePA == null) return 1;
             if (changePB == null) return -1;
-            return changePA - changePB
-        });
+            
+            if (sortAscending) {
+                return changePA - changePB
+            }
+            return changePB - changePA
+        }) : 
+        watchlistArray;
+
+    const handleDirectionChange = (column: Columns) => {
+        if (column === sortColumn) {
+            setSortAscending(!sortAscending);
+        }else{
+            setSortAscending(true);
+        }
+        
+        setSortColumn(column);
     }
 
 
@@ -55,9 +73,9 @@ export default function StockTable({watchlistArray, removeStock, profileData} : 
         <Card>
             <DataTable>
                 <DataTable.Header>
-                    <DataTable.Title style={isMobile && styles.mobileHeader}>Company</DataTable.Title>
-                    <DataTable.Title sortDirection= {sortAscending ? 'ascending' : 'descending'} numeric>Price</DataTable.Title>
-                    <DataTable.Title numeric>Today</DataTable.Title>
+                    <DataTable.Title onPress={() => {handleDirectionChange('company')}} sortDirection= {sortColumn === 'company' ? sortAscending ? 'ascending' : 'descending' : undefined} style={isMobile && styles.mobileHeader}>Company</DataTable.Title>
+                    <DataTable.Title onPress={() => {handleDirectionChange('price')}} sortDirection= {sortColumn === 'price' ? sortAscending ? 'ascending' : 'descending' : undefined} numeric>Price</DataTable.Title>
+                    <DataTable.Title onPress={() => {handleDirectionChange('today')}} sortDirection= {sortColumn === 'today' ? sortAscending ? 'ascending' : 'descending' : undefined} numeric>Today</DataTable.Title>
                     {!isMobile && <DataTable.Title style={{paddingLeft: 24,}} textStyle={{fontWeight: '500'}}>7-Day Trend</DataTable.Title>}
                     <DataTable.Title style={styles.exitColumn}>{''}</DataTable.Title>
                 </DataTable.Header>
@@ -70,7 +88,9 @@ export default function StockTable({watchlistArray, removeStock, profileData} : 
                     const formattedPrice = profile?.price != null ? `$${profile.price.toFixed(2)}` : '--';
                     const formattedChange = profile?.change != null ? `${plusOrMinus}$${Math.abs(profile?.change).toFixed(2)}` : '--';
                     const formattedPercentage = changePercentage != null ? `${plusOrMinus}${Math.abs(changePercentage).toFixed(2)}%` : '--';
-                    
+                    const historicalStockData = historicalData[stock.symbol] !== undefined ? historicalData[stock.symbol] : '--';
+
+
                     return (
                         <DataTable.Row key={stock.symbol} style={{paddingVertical: 10}}>
                             <DataTable.Cell style={isMobile && styles.mobileHeader}>
@@ -103,7 +123,7 @@ export default function StockTable({watchlistArray, removeStock, profileData} : 
                                     </Text>
                                 </View>
                             </DataTable.Cell>
-                            {!isMobile && <DataTable.Cell style={{paddingLeft: 24,}}>--</DataTable.Cell>}
+                            {!isMobile && <DataTable.Cell style={{paddingLeft: 24,}}><Sparkline historicalData={historicalStockData}/></DataTable.Cell>}
                             <DataTable.Cell style={styles.exitColumn}>
                                 <IconButton
                                     icon='close'

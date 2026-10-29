@@ -41,8 +41,8 @@ export async function searchStocksData(searchKeyword: string) : Promise<Watchlis
 
 }
 
-export async function getStockData(company: WatchlistStock) : Promise<AlphaVantageDailyResponse | null>{
-    const encodedCompany= encodeURIComponent(company.symbol);
+export async function getStockData(company: string) : Promise<AlphaVantageDailyResponse | null>{
+    const encodedCompany= encodeURIComponent(company);
     const apiUrl =`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${encodedCompany}&apikey=${avApiKey}`;
 
 
