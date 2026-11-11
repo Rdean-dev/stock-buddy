@@ -86,11 +86,20 @@ export default function StockTable({watchlistArray, removeStock, profileData, hi
         <Card>
             <DataTable>
                 <DataTable.Header>
-                    <DataTable.Title onPress={() => {handleDirectionChange('company')}} sortDirection= {sortColumn === 'company' ? sortAscending ? 'ascending' : 'descending' : undefined} style={isMobile && styles.mobileHeader}>Company</DataTable.Title>
-                    <DataTable.Title onPress={() => {handleDirectionChange('price')}} sortDirection= {sortColumn === 'price' ? sortAscending ? 'ascending' : 'descending' : undefined} numeric>Price</DataTable.Title>
-                    <DataTable.Title onPress={() => {handleDirectionChange('today')}} sortDirection= {sortColumn === 'today' ? sortAscending ? 'ascending' : 'descending' : undefined} numeric>Today</DataTable.Title>
-                    <DataTable.Title onPress={() => {handleDirectionChange('volume')}} sortDirection= {sortColumn === 'volume' ? sortAscending ? 'ascending' : 'descending' : undefined} numeric>Volume</DataTable.Title>
-                    {!isMobile && <DataTable.Title style={{paddingLeft: 24,}} textStyle={{fontWeight: '500'}} numeric>7-Day Trend</DataTable.Title>}
+                    <DataTable.Title onPress={() => {handleDirectionChange('company')}} sortDirection= {sortColumn === 'company' ? sortAscending ? 'ascending' : 'descending' : undefined} style={[styles.companyColumn, isMobile && styles.mobileHeader]}>Company</DataTable.Title>
+                    <DataTable.Title onPress={() => {handleDirectionChange('price')}} sortDirection= {sortColumn === 'price' ? sortAscending ? 'ascending' : 'descending' : undefined} style={styles.priceColumn} numeric>Price</DataTable.Title>
+                    <DataTable.Title onPress={() => {handleDirectionChange('today')}} sortDirection= {sortColumn === 'today' ? sortAscending ? 'ascending' : 'descending' : undefined} style={styles.todayColumn} numeric>Today</DataTable.Title>
+                    <DataTable.Title
+                        onPress={() => handleDirectionChange('volume')}
+                        sortDirection={
+                            sortColumn === 'volume'
+                            ? sortAscending ? 'ascending' : 'descending'
+                            : undefined
+                        }
+                        style={styles.volumeColumn}
+                        numeric
+                    >Volume</DataTable.Title>
+                    {!isMobile && <DataTable.Title style={styles.trendColumn} textStyle={{fontWeight: '500'}} numeric>7-Day Trend</DataTable.Title>}
                     <DataTable.Title style={styles.exitColumn}>{''}</DataTable.Title>
                 </DataTable.Header>
 
@@ -108,7 +117,7 @@ export default function StockTable({watchlistArray, removeStock, profileData, hi
 
                     return (
                         <DataTable.Row key={stock.symbol} style={{paddingVertical: 10}}>
-                            <DataTable.Cell style={isMobile && styles.mobileHeader}>
+                            <DataTable.Cell style={[styles.companyColumn, isMobile && styles.mobileHeader]}>
                                 <View style={{flexDirection: 'row', alignItems: 'center', gap: 7, flex: 1, minWidth: 0}}>
                                     <Image
                                         style={{width: 37, height: 37, alignContent: 'center', borderRadius: 6,}}
@@ -120,13 +129,13 @@ export default function StockTable({watchlistArray, removeStock, profileData, hi
                                     </View>
                                 </View>
                             </DataTable.Cell>
-                            <DataTable.Cell numeric>
+                            <DataTable.Cell style={[styles.priceColumn, { paddingRight: 0 }]} numeric>
                                 <Text style={{fontWeight: '700', fontSize: isMobile ? 15 : 17}}>
                                     {formattedPrice}
                                 </Text>
                             </DataTable.Cell>
-                            <DataTable.Cell numeric>
-                                <View style={{flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-end' :  'center',gap: isMobile ?  2 : 5}}>
+                            <DataTable.Cell style={[styles.todayColumn, { paddingRight: 0 }]} numeric>
+                                <View style={{flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-end' :  'center', gap: isMobile ?  2 : 5}}>
                                     <Text 
                                         style={[styles.changeText, (changePercentage ?? 0) >= 0 ? 
                                             styles.positive : styles.negative, {fontSize: isMobile ? 13 : 16}]}>
@@ -138,10 +147,12 @@ export default function StockTable({watchlistArray, removeStock, profileData, hi
                                     </Text>
                                 </View>
                             </DataTable.Cell>
-                            <DataTable.Cell numeric>
-                                <Text style={{fontWeight: '600', fontSize: isMobile ? 15 : 17}}>{volume}</Text>
+                            <DataTable.Cell style={[styles.volumeColumn, { paddingRight: 0 }]} numeric>
+                                <Text style={{ fontWeight: '600', fontSize: isMobile ? 15 : 17 }}>
+                                    {volume}
+                                </Text>
                             </DataTable.Cell>
-                            {!isMobile && <DataTable.Cell numeric><View style={{flex: 1, paddingLeft: 24, justifyContent: 'center'}}>{historicalStockData ? <Sparkline historicalData={historicalStockData}/> : <Text>--</Text>}</View></DataTable.Cell>}
+                            {!isMobile && <DataTable.Cell style={styles.trendColumn}numeric><View style={{paddingLeft: 24}}>{historicalStockData ? <Sparkline historicalData={historicalStockData}/> : <Text>--</Text>}</View></DataTable.Cell>}
                             <DataTable.Cell style={styles.exitColumn}>
                                 <IconButton
                                     icon='close'
@@ -188,6 +199,21 @@ const styles = StyleSheet.create({
     mobileHeader: {
         flex: 2,
         paddingRight: 8,
+    },
+    companyColumn: { 
+        flex: 1.2 
+    },
+    priceColumn: { 
+        flex: 0.6 
+    },
+    todayColumn: { 
+        flex: 1.4 
+    },
+    volumeColumn: { 
+        flex: 1 
+    },
+    trendColumn: { 
+        flex: 1 
     },
 
 });
