@@ -13,7 +13,7 @@ type StockTableProps = {
     historicalData: Partial<Record<string, AlphaVantageDailyResponse>>;
 };
 
-type Columns = | 'company' | 'price' | 'today' | null;
+type Columns = | 'company' | 'price' | 'today' | 'volume' | null;
 
 
 export default function StockTable({watchlistArray, removeStock, profileData, historicalData} : StockTableProps) {
@@ -56,6 +56,19 @@ export default function StockTable({watchlistArray, removeStock, profileData, hi
             }
             return changePB - changePA
         }) : 
+        sortColumn == 'volume' ? [...watchlistArray].sort((a,b) => {
+            const priceA = profileData[a.symbol]?.volume;
+            const priceB = profileData[b.symbol]?.volume;
+
+            if (priceA == null && priceB == null) return 0;
+            if (priceA == null) return 1;
+            if (priceB == null) return -1;
+
+            if (sortAscending) {
+                return priceA - priceB
+            }
+            return priceB - priceA
+        }) :
         watchlistArray;
 
     const handleDirectionChange = (column: Columns) => {
@@ -76,7 +89,8 @@ export default function StockTable({watchlistArray, removeStock, profileData, hi
                     <DataTable.Title onPress={() => {handleDirectionChange('company')}} sortDirection= {sortColumn === 'company' ? sortAscending ? 'ascending' : 'descending' : undefined} style={isMobile && styles.mobileHeader}>Company</DataTable.Title>
                     <DataTable.Title onPress={() => {handleDirectionChange('price')}} sortDirection= {sortColumn === 'price' ? sortAscending ? 'ascending' : 'descending' : undefined} numeric>Price</DataTable.Title>
                     <DataTable.Title onPress={() => {handleDirectionChange('today')}} sortDirection= {sortColumn === 'today' ? sortAscending ? 'ascending' : 'descending' : undefined} numeric>Today</DataTable.Title>
-                    {!isMobile && <DataTable.Title style={{paddingLeft: 24,}} textStyle={{fontWeight: '500'}}>7-Day Trend</DataTable.Title>}
+                    <DataTable.Title onPress={() => {handleDirectionChange('volume')}} sortDirection= {sortColumn === 'volume' ? sortAscending ? 'ascending' : 'descending' : undefined} numeric>Volume</DataTable.Title>
+                    {!isMobile && <DataTable.Title style={{paddingLeft: 24,}} textStyle={{fontWeight: '500'}} numeric>7-Day Trend</DataTable.Title>}
                     <DataTable.Title style={styles.exitColumn}>{''}</DataTable.Title>
                 </DataTable.Header>
 
@@ -88,7 +102,8 @@ export default function StockTable({watchlistArray, removeStock, profileData, hi
                     const formattedPrice = profile?.price != null ? `$${profile.price.toFixed(2)}` : '--';
                     const formattedChange = profile?.change != null ? `${plusOrMinus}$${Math.abs(profile?.change).toFixed(2)}` : '--';
                     const formattedPercentage = changePercentage != null ? `${plusOrMinus}${Math.abs(changePercentage).toFixed(2)}%` : '--';
-                    const historicalStockData = historicalData[stock.symbol] !== undefined ? historicalData[stock.symbol] : '--';
+                    const historicalStockData = historicalData[stock.symbol]
+                    const volume = profile?.volume != null ? `${profile.volume.toLocaleString('en-US')}` : '--'
 
 
                     return (
@@ -123,7 +138,10 @@ export default function StockTable({watchlistArray, removeStock, profileData, hi
                                     </Text>
                                 </View>
                             </DataTable.Cell>
-                            {!isMobile && <DataTable.Cell style={{paddingLeft: 24,}}><Sparkline historicalData={historicalStockData}/></DataTable.Cell>}
+                            <DataTable.Cell numeric>
+                                <Text style={{fontWeight: '600', fontSize: isMobile ? 15 : 17}}>{volume}</Text>
+                            </DataTable.Cell>
+                            {!isMobile && <DataTable.Cell numeric><View style={{flex: 1, paddingLeft: 24, justifyContent: 'center'}}>{historicalStockData ? <Sparkline historicalData={historicalStockData}/> : <Text>--</Text>}</View></DataTable.Cell>}
                             <DataTable.Cell style={styles.exitColumn}>
                                 <IconButton
                                     icon='close'

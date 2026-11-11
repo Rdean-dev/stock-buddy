@@ -8,6 +8,7 @@ export type StockProfile = {
     change: number;
     changePercentage: number;
     image: string;
+    volume: number;
 };
 
 export type AlphaVantageDailyEntry = {

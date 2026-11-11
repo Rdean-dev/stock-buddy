@@ -1,662 +1,92 @@
 # Stock Buddy — Project Notes
 
-**Last Updated:** October 9, 2026  
-**Project:** Stock Buddy  
-**Technology:** React Native, Expo, Expo Router, JavaScript
+**Last updated:** November 10, 2026  
+**Stage:** Functional prototype; UI refinement and data integration in progress  
+**Stack:** React Native, Expo, Expo Router, TypeScript migration in progress, React Native Paper, SVG (web sparklines), react-native-wagmi-charts (candlestick chart)
+
+## 1. Project overview
+Stock Buddy is a cross-platform stock research and educational app designed to make stock tracking, price action, and candlestick-pattern analysis approachable. The intended experience includes a watchlist, stock details, pattern scanner, market report, news, and eventually AI-assisted research explanations. It is **not yet a production-ready market-data application**.
+
+## 2. Current status at a glance
+| Area | Current status | Next work |
+|---|---|---|
+| Watchlist UI | Desktop watchlist rendered with five mock stocks; price, daily change, volume, 7-day trend, remove affordance, search input | Connect data and interactions; verify mobile behavior |
+| 7-day sparklines | **Implemented and visually verified with mock data** | Validate live historical responses and edge cases |
+| Market status | Market-open/closed/unavailable display connected to Twelve Data status request per Oct 26 notes | Automatic refresh, cleanup, app foreground handling |
+| Pattern Scanner | Core historical processing, pattern detection, date controls, and interactive candlestick chart implemented | Finish result-card UI, verify detections and annotations, test workflow |
+| Stock Detail | Initial sections and navigation exist | Verify stock-specific data and integration |
+| Global search | Header/search design visible; complete functionality not established | Integrate suggestions and stock-detail navigation |
+| Backend/auth | Not implemented | Decide architecture later |
+| TypeScript | Conversion ongoing | Continue incremental migration and type checks |
+
+## 3. Watchlist — current implementation
+The current desktop watchlist displays five mock entries: **AAPL, TSLA, AMZN, MSFT, and DELL**. The latest screenshot shows columns for **Company, Price, Today, Volume, and 7-Day Trend**, plus a remove icon. The interface also shows a stock search input and market status. These visuals do **not** establish that adding/removing stocks, searching, or persisting selections is fully implemented.
+
+### Custom SVG sparkline — completed November 10
+The former sparkline/chart-library approach had clipping problems. Replaced it with a small **web SVG** `Sparkline` component (120 × 35 px), with:
+- Seven chronological closing-price points supplied by `normalizeLineChartData()`.
+- X/Y normalization using minimum and maximum close, with 3 px padding on each side.
+- Green line for a rising first-to-last trend, red for falling, gray for unchanged; trend color is independent of the **Today** column.
+- Polygon beneath the polyline with a top-to-bottom transparent gradient; each instance has its own gradient ID via React `useId()`.
+- Guard for fewer than two prices (`return null`).
+- Flat, vertically centered line when all closing prices are equal (avoids dividing by zero).
+- Visual verification in the watchlist screenshot: five sparklines render with gradient shading and no apparent clipping.
+
+**Implementation notes:** Render `<polygon>` before `<polyline>` so the line stays on top. Use `fill={`url(#${gradientId})`}` and `id={gradientId}` on the gradient definition. No memoization or additional chart dependency needed for the current small dataset. Cleaned up imports, equality comparison, and formatting during the session (per user confirmation).
+
+**Still to verify:** The screenshot uses **mock** historical data, not live Alpha Vantage responses. Check date ordering, missing/invalid values, fewer-than-two records, flat series, and responsive behavior against real data before calling integration complete. SVG component currently uses web `<div>`/`<svg>` elements; do not assume it works natively on mobile without a separate implementation or platform handling.
+
+### Watchlist remaining work
+- Connect quote, change, volume, and historical trend to real market-data sources.
+- Wire up and test add/remove stock behavior and persistence.
+- Handle loading, empty, and API-error states.
+- Verify watchlist-to-stock-detail navigation and responsive/mobile layout.
+- Implement reliable market-status refresh, if still outstanding.
+
+## 4. Market-status integration
+**Recorded October 26:** Added Twelve Data NYSE market-status request, HTTP and boolean validation for `is_market_open`, and watchlist labels for open, closed, and unavailable. Request fires when Watchlist mounts. **Not yet verified complete:** scheduled refresh using `time_to_close` / `time_to_open`, timer cleanup, foreground refresh, and neutral unavailable-state styling.
+
+## 5. Pattern Scanner
+Core functionality documented as implemented:
+- Stock search; historical Alpha Vantage daily time-series normalization.
+- Candlestick pattern detection, including Doji, Hammer, Bullish/Bearish Engulfing, Morning/Evening Star, and Bullish/Bearish Harami; other patterns have been explored or implemented but need per-pattern verification.
+- Date selection, validation, 1M/3M/6M/1Y presets, and selected-pattern multi-select controls.
+- Interactive candlestick chart with crosshair, price/date/OHLC information, annotations, and legend.
+- Responsive scanner controls and a shared visual marker configuration.
+
+**Next:** Improve compact PatternCard results, date typography, spacing, and mobile layout; verify every selectable detection function and annotation alignment; test end-to-end scanner workflow and loading/error states. `react-native-wagmi-charts` is still used for the candlestick chart; replacing the watchlist sparkline did **not** replace this chart.
+
+## 6. Stock Detail
+Existing/planned sections: stock header, AI Research Summary, stock chart, Price Action Summary, Technical Pattern Signals, Analyst Sentiment, and Recent News Summary. Navigation from the watchlist has been worked on; current stock-specific loading, live market data, news, and AI summaries still need verification or implementation. Do not mark them complete solely because the UI exists.
+
+## 7. Navigation and layout
+Expo Router is used. Earlier notes document desktop left-side tabs and mobile bottom tabs. A collapsible desktop sidebar and global stock search remain future work. Current watchlist screenshot confirms a left navigation rail and global header on desktop, but not full functionality of every header control.
+
+## 8. Data sources and architecture
+- **Alpha Vantage:** daily historical time-series format, normalization, and earlier scanner symbol-search work; live watchlist historical integration pending.
+- **Twelve Data:** symbol-search exploration/integration and NYSE market status.
+- **FMP:** company-profile API considered/planned; implementation status not verified.
+- **Current data strategy:** mock data supports UI development; production quote, historical, news, caching, refresh, API quota, and error strategy remain to be designed and validated.
+- **Architecture principle:** keep normalization/data fetching separate from presentation; avoid premature abstractions.
+
+## 9. Roadmap — recommended next sequence
+1. **Commit the completed SVG sparkline work** as a standalone change, if not already committed.
+2. **Finish watchlist behavior and data integration:** verify normalization against actual Alpha Vantage responses, decide quote/volume sources, implement loading/error/empty states, add/remove behavior, and persistence plan.
+3. **Return to Pattern Scanner UI and verification:** compact result cards, mobile layout, pattern tests, annotation alignment.
+4. **Verify Stock Detail data flow** and selected ticker handling.
+5. **Address broader infrastructure:** shared stock search, market-status refresh, caching, authentication/backend, and eventually landing page.
+
+The order above is a recommendation based on the latest watchlist work, **not** a claim that earlier Pattern Scanner priorities have been abandoned.
+
+## 10. Future product ideas (not current deliverables)
+Daily AI market report; AI research summaries; analyst sentiment; stock news; stock screener/multi-stock pattern scanning; user accounts; persistent personalized watchlists; public landing page; dark theme; collapsible sidebar. Prior branding concept: approachable green/navy identity and a handshake-like money-stack logo; final logo not selected in the supplied notes.
+
+## 11. Next-session handoff
+**Just completed:** Custom SVG 7-day sparklines with gradient fill, unique IDs, padding, trend colors, flat-series guard, and insufficient-data guard; visually checked on desktop with five mock stocks. User confirmed cleanup/formatting.
+
+**Start next time:** Check Git commit status, then inspect `normalizeLineChartData()` and the watchlist's data flow before connecting live history. Confirm whether the component is web-only by design and how the mobile watchlist should handle the trend column. Do not revisit the old clipping issue unless it reappears.
+
+**Open questions:** Which provider supplies current quotes and volume? How will add/remove selections persist? How should requests be cached within provider limits? Which Pattern Scanner UI items have been completed since the October notes?
 
 ---
-
-## 1. Project Overview
-
-Stock Buddy is a cross-platform stock research and educational application designed to help users track stocks, understand market movements, identify candlestick patterns, and make more informed investment decisions.
-
-The application aims to combine financial research tools with an approachable, beginner-friendly user experience.
-
-**Product direction:** A friendly investing companion that makes technical stock analysis easier to understand.
-
-### Planned Features
-
-- Home dashboard
-- Personalized watchlist
-- Stock Detail pages
-- Daily AI market report
-- Interactive stock charts and historical prices
-- AI-powered research summaries
-- Recent stock news
-- Price action summaries
-- Technical and candlestick pattern signals
-- Analyst sentiment
-- Pattern Scanner
-- Stock trend and risk information
-- Stock Screener (future)
-- Global stock search
-- User accounts and authentication
-- Public landing page
-- Light and dark themes
-- Responsive web and mobile layouts
-
----
-
-# 2. Current Project Status
-
-**Development stage:** Functional prototype and ongoing UI development.
-
-Stock Buddy has progressed beyond its original static UI prototype.
-
-The Pattern Scanner now performs actual candlestick pattern detection against historical stock data and displays results on an interactive chart.
-
-### Current Progress
-
-**Watchlist**
-- UI implemented.
-- Reusable stock cards.
-- Navigation to Stock Detail.
-- Further real-data integration and functionality needed.
-
-**Stock Detail**
-- Initial UI sections implemented.
-- Stock-specific navigation and data integration need continued verification and development.
-
-**Pattern Scanner**
-- Historical data processing implemented.
-- Multiple candlestick detection algorithms implemented.
-- Date-range filtering implemented.
-- Interactive candlestick chart implemented.
-- Pattern annotations and legend implemented.
-- Responsive controls implemented.
-- UI redesign in progress.
-
-**Navigation**
-- Expo Router tab navigation implemented.
-- Desktop uses left-positioned tabs.
-- Mobile uses bottom tabs.
-- Collapsible desktop sidebar planned.
-
-**Backend and Authentication**
-- No production backend or user authentication system implemented yet.
-
----
-
-# 3. Watchlist
-
-## Implemented
-
-- Stock cards rendered from an array using `.map()`.
-- Reusable `StockCard` component.
-- Pressable stock cards.
-- Expo Router navigation to Stock Detail.
-- Initial mock stocks included BALL and AAPL.
-
-### StockCard
-
-Receives a `stock` prop and displays:
-
-- Ticker
-- Price
-- Daily percentage change
-- Trend
-- Risk category
-- Pattern count
-
-### Remaining Work
-
-- Connect watchlist to real stock data.
-- Add and remove stocks.
-- Persist watchlist selections.
-- Associate saved watchlists with user accounts.
-- Handle loading and API errors.
-- Verify stock-specific navigation and data loading.
-
----
-
-# 4. Stock Detail
-
-## Existing UI Sections
-
-- Stock header
-- AI Research Summary
-- Stock Chart
-- Price Action Summary
-- Technical Pattern Signals
-- Analyst Sentiment
-- Recent News Summary
-
-### Remaining Work
-
-- Complete stock-specific data integration.
-- Connect historical and current stock information.
-- Integrate relevant news.
-- Implement AI-generated summaries.
-- Handle loading and error states.
-- Improve responsive layouts.
-
-**Important:** The original project notes identified passing the selected ticker from Watchlist to Stock Detail as a priority. This should be rechecked against the current implementation rather than assumed unfinished.
-
----
-
-# 5. Pattern Scanner
-
-**Status: Core functionality implemented; UI improvements and testing ongoing.**
-
-The Pattern Scanner allows users to select a stock, choose a date range, select candlestick patterns, and identify matching formations in historical price data.
-
-## Stock Search
-
-- Implemented stock symbol search using Alpha Vantage's `SYMBOL_SEARCH`.
-- Search input uses a debounce delay.
-- Search results include ticker and company name.
-- Selected stock is passed to the scanner.
-
-## Historical Data Processing
-
-The scanner processes Alpha Vantage daily time-series data.
-
-Processing includes:
-
-1. Extracting `"Time Series (Daily)"`.
-2. Converting the response into an array using `Object.entries()`.
-3. Ordering candles chronologically.
-4. Converting OHLC and volume values into numbers.
-5. Filtering candles by the selected date range.
-6. Producing normalized candle objects.
-
-Normalized structure:
-
-`{ date, open, high, low, close, volume }`
-
-## Pattern Detection
-
-The scanner iterates through the selected candles and chosen patterns.
-
-Detection logic evaluates the relevant candle windows and records matching formations.
-
-Implemented or previously developed patterns include:
-
-- Doji
-- Hammer
-- Bullish Engulfing
-- Bearish Engulfing
-- Morning Star
-- Evening Star
-- Bullish Harami
-- Bearish Harami
-
-Additional patterns and visual configurations have been explored, including Shooting Star, Inverted Hammer, Hanging Man, Piercing Line, and Dark Cloud Cover.
-
-**Verification needed:** Confirm that every selectable pattern has a working detection function and corresponding visual configuration.
-
-## Date Range Controls
-
-Implemented:
-
-- Start Date picker
-- End Date picker
-- Date validation
-- Preset date ranges:
-  - 1M
-  - 3M
-  - 6M
-  - 1Y
-
-### Recent UI Improvements
-
-- Created a reusable `datePresets` configuration array.
-- Rendered preset buttons using `.map()`.
-- Added selected-state styling.
-- Added hover styling for web.
-- Connected presets to `dateInterval()`.
-- Cleared preset selection when dates are manually changed.
-- Improved button spacing and alignment.
-
-## Pattern Selection
-
-Uses `MultiSelect` from `react-native-element-dropdown`.
-
-Implemented:
-
-- Multiple pattern selection.
-- Customized dropdown appearance.
-- Customized dropdown items through `renderItem`.
-- Pattern-specific markers beside pattern names.
-- Custom selected-pattern chips using `renderSelectedItem`.
-- Pattern removal controls.
-
-### Reusable Marker Component
-
-The `Marker` component is used to render pattern-specific symbols.
-
-Visual properties are defined through `patternAnnotationVisuals`.
-
-This separates:
-
-- Visual configuration: pattern shape and color.
-- Marker rendering: drawing the symbol.
-- Feature-specific layout: dropdowns, selected chips, and chart legends.
-
-The same visual definitions can eventually be used in Pattern Cards.
-
-## Interactive Stock Chart
-
-Uses `react-native-wagmi-charts`.
-
-Implemented functionality includes:
-
-- Historical candlestick rendering.
-- Responsive chart sizing.
-- Date-range filtering.
-- Crosshair interaction.
-- Price and date information.
-- OHLC information.
-- Pattern annotations.
-- Pattern legend.
-
-### Pattern Annotations
-
-Pattern matches are mapped to candle indices.
-
-Annotations are positioned using chart information such as:
-
-- Candle index
-- Chart step
-- Price domain
-- Chart height
-- Candle high price
-
-### Remaining Chart Work
-
-- Improve annotation overlap handling.
-- Verify marker positioning across screen sizes.
-- Improve chart readability.
-- Continue reviewing price and date axis presentation.
-- Test different date ranges and stocks.
-
----
-
-# 6. Pattern Scanner UI Redesign
-
-**Current priority: Finish the Pattern Scanner interface.**
-
-A desktop and mobile design direction has been established.
-
-### Completed Improvements
-
-- Date preset styling.
-- Active and hover states.
-- Pattern dropdown styling.
-- Pattern-specific colored markers.
-- Custom selected-pattern chips.
-- Reusable visual configuration.
-- More consistent colors, borders, and spacing.
-
-### Remaining UI Improvements
-
-1. Redesign `PatternCard` components.
-2. Replace large, plain result rectangles with compact, informative cards.
-3. Display pattern markers consistently in results.
-4. Improve Start Date and End Date typography.
-5. Refine spacing between scanner controls, results, and chart.
-6. Review the mobile layout.
-7. Verify selected-chip removal and chart legend behavior.
-8. Test the complete scanner workflow.
-
-### PatternCard
-
-The existing component receives a pattern and displays:
-
-- Pattern name
-- Match count
-- Pattern type
-- Matching dates
-
-**Planned redesign:** Present a compact pattern summary with a recognizable marker and match count. Consider expandable details or a drawer for individual matching dates.
-
-The chart should remain the primary visual focus.
-
----
-
-# 7. Navigation and Application Layout
-
-## Current Implementation
-
-Stock Buddy uses Expo Router's `Tabs` navigator.
-
-Current destinations:
-
-- Home
-- Daily Report
-- Watchlist
-- Pattern Scanner
-- News
-- Settings
-
-Responsive navigation currently uses `useWindowDimensions()`.
-
-At widths of 768px and above, tabs are positioned on the left. Smaller screens use bottom tabs.
-
-## Planned Navigation Redesign
-
-**Desktop: Collapsible sidebar**
-
-Expanded state:
-- Approximately 220–240px wide.
-- Icons and navigation labels.
-- Active route highlighted.
-
-Collapsed state:
-- Approximately 64–72px wide.
-- Icons only.
-- Tooltips for navigation labels.
-- More space available for charts.
-
-**Mobile:**
-- Explore hamburger-menu drawer navigation.
-- Retain working bottom tabs until a replacement is implemented and tested.
-
-### Implementation Direction
-
-- Preserve Expo Router navigation.
-- Create a custom desktop tab bar/sidebar.
-- Use navigator state for active routes.
-- Introduce expanded/collapsed state.
-- Keep navigation logic separate from visual presentation.
-
----
-
-# 8. Global Application Header
-
-## Planned Feature: Global Stock Search
-
-Add a search field to the overall application header.
-
-Purpose:
-- Search stocks by ticker or company name.
-- Display matching stock suggestions.
-- Navigate directly to the selected stock's detail page.
-
-### Important Distinction
-
-**Global search:** Finds a stock and opens Stock Detail.
-
-**Pattern Scanner search:** Selects a stock to analyze for candlestick patterns.
-
-Both should eventually share underlying search functionality without duplicating API logic.
-
-### Possible Future Header Features
-
-- Notifications
-- User profile
-- Account settings
-- Keyboard shortcut for search on desktop
-
----
-
-# 9. Landing Page and Authentication
-
-## New Product Requirement
-
-Stock Buddy needs a public-facing landing page that introduces the application before users create accounts.
-
-### Landing Page Goals
-
-- Explain what Stock Buddy does.
-- Communicate its educational value.
-- Highlight the Pattern Scanner and other key features.
-- Show product previews.
-- Encourage users to create an account.
-- Provide login and registration links.
-
-### Planned User Journey
-
-Landing Page → Sign Up / Log In → Stock Buddy Application
-
-### Architectural Considerations
-
-- Separate public and authenticated routes.
-- Use a simpler public website header.
-- Protect personalized application features.
-- Store user-specific watchlists and preferences.
-- Consider allowing limited exploration without an account.
-
-### Status
-
-Planning stage. Authentication provider and backend architecture have not been selected.
-
----
-
-# 10. Branding and Visual Identity
-
-## Brand Direction
-
-Stock Buddy should feel:
-
-- Friendly
-- Approachable
-- Modern
-- Trustworthy
-- Educational
-- Professional without being intimidating
-
-### Logo Concept
-
-Two stylized stacks of dollar bills with arms extending toward each other in a handshake.
-
-Design preferences:
-- No cartoon faces.
-- Simple, recognizable shapes.
-- Green and dark navy color palette.
-- Friendly without appearing childish.
-- Recognizable at small icon sizes.
-
-The logo should work in:
-- Landing page header
-- Expanded desktop sidebar
-- Collapsed sidebar
-- Mobile application icon
-
-**Status:** Concept only; final logo not selected.
-
-### Design Inspiration
-
-Explore:
-- TradingView for charting and screening workflows.
-- Robinhood for approachable financial interfaces.
-- Webull for stock analysis layouts.
-- Coinbase Advanced for information-dense interfaces.
-- Dribbble and Behance for dashboard styling.
-
-Focus on how professional applications organize filters, results, and charts without overwhelming users.
-
----
-
-# 11. Future Feature: Stock Screener
-
-**Status: Roadmap — not currently in development.**
-
-A stock screener would allow users to discover stocks matching selected criteria.
-
-### Potential Filters
-
-- Price range
-- Trading volume
-- Market capitalization
-- Sector
-- Technical indicators
-- Candlestick patterns
-
-### Difference From Pattern Scanner
-
-**Pattern Scanner:** Analyze selected patterns for one stock over a chosen period.
-
-**Stock Screener:** Discover multiple stocks matching financial or technical criteria.
-
-### Recommended Development Sequence
-
-**Phase 1 — Complete Pattern Scanner**
-
-Finish UI styling, pattern detection verification, and chart interactions.
-
-**Phase 2 — Multi-stock Pattern Screening**
-
-Extend existing detection logic to analyze a small group of stocks.
-
-**Phase 3 — Full Stock Screener**
-
-Introduce broader financial filters and technical indicators.
-
-### Backend Considerations
-
-Market-wide screening requires more than the current single-stock workflow.
-
-Consider:
-- API rate limits
-- Data caching
-- Server-side scanning
-- Scheduled data updates
-- Query performance
-- Data freshness
-
-Do not attempt large-scale scanning until the data architecture can support it.
-
----
-
-# 12. Data and API Integration
-
-## Selected Provider
-
-**Alpha Vantage**
-
-Previously selected for historical stock data and ticker search.
-
-Current integration includes:
-- Historical daily time-series processing.
-- Symbol search.
-- Local historical test data used during development.
-
-**Twelve Data**
-
-Being integrated for symbol search
-
-### Important Limitation
-
-Stock Buddy is not yet connected to a complete production market-data backend.
-
-Historical data processing should not be confused with fully implemented live quotes, real-time streaming, or production-ready API integration.
-
-### Remaining Data Work
-
-- Current stock prices.
-- Daily price changes.
-- Watchlist data integration.
-- Stock Detail data integration.
-- News data.
-- Loading and error handling.
-- Caching.
-- Refresh strategy.
-- API key and quota management.
-
-### Refreshing Stock Data
-
-The refresh strategy remains undecided.
-
-Potential approaches:
-- Polling
-- WebSockets, if supported by a future provider
-- Cached backend responses
-- Scheduled updates
-
-The choice should depend on provider capabilities, data requirements, and rate limits.
-
----
-
-# 13. Technical Architecture
-
-## Current Technology
-
-- React Native
-- Expo
-- Expo Router
-- JavaScript
-- React hooks
-- React Native SVG
-- react-native-wagmi-charts
-- react-native-element-dropdown
-- react-native-paper
-- Alpha Vantage
-
-## Existing Component Concepts
-
-- `StockCard`
-- `PatternCard`
-- `StockChart`
-- `PatternLegend`
-- `Marker`
-- `DateRangePicker`
-- `StockSearchbar`
-
-## Important Engineering Principles
-
-- Separate data processing from presentation.
-- Keep reusable components focused on a single responsibility.
-- Share pattern visual configurations.
-- Avoid duplicating stock-search logic.
-- Use responsive layouts for web and mobile.
-- Verify functionality before making large architectural changes.
-- Avoid premature abstractions.
-
-### Maintenance
-
-Re-run `npm audit` during the next Expo SDK upgrade.
-
-The earlier audit reported 27 transitive vulnerabilities whose available fixes required potentially breaking Expo or Expo Router changes. Recheck the current dependency status rather than assuming that count is unchanged.
-
----
-
-# 14. Development Roadmap
-
-## Immediate Priorities
-
-1. Finish Pattern Scanner result-card styling.
-2. Improve date-picker typography.
-3. Verify reusable marker behavior across the scanner and chart.
-4. Test responsive layouts.
-5. Verify detection results and chart annotations.
-6. Improve scanner loading and error states.
-
-## Near-Term Priorities
-
-7. Finish Watchlist functionality.
-8. Complete stock-specific Stock Detail integration.
-9. Improve API integration and data management.
-10. Implement the collapsible desktop sidebar.
-11. Add global stock search.
-12. Establish consistent light and dark themes.
-
-## Product Expansion
-
-13. Design the public landing page.
-14. Implement authentication and user accounts.
-15. Add persistent watchlists.
-16. Develop Daily Report and news features.
-17. Integrate AI research summaries.
-18. Prototype multi-stock pattern screening.
-19. Expand toward a full Stock Screener.
-
----
-
-Before I Stop Working — October 26, 2026
-
-Completed
-- Added a Twelve Data market-status service request for NYSE.
-- Added HTTP response checking and validation that is_market_open is a boolean.
-- Connected the response to watchlist state.
-- Added market-open, market-closed, and unavailable labels with a status marker.
-
-Current behavior
-- Market status is fetched when WatchlistScreen mounts.
-- Automatic refresh is still pending.
-
-Next session
-- Write the countdown-to-milliseconds helper.
-- Use time_to_close when open and time_to_open when closed to schedule another request.
-- Add timer cleanup and refresh when the app returns to the foreground.
-- Give unavailable status a neutral marker color if still pending.
+*Basis: original Stock Buddy notes last updated October 9 with October 26 market-status addendum, plus the November 10 sparkline implementation discussion and desktop screenshot. Items without fresh verification remain explicitly pending.*

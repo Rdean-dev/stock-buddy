@@ -4,11 +4,11 @@ import StockTable from "../components/StockTable";
 import { getStockProfile, getMarketStatus, getStockData } from "../services/stockService";
 import  StockSearchbar  from '../components/StockSearchbar';
 import { theme } from "../constants/theme";
-import { mockWatchlist, mockProfileData } from "../utils/test";
+import { mockWatchlist, mockProfileData, mockHistoricalData, } from '../utils/test';
 import type {WatchlistStock, StockProfile, MarketState, AlphaVantageDailyEntry, AlphaVantageDailyResponse} from '../types/stock';
 import  Marker  from "../components/Marker";
 
-const USE_MOCK_DATA = false;
+const USE_MOCK_DATA = true;
 
 const countdownToMilliseconds = (countdown: string): number => {
     const [hours, minutes, seconds] = countdown.split(':').map(Number);
@@ -20,33 +20,13 @@ const countdownToMilliseconds = (countdown: string): number => {
 }
 
 export default function WatchlistScreen(){
-    const [watchlistArray, setWatchlistArray] = useState<WatchlistStock[]>([  
-    {
-        "symbol": "AAPL",
-        "name": "Apple Inc."
-    },
-    {
-        "symbol": "TSLA",
-        "name": "Tesla, Inc."
-    },
-    {
-        "symbol": "AMZN",
-        "name": "Amazon.com, Inc."
-    },
-    {
-        "symbol": "MSFT",
-        "name": "Microsoft Corporation"
-    },
-    {
-        "symbol": "DELL",
-        "name": "Dell Technologies Inc."
-    }]);
+    const [watchlistArray, setWatchlistArray] = useState<WatchlistStock[]>(mockWatchlist);
 
-    const [profileData, setProfileData] = useState<Partial<Record<string, StockProfile>>>(mockProfileData);
+    const [profileData, setProfileData] = useState<Partial<Record<string, StockProfile>>>(USE_MOCK_DATA ? mockProfileData : {});
 
     const [marketState, setMarketState] = useState<MarketState | null>(null);
 
-    const [historicalData, setHistoricalData] = useState<Partial<Record<string, AlphaVantageDailyResponse>>>({});
+    const [historicalData, setHistoricalData] = useState<Partial<Record<string, AlphaVantageDailyResponse>>>(USE_MOCK_DATA ? mockHistoricalData : {});
 
     let marketStatement = '';
 
@@ -102,6 +82,9 @@ export default function WatchlistScreen(){
         
             const profile = await getStockProfile(stockSymbol);
             const hdata = await getStockData(stockSymbol);
+
+            console.log("stock symbol",stockSymbol);
+            console.log("histordata:",hdata);
             
             console.log("Profile Data:",profile);
             if (profile){
@@ -115,7 +98,19 @@ export default function WatchlistScreen(){
         }
         const filteredWatchlistArray = watchlistArray.filter((stock) => !profileData[stock.symbol] /*&& !fetchingRef.current.has(stock.symbol)*/ && !attemptedRef.current.has(stock.symbol))
         
-        Promise.all(filteredWatchlistArray.map((watchlistStock) => {attemptedRef.current.add(watchlistStock.symbol); /*fetchingRef.current.add(watchlistStock.symbol);*/ return getWatchlistData(watchlistStock.symbol)}));
+        filteredWatchlistArray.forEach((stock) => {
+            attemptedRef.current.add(stock.symbol);
+        });
+
+        const loadWatchlist = async () => {
+            for(const stock of filteredWatchlistArray) {
+                await getWatchlistData(stock.symbol);
+
+                await new Promise<void>((resolve) => setTimeout(resolve, 1100));
+            }
+        };
+
+        loadWatchlist();
         
     },[watchlistArray, profileData, historicalData])
 
