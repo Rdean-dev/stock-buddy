@@ -6,7 +6,7 @@ import PatternCard from '../components/PatternCard';
 import { formatDateAsISODate as formatDate, formatDisplayDate } from "../utils/formatDate";
 import scanPatterns from '../utils/patternScanner';
 import { MultiSelect } from 'react-native-element-dropdown';
-import StockChart from '../components/StockChart';
+import PatternStockChart from '../components/PatternStockChart';
 import { getStockData } from "../services/stockService";
 import { Breakpoints } from '../constants/breakpoints';
 import  Marker  from "../components/Marker";
@@ -272,7 +272,7 @@ export default function PatternScannerScreen() {
                 {hasScanned && startDate 
                     && endDate && selectedStockData 
                     && selectedStock && selectedPatterns.length > 0 
-                    ? <StockChart startDate={startDate} endDate={endDate} stockData={selectedStockData} patternResults={patternResults} selectedStock={selectedStock} dateInterval={dateInterval} selectedPatterns={selectedPatterns}/> : null}
+                    ? <PatternStockChart startDate={startDate} endDate={endDate} stockData={selectedStockData} patternResults={patternResults} selectedStock={selectedStock} dateInterval={dateInterval} selectedPatterns={selectedPatterns}/> : null}
             </View>
             <View style={[{zIndex: 0 ,position: 'relative',marginHorizontal: theme.spacing.pageHorizontalMargin, marginTop: 24, backgroundColor: 'white', borderWidth: 1, borderColor: theme.colors.cardBorderColor, borderRadius: 14, padding: 16}, isMobile && {marginHorizontal: 16, marginTop: 16,}]}>
                 <Text style={{fontSize: 18, fontWeight: 700, color: '#0F172A'}}>Pattern results</Text>

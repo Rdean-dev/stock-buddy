@@ -8,82 +8,20 @@ import {useState} from 'react';
 import { theme } from "../constants/theme";
 import type { PatternName, Candle, AlphaVantageDailyResponse, WatchlistStock } from "../types/stock";
 
-type PatternMatch = {
-    date: string;
-    pattern: PatternName;
-    matchIndex: number;
-};
-
-type PatternAnnotationsProps = {
-    matchResults: PatternMatch[];
-}
-
 type XAxisProps = {
     candlestickData: Candle[];
     width: number;
 }
-type PatternLegendProps = {
-    selectedPatterns: PatternName[];
-}
+
 type StockChartProps = {
     startDate: Date;
     endDate: Date;
     stockData: AlphaVantageDailyResponse;
-    patternResults: Partial<Record<PatternName, Candle[]>>;
     dateInterval: (months: number) => void;
-    selectedStock: WatchlistStock;
-    selectedPatterns: PatternName[];
-}
-
-function PatternAnnotations({matchResults}: PatternAnnotationsProps) {
-    const {step, domain, data, height} = useCandlestickChart();
+    symbol: string;
+    annotations?: React.ReactNode;
+    legend?: React.ReactNode;
     
-    const countOfDatesSeen: Record<string, number> = {};
-    const annotationsArray = matchResults.map((match) => {
-        const candle = data[match.matchIndex];
-        const index = match.matchIndex;
-        const xPosition = step * index + step / 2 - 5;
-        const maxPrice = domain[1];
-        const minPrice = domain[0];
-        const priceRange = maxPrice - minPrice;
-        const distanceFromTop = maxPrice - candle.high;
-        const percentageDownChart = distanceFromTop / priceRange;
-
-        const yPosition = (percentageDownChart  * height) - 15;
-        let finalYPosition = yPosition;
-        const markerSpacing = -15;
-
-        if (match.date in countOfDatesSeen) {
-            finalYPosition = yPosition + (markerSpacing * countOfDatesSeen[match.date])
-            countOfDatesSeen[match.date] += 1;
-        }else{
-            countOfDatesSeen[match.date] = 1;
-        }
-
-
-        return {date:match.date, pattern:match.pattern, matchIndex: match.matchIndex, xPosition, yPosition: finalYPosition};
-
-    });
-
-    
-
-    return(
-        <View pointerEvents="none" style={styles.outerAnnotation}>
-            {annotationsArray.map((annotation) => (<View key={`${annotation.date}-${annotation.pattern}`} style={[styles.annotation, {left: annotation.xPosition, top: annotation.yPosition}]}><Marker shape={patternAnnotationVisuals[annotation.pattern].shape} color={patternAnnotationVisuals[annotation.pattern].color}/></View>))}
-        </View>
-    );
-
-    
-}
-
-
-
-function PatternLegend({selectedPatterns}: PatternLegendProps) {
-    return(
-        <View style={styles.patternLegend}>
-            {selectedPatterns.map((pattern) => (<View key={pattern} style={styles.legend}><Marker shape={patternAnnotationVisuals[pattern].shape} color={patternAnnotationVisuals[pattern].color}/><Text>{pattern}</Text></View>))}
-        </View>
-    );
 }
 
 function YAxis() {
@@ -160,7 +98,7 @@ function XAxis({candlestickData, width}: XAxisProps){
 }
 
 
-export default function StockChart({startDate, endDate, stockData, patternResults, dateInterval,selectedStock, selectedPatterns}: StockChartProps) {
+export default function StockChart({startDate, endDate, stockData, dateInterval, symbol,  annotations, legend}: StockChartProps) {
     const [innerWidth, setInnerWidth] = useState(0);
     
     if (!stockData?.["Time Series (Daily)"] || !startDate || !endDate) {
@@ -180,32 +118,14 @@ export default function StockChart({startDate, endDate, stockData, patternResult
         return null;
     }
 
-    const matchesArray = [];
-
-    for (const patternName of selectedPatterns){
-        const matches = patternResults[patternName];
-        if (!matches) continue;
-        const mappedMatches = matches.map((match) => {
-            return {
-                date: match.date,
-                pattern: patternName,
-            };
-        });
-
-        matchesArray.push(...mappedMatches);
-    }
     
-    const matchResults = matchesArray.map((match) =>{
-        const matchIndex = filteredArrayOfCandlestickObjects.findIndex((candle) => match.date === candle.date);
-        return {date:match.date, pattern:match.pattern, matchIndex};
-    }).filter(result => result.matchIndex >= 0);
 
 
 
     
     return (
         <View style={styles.chartContainer}>
-            <Text style={styles.chartHeader}>{selectedStock.symbol}</Text>
+            <Text style={styles.chartHeader}>{symbol}</Text>
             <View style={styles.dateSection}>
                 <Pressable onPress={() => dateInterval(1)}>{({ hovered, pressed }) => (<View style={[styles.dateButton,(hovered || pressed) && styles.dateButtonActive]}><Text style={styles.dateText}>1m</Text></View>)}</Pressable>
                 <Pressable onPress={() => dateInterval(3)}>{({ hovered, pressed }) => (<View style={[styles.dateButton,(hovered || pressed) && styles.dateButtonActive]}><Text style={styles.dateText}>3m</Text></View>)}</Pressable>
@@ -222,7 +142,7 @@ export default function StockChart({startDate, endDate, stockData, patternResult
                         <CandlestickChart.Crosshair>
                             <CandlestickChart.Tooltip/>
                         </CandlestickChart.Crosshair>
-                        <PatternAnnotations matchResults={matchResults}/>
+                        {annotations}
                     </CandlestickChart>
                     
                     <XAxis candlestickData={filteredArrayOfCandlestickObjects}  width={candleChartWidth}/>
@@ -268,7 +188,7 @@ export default function StockChart({startDate, endDate, stockData, patternResult
                     </View>
 
                     <View>
-                        <PatternLegend selectedPatterns={selectedPatterns}/>
+                        {legend}
                     </View>
 
                 </View>

@@ -1,11 +1,64 @@
-import React from "react";
-import {Text, StyleSheet, View, ScrollView } from 'react-native';
+
 import { useLocalSearchParams } from "expo-router";
+import StockChart from "../components/StockChart";
+import type {AlphaVantageDailyResponse, WatchlistStock, PatternName} from "@/types/stock";
+import React, { useState, useEffect} from "react";
+import { Pressable, useWindowDimensions, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { formatDateAsISODate as formatDate, formatDisplayDate } from "../utils/formatDate";
+import { getStockData } from "../services/stockService";
+import { Breakpoints } from '../constants/breakpoints';
+import { theme } from "../constants/theme";
 
 export default function StockDetailScreen() {
     
     const { ticker } = useLocalSearchParams<{ ticker: string }>();
+    const [startDate, setStartDate] = useState<Date | null>(null);
+    const [endDate, setEndDate] = useState<Date | null>(null);
+    const [selectedStockData, setSelectedStockData] = useState<AlphaVantageDailyResponse | null>(null);
+    const [selectedInterval, setSelectedInterval] = useState<number | null>(null);
+    
+    useEffect(() => {
+        let ignore = false;
+        
+        setSelectedStockData(null);
+        
+        if (!ticker) {
+            return;
+        }
+        const getData = async () => {
+            const result = await getStockData(ticker);
+            if (!ignore){ 
+                setSelectedStockData(result)
+            };
+        }
 
+        getData();
+        
+        return () => {
+            ignore = true;
+        };
+    }, [ticker]);
+
+    useEffect(() => {
+        dateInterval(1)
+
+    }, [])
+    
+    const dateInterval = (numOfMonths: number) => {
+        const today = new Date();
+
+        const backDate = new Date(today)
+
+        backDate.setMonth(today.getMonth() - numOfMonths);
+
+        if (today.getDate() !== backDate.getDate()){
+            backDate.setDate(0)
+        }
+
+        setSelectedInterval(numOfMonths)
+        setStartDate(backDate);
+        setEndDate(today);
+    };
     return (
         <>
             <ScrollView style={styles.container}>
@@ -14,8 +67,8 @@ export default function StockDetailScreen() {
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>AI Research Summary</Text>
                 </View>
-                <View style={styles.chartContainer}>
-                    <Text style={styles.sectionTitle}>Stock Chart</Text>
+                <View>
+                    {(startDate && endDate && selectedStockData )&&<StockChart startDate={startDate} endDate={endDate} stockData={selectedStockData}  symbol={ticker} dateInterval={dateInterval}/>}
                 </View>
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Price Action Summary</Text>

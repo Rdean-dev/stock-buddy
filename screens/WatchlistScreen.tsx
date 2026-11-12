@@ -1,12 +1,13 @@
 import {useState, useEffect, useRef} from "react";
-import {Pressable, Text, StyleSheet, ScrollView, View, AppState} from 'react-native';
+import { Text, StyleSheet, ScrollView, View, AppState, useWindowDimensions} from 'react-native';
 import StockTable from "../components/StockTable";
 import { getStockProfile, getMarketStatus, getStockData } from "../services/stockService";
 import  StockSearchbar  from '../components/StockSearchbar';
 import { theme } from "../constants/theme";
 import { mockWatchlist, mockProfileData, mockHistoricalData, } from '../utils/test';
-import type {WatchlistStock, StockProfile, MarketState, AlphaVantageDailyEntry, AlphaVantageDailyResponse} from '../types/stock';
+import type {WatchlistStock, StockProfile, MarketState, AlphaVantageDailyResponse} from '../types/stock';
 import  Marker  from "../components/Marker";
+import { Breakpoints } from '../constants/breakpoints';
 
 const USE_MOCK_DATA = true;
 
@@ -20,6 +21,10 @@ const countdownToMilliseconds = (countdown: string): number => {
 }
 
 export default function WatchlistScreen(){
+    const { width } = useWindowDimensions();
+        
+    const isMobile = width < Breakpoints.mobile;
+
     const [watchlistArray, setWatchlistArray] = useState<WatchlistStock[]>(mockWatchlist);
 
     const [profileData, setProfileData] = useState<Partial<Record<string, StockProfile>>>(USE_MOCK_DATA ? mockProfileData : {});
@@ -139,14 +144,14 @@ export default function WatchlistScreen(){
     }
     return (
         <>
-            <View>
-                <Text style={theme.subtitle}>Your stocks, all in one place</Text>
+            <View style={isMobile && {flexDirection: 'row', alignItems: 'center',}}>
+                <Text style={[theme.subtitle]}>Your stocks, all in one place</Text>
             </View>
             <ScrollView style={styles.container}>
-                <View style={{flexDirection: 'row', gap: 25}}>
-                    {watchlistArray.length > 0 && <Text style={styles.label}>{watchlistArray.length} stocks</Text>}
+                <View style={[{flexDirection: 'row', gap: 25}, isMobile && {flexDirection: 'column'}]}>
+                    {(watchlistArray.length > 0 && !isMobile) && <Text style={styles.label}>{watchlistArray.length} stocks</Text>}
                     <StockSearchbar onSelectedStockChange={handleWatchlistChange} placeholder="Search to add to watchlist" variant='scanner'/>
-                    <View style={{flexDirection: 'row', gap: 5, justifyContent: 'flex-end', alignItems: 'center'}}>
+                    <View style={[{flexDirection: 'row', gap: 5, justifyContent: 'flex-end', alignItems: 'center'}, isMobile && {paddingHorizontal: 5,justifyContent: 'flex-start'}]}>
                         <Marker shape="circle" color={marketStatement === "Market open" ? theme.colors.positive : theme.colors.negative}/>
                         <Text style={styles.label}>{marketStatement}</Text>
                     </View>

@@ -87,9 +87,9 @@ export default function StockTable({watchlistArray, removeStock, profileData, hi
             <DataTable>
                 <DataTable.Header>
                     <DataTable.Title onPress={() => {handleDirectionChange('company')}} sortDirection= {sortColumn === 'company' ? sortAscending ? 'ascending' : 'descending' : undefined} style={[styles.companyColumn, isMobile && styles.mobileHeader]}>Company</DataTable.Title>
-                    <DataTable.Title onPress={() => {handleDirectionChange('price')}} sortDirection= {sortColumn === 'price' ? sortAscending ? 'ascending' : 'descending' : undefined} style={styles.priceColumn} numeric>Price</DataTable.Title>
+                    <DataTable.Title onPress={() => {handleDirectionChange('price')}} sortDirection= {sortColumn === 'price' ? sortAscending ? 'ascending' : 'descending' : undefined} style={[styles.priceColumn, isMobile && {flex: 1}]} numeric>Price</DataTable.Title>
                     <DataTable.Title onPress={() => {handleDirectionChange('today')}} sortDirection= {sortColumn === 'today' ? sortAscending ? 'ascending' : 'descending' : undefined} style={styles.todayColumn} numeric>Today</DataTable.Title>
-                    <DataTable.Title
+                    {!isMobile && <DataTable.Title
                         onPress={() => handleDirectionChange('volume')}
                         sortDirection={
                             sortColumn === 'volume'
@@ -98,7 +98,7 @@ export default function StockTable({watchlistArray, removeStock, profileData, hi
                         }
                         style={styles.volumeColumn}
                         numeric
-                    >Volume</DataTable.Title>
+                    >Volume</DataTable.Title>}
                     {!isMobile && <DataTable.Title style={styles.trendColumn} textStyle={{fontWeight: '500'}} numeric>7-Day Trend</DataTable.Title>}
                     <DataTable.Title style={styles.exitColumn}>{''}</DataTable.Title>
                 </DataTable.Header>
@@ -129,8 +129,8 @@ export default function StockTable({watchlistArray, removeStock, profileData, hi
                                     </View>
                                 </View>
                             </DataTable.Cell>
-                            <DataTable.Cell style={[styles.priceColumn, { paddingRight: 0 }]} numeric>
-                                <Text style={{fontWeight: '700', fontSize: isMobile ? 15 : 17}}>
+                            <DataTable.Cell style={[styles.priceColumn, { paddingRight: 0 }, isMobile && {flex: 1}]} numeric>
+                                <Text numberOfLines={1} style={{fontWeight: '700', fontSize: isMobile ? 15 : 17}}>
                                     {formattedPrice}
                                 </Text>
                             </DataTable.Cell>
@@ -147,11 +147,11 @@ export default function StockTable({watchlistArray, removeStock, profileData, hi
                                     </Text>
                                 </View>
                             </DataTable.Cell>
-                            <DataTable.Cell style={[styles.volumeColumn, { paddingRight: 0 }]} numeric>
+                           {!isMobile && <DataTable.Cell style={[styles.volumeColumn, { paddingRight: 0 }]} numeric>
                                 <Text style={{ fontWeight: '600', fontSize: isMobile ? 15 : 17 }}>
                                     {volume}
                                 </Text>
-                            </DataTable.Cell>
+                            </DataTable.Cell>}
                             {!isMobile && <DataTable.Cell style={styles.trendColumn}numeric><View style={{paddingLeft: 24}}>{historicalStockData ? <Sparkline historicalData={historicalStockData}/> : <Text>--</Text>}</View></DataTable.Cell>}
                             <DataTable.Cell style={styles.exitColumn}>
                                 <IconButton
