@@ -4,11 +4,16 @@ export type WatchlistStock = {
 };
 
 export type StockProfile = {
+    symbol?: string;
     price: number;
     change: number;
     changePercentage: number;
     image: string;
     volume: number;
+    companyName?: string;
+    exchange?: string;
+    exchangeFullName?: string;
+    description?: string;
 };
 
 export type AlphaVantageDailyEntry = {

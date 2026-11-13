@@ -1,5 +1,5 @@
-//import datas from '../data/mockDailyIBMData.json';
-//import data from '../data/mockSearchDataBA.json';
+import datas from '../data/mockDailyIBMData.json';
+//import datas from '../data/mockSearchDataBA.json';
 
 import type {WatchlistStock, StockProfile, AlphaVantageDailyResponse, MarketState} from '../types/stock';
 
@@ -41,17 +41,17 @@ export async function searchStocksData(searchKeyword: string) : Promise<Watchlis
 
 }
 
-export async function getStockData(company: string) : Promise<AlphaVantageDailyResponse | null>{
-    const encodedCompany= encodeURIComponent(company);
-    const apiUrl =`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${encodedCompany}&apikey=${avApiKey}`;
+export async function getStockData(symbol: string) : Promise<AlphaVantageDailyResponse | null>{
+    const encodedSymbol  = encodeURIComponent(symbol);
+    //const apiUrl =`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${encodedSymbol}&apikey=${avApiKey}`;
 
 
 
     try {
-        const response = await fetch(apiUrl);
+        //const response = await fetch(apiUrl);
 
-        const data = await response.json();
-        
+        //const data = await response.json();
+        const data = datas
 
         if (data["Time Series (Daily)"]){
             return data;

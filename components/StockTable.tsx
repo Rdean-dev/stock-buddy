@@ -5,6 +5,7 @@ import { Breakpoints } from '../constants/breakpoints';
 import { useState } from "react";
 import type { WatchlistStock, StockProfile, AlphaVantageDailyResponse } from '../types/stock';
 import Sparkline  from "../components/Sparkline";
+import  formatStockProfile  from "../utils/formatStockProfile";
 
 type StockTableProps = {
     watchlistArray: WatchlistStock[];
@@ -106,14 +107,9 @@ export default function StockTable({watchlistArray, removeStock, profileData, hi
                 {sortedStocks.length > 0 && sortedStocks.map((stock) => {
 
                     const profile = profileData[stock.symbol];
-                    const changePercentage = profile?.changePercentage;
-                    const plusOrMinus = changePercentage == null ? '' : changePercentage > 0 ? '+' : changePercentage < 0 ? '-' : '';
-                    const formattedPrice = profile?.price != null ? `$${profile.price.toFixed(2)}` : '--';
-                    const formattedChange = profile?.change != null ? `${plusOrMinus}$${Math.abs(profile?.change).toFixed(2)}` : '--';
-                    const formattedPercentage = changePercentage != null ? `${plusOrMinus}${Math.abs(changePercentage).toFixed(2)}%` : '--';
                     const historicalStockData = historicalData[stock.symbol]
-                    const volume = profile?.volume != null ? `${profile.volume.toLocaleString('en-US')}` : '--'
-
+                    
+                    const {formattedPrice, formattedChange, changePercentage, formattedPercentage, volume} = formatStockProfile(profile)
 
                     return (
                         <DataTable.Row key={stock.symbol} style={{paddingVertical: 10}}>
@@ -139,11 +135,7 @@ export default function StockTable({watchlistArray, removeStock, profileData, hi
                                     <Text 
                                         style={[styles.changeText, (changePercentage ?? 0) >= 0 ? 
                                             styles.positive : styles.negative, {fontSize: isMobile ? 13 : 16}]}>
-                                        {formattedChange}
-                                    </Text>
-                                    <Text style={[styles.changeText, (changePercentage ?? 0) >= 0 ? 
-                                        styles.positive : styles.negative, {fontSize: isMobile ? 13 : 16}]}>
-                                        ({formattedPercentage})
+                                        {formattedChange} ({formattedPercentage})
                                     </Text>
                                 </View>
                             </DataTable.Cell>
