@@ -1,4 +1,4 @@
-import StockDetailScreen from "../screens/StockDetailScreen";
+import StockDetailScreen from "../../screens/StockDetailScreen";
 
 
 

@@ -9,11 +9,12 @@ export default function formatStockProfile(profile:StockProfile | undefined | nu
     const formattedChange = profile?.change != null ? `${plusOrMinus}$${Math.abs(profile?.change).toFixed(2)}` : '--';
     const formattedPercentage = changePercentage != null ? `${plusOrMinus}${Math.abs(changePercentage).toFixed(2)}%` : '--';
     const volume = profile?.volume != null ? `${profile.volume.toLocaleString('en-US')}` : '--'
+    const image = profile?.image
     const companyName = profile?.companyName
     const description = profile?.description
     const exchange = profile?.exchange
     const exchangeFullName = profile?.exchangeFullName
     const symbol = profile?.symbol
     
-    return {formattedPrice, formattedChange, changePercentage, formattedPercentage, volume, companyName, description, exchange, exchangeFullName, symbol};
+    return {formattedPrice, formattedChange, changePercentage, formattedPercentage, volume, companyName, description, exchange, exchangeFullName, symbol, image};
 }

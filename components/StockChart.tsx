@@ -1,12 +1,13 @@
 import {CandlestickChart, useCandlestickChart} from 'react-native-wagmi-charts';
 import normalizeCandleData from '../utils/normalizeCandleData';
 import { formatDateAsISODate} from '../utils/formatDate';
-import { StyleSheet, View, Text, Pressable} from 'react-native';
+import { StyleSheet, View, Text, Pressable, useWindowDimensions,} from 'react-native';
 import  Marker  from "./Marker";
 import { patternAnnotationVisuals } from "../constants/patternAnnotationVisuals";
 import {useState} from 'react';
 import { theme } from "../constants/theme";
 import type { PatternName, Candle, AlphaVantageDailyResponse, WatchlistStock } from "../types/stock";
+import { Breakpoints } from '../constants/breakpoints';
 
 type XAxisProps = {
     candlestickData: Candle[];
@@ -19,12 +20,14 @@ type StockChartProps = {
     stockData: AlphaVantageDailyResponse;
     dateInterval: (months: number) => void;
     symbol: string;
+    title?: string;
+    height?: number;
     annotations?: React.ReactNode;
     legend?: React.ReactNode;
     
 }
 
-function YAxis() {
+function YAxis({height}: {height: number}) {
     const yAxisArray = [];
     const {domain} = useCandlestickChart();
     const maxPrice = Math.ceil(domain[1]);
@@ -39,7 +42,7 @@ function YAxis() {
     }
 
     return(
-        <View style={styles.yAxis}>
+        <View style={[styles.yAxis, {height}]}>
             {yAxisArray.map((axisNumber, index) => (
                 <Text 
                     key={index}
@@ -98,7 +101,10 @@ function XAxis({candlestickData, width}: XAxisProps){
 }
 
 
-export default function StockChart({startDate, endDate, stockData, dateInterval, symbol,  annotations, legend}: StockChartProps) {
+export default function StockChart({startDate, endDate, stockData, dateInterval,  symbol, title=symbol, height=350, annotations, legend}: StockChartProps) {
+    const { width } = useWindowDimensions();
+        
+    const isMobile = width < Breakpoints.mobile;
     const [innerWidth, setInnerWidth] = useState(0);
     
     if (!stockData?.["Time Series (Daily)"] || !startDate || !endDate) {
@@ -118,26 +124,23 @@ export default function StockChart({startDate, endDate, stockData, dateInterval,
         return null;
     }
 
-    
-
-
-
-    
     return (
         <View style={styles.chartContainer}>
-            <Text style={styles.chartHeader}>{symbol}</Text>
-            <View style={styles.dateSection}>
-                <Pressable onPress={() => dateInterval(1)}>{({ hovered, pressed }) => (<View style={[styles.dateButton,(hovered || pressed) && styles.dateButtonActive]}><Text style={styles.dateText}>1m</Text></View>)}</Pressable>
-                <Pressable onPress={() => dateInterval(3)}>{({ hovered, pressed }) => (<View style={[styles.dateButton,(hovered || pressed) && styles.dateButtonActive]}><Text style={styles.dateText}>3m</Text></View>)}</Pressable>
-                <Pressable onPress={() => dateInterval(6)}>{({ hovered, pressed }) => (<View style={[styles.dateButton,(hovered || pressed) && styles.dateButtonActive]}><Text style={styles.dateText}>6m</Text></View>)}</Pressable>
-                <Pressable onPress={() => dateInterval(12)}>{({ hovered, pressed }) => (<View style={[styles.dateButton,(hovered || pressed) && styles.dateButtonActive]}><Text style={styles.dateText}>1Y</Text></View>)}</Pressable>
+            <View style={[{width: '100%', flexDirection: 'row',justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12}]}>
+                <Text style={styles.chartHeader}>{title}</Text>
+                <View style={styles.dateSection}>
+                    <Pressable onPress={() => dateInterval(1)}>{({ hovered, pressed }) => (<View style={[styles.dateButton,(hovered || pressed) && styles.dateButtonActive]}><Text style={styles.dateText}>1m</Text></View>)}</Pressable>
+                    <Pressable onPress={() => dateInterval(3)}>{({ hovered, pressed }) => (<View style={[styles.dateButton,(hovered || pressed) && styles.dateButtonActive]}><Text style={styles.dateText}>3m</Text></View>)}</Pressable>
+                    <Pressable onPress={() => dateInterval(6)}>{({ hovered, pressed }) => (<View style={[styles.dateButton,(hovered || pressed) && styles.dateButtonActive]}><Text style={styles.dateText}>6m</Text></View>)}</Pressable>
+                    <Pressable onPress={() => dateInterval(12)}>{({ hovered, pressed }) => (<View style={[styles.dateButton,(hovered || pressed) && styles.dateButtonActive]}><Text style={styles.dateText}>1Y</Text></View>)}</Pressable>
+                </View>
             </View>
             <CandlestickChart.Provider data={filteredArrayOfCandlestickObjects}>
             <View style={styles.chartStyle} onLayout={(event) => setInnerWidth(event.nativeEvent.layout.width)}>
                 {candleChartWidth > 0 &&
                 <>
                     <View style={{flexDirection: 'column'}}>
-                    <CandlestickChart width={candleChartWidth} height={350}>
+                    <CandlestickChart width={candleChartWidth} height={height}>
                         <CandlestickChart.Candles/>
                         <CandlestickChart.Crosshair>
                             <CandlestickChart.Tooltip/>
@@ -149,7 +152,7 @@ export default function StockChart({startDate, endDate, stockData, dateInterval,
                     
                 </View>
                 
-                <YAxis />
+                <YAxis height={height}/>
                 </>
                 }
                 
@@ -259,7 +262,7 @@ const styles = StyleSheet.create({
 
     chartHeader: {
         alignSelf: 'flex-start',
-        fontSize: 28,
+        fontSize: 18,
         fontWeight: '700',
         paddingBottom: 4,
     },
@@ -312,7 +315,6 @@ const styles = StyleSheet.create({
     },
     yAxis: {
         width: 60,
-        height: 350,
         justifyContent: 'space-between',
         paddingLeft: 8,
     },

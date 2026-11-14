@@ -86,6 +86,13 @@ export default function TabLayout() {
           tabBarIcon: ({color}) => <FontAwesome6 size={24} name="newspaper" color={color} />,
         }}
       />
+      <Tabs.Screen 
+        name='stock-detail'
+        options={{
+          title: 'Stock Details',
+          href: null,
+        }}
+      />
 
     </Tabs>
   );

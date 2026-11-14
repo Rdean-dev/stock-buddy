@@ -2,7 +2,7 @@
 import { useLocalSearchParams } from "expo-router";
 import StockChart from "../components/StockChart";
 import React, { useState, useEffect} from "react";
-import { Pressable, useWindowDimensions, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, useWindowDimensions, ScrollView, Image,StyleSheet, Text, View } from 'react-native';
 import { formatDateAsISODate as formatDate, formatDisplayDate } from "../utils/formatDate";
 import { getStockData, getStockProfile } from "../services/stockService";
 import { Breakpoints } from '../constants/breakpoints';
@@ -74,33 +74,53 @@ export default function StockDetailScreen() {
         setEndDate(today);
     };
 
-    const {formattedPrice, formattedChange, changePercentage, formattedPercentage, volume, companyName, description, exchange, exchangeFullName, symbol} = formatStockProfile(profileData)
+    const {formattedPrice, formattedChange, changePercentage, formattedPercentage, volume, companyName, description, exchange, exchangeFullName, symbol, image} = formatStockProfile(profileData)
+    
     return (
         <>
             <ScrollView style={styles.container}>
-                <View style={{gap: 8}}>
-                    <Text style={{fontWeight: 'bold', fontSize: 24,}}>{companyName}</Text>
-                    <Text style={{fontWeight: 'bold', fontSize: 14,}}>{ticker} · {exchange}</Text>
-                    <Text style={{fontWeight: 'bold', fontSize: 32,}}>{formattedPrice}</Text>
-                    <View style={{flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-end' :  'center', gap: isMobile ?  2 : 5,}}>
-                        <Text 
-                            style={[styles.changeText, (changePercentage ?? 0) >= 0 ? 
-                                styles.positive : styles.negative, {fontSize: isMobile ? 13 : 16}]}>
-                            {formattedChange} ({formattedPercentage})
-                        </Text>
+                <View style={{
+                        flexDirection: isMobile ? 'column' : 'row',
+                        alignItems: isMobile ? 'flex-start' : 'center',
+                        gap: 24,
+                        marginBottom: 24,
+                    }}>
+                    <View style={{gap: 16, flexDirection: 'row'}}>
+                        <Image
+                            style={{width: 60, height: 60, alignContent: 'center', borderRadius: 10,}}
+                            source={{uri: image}}
+                            resizeMode='contain'/>
+                        <View>
+                            <Text style={{fontWeight: 'bold', fontSize: 24,}}>{companyName}</Text>
+                            <Text style={{fontWeight: '500', fontSize: 14,}}>{ticker} · {exchange}</Text>
+                        </View>
+                    </View>
+                    <View style={{flexDirection: 'row', alignItems: 'baseline', gap: 12}}>
+                        <Text style={{fontWeight: 'bold', fontSize: 32,}}>{formattedPrice}</Text>
+                        <View style={{flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-end' :  'center', gap: isMobile ?  2 : 5,}}>
+                            <Text 
+                                style={[styles.changeText, (changePercentage ?? 0) >= 0 ? 
+                                    styles.positive : styles.negative, {fontSize: isMobile ? 13 : 16}]}>
+                                {formattedChange} ({formattedPercentage})
+                            </Text>
+                        </View>
                     </View>
                 </View>
                 
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>AI Research Summary</Text>
                 </View>
-                <View style={[{zIndex: 0 ,marginHorizontal: theme.spacing.pageHorizontalMargin, marginTop: 24,}, isMobile && {marginHorizontal: 16, marginTop: 16,}]}>
-                    {(startDate && endDate && selectedStockData )&&<StockChart startDate={startDate} endDate={endDate} stockData={selectedStockData}  symbol={ticker} dateInterval={dateInterval}/>}
+                <View style={[{zIndex: 0 , marginBottom: 24}, isMobile && {marginHorizontal: 16, marginTop: 16,}]}>
+                    {(startDate && endDate && selectedStockData )&&<StockChart startDate={startDate} endDate={endDate} stockData={selectedStockData}  symbol={ticker} dateInterval={dateInterval} height={250} title="Price History"/>}
+                </View>
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>About the Company</Text>
+                    <Text style={{fontSize: 14, color: theme.colors.labelColor, lineHeight: 22}} numberOfLines={3}>{description}</Text>
                 </View>
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Price Action Summary</Text>
                 </View>
-                <View style={styles.rowContainer}>
+                <View style={[styles.rowContainer, {flexDirection: isMobile ? 'column' : 'row',}]}>
                     <View style={styles.halfSection}>
                         <Text style={styles.sectionTitle}>Technical Pattern Signals</Text>
                     </View>
@@ -127,13 +147,12 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.cardBackgroundColor,
         borderColor: theme.colors.cardBorderColor,
         borderWidth: 1,
-        borderRadius: 16,
-        padding: 15,
-        marginBottom: 12,
+        borderRadius: 12,
+        padding: 24,
+        marginBottom: 24,
     },
 
     chartContainer: {
-        backgroundColor: "#1a1a1a",
         borderRadius: 16,
         height: 250,
         padding: 15,
@@ -143,14 +162,17 @@ const styles = StyleSheet.create({
     rowContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
-        marginBottom: 12,
+        marginBottom: 24,
+        gap: 24,
     },
 
     halfSection: {
-        backgroundColor: "#1a1a1a",
-        borderRadius: 16,
-        padding: 15,
-        width: "48%",
+        backgroundColor: theme.colors.cardBackgroundColor,
+        borderRadius: 12,
+        padding: 24,
+        flex: 1,
+        borderColor: theme.colors.cardBorderColor,
+        borderWidth: 1,
     },
 
     sectionTitle: {
