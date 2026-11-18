@@ -7,9 +7,10 @@ import { formatDateAsISODate as formatDate, formatDisplayDate } from "../utils/f
 import { getStockData, getStockProfile } from "../services/stockService";
 import { Breakpoints } from '../constants/breakpoints';
 import { mockWatchlist, mockProfileData, mockHistoricalData, } from '../utils/test';
-import type {WatchlistStock, StockProfile, MarketState, PatternName, AlphaVantageDailyResponse} from '../types/stock';
+import type {WatchlistStock, StockProfile, PriceActionSummary,MarketState, PatternName, AlphaVantageDailyResponse} from '../types/stock';
 import { theme } from "../constants/theme";
 import formatStockProfile from "../utils/formatStockProfile";
+import { getPriceActionSummary } from "../services/priceActionService";
 
 const USE_MOCK_DATA = false;
 
@@ -25,6 +26,10 @@ export default function StockDetailScreen() {
     const [selectedStockData, setSelectedStockData] = useState<AlphaVantageDailyResponse | null>(null);
     const [selectedInterval, setSelectedInterval] = useState<number | null>(null);
     const [profileData, setProfileData] = useState<StockProfile | null>(null);
+    const [priceActionSummary, setPriceActionSummary] = useState<PriceActionSummary | null>(null);
+    const [summaryLoading, setSummaryLoading] = useState<Boolean>(false);
+    const [summaryError, setSummaryError] = useState<string>("");
+
 
     useEffect(() => {
         if(USE_MOCK_DATA) return;
@@ -32,6 +37,30 @@ export default function StockDetailScreen() {
         
         setSelectedStockData(null);
         setProfileData(null);
+        
+        if (!ticker) {
+            return;
+        }
+        const getData = async () => {
+            const stockData = await getStockData(ticker);
+            const stockProfile = await getStockProfile(ticker);
+            if (!ignore){ 
+                setSelectedStockData(stockData)
+                setProfileData(stockProfile);
+            };
+        }
+
+        getData();
+        
+        return () => {
+            ignore = true;
+        };
+    }, [ticker]);
+    useEffect(() => {
+        if(USE_MOCK_DATA) return;
+        let ignore = false;
+        
+        setPriceActionSummary(null);
         
         if (!ticker) {
             return;

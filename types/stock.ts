@@ -54,9 +54,14 @@ export type MarketState= {
     is_market_open: boolean;
     time_to_open: string;
     time_to_close: string;
-}
+};
 
 export type LineChartPoint = {
     timestamp: number,
     value: number,
+};
+
+export type PriceActionSummary = {
+    symbol: string;
+    summary: string;
 };
