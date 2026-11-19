@@ -1,25 +1,25 @@
+import { PriceActionSummary } from "@/types/stock";
 
 
-export async function getPriceActionSummary(symbol:string) {
-    
-    const encodedSymbol  = encodeURIComponent(symbol);
+export async function getPriceActionSummary(symbol:string): Promise<PriceActionSummary | null>{
     
     try {
         const response = await fetch(
             `http://localhost:3000/api/price-action-summary/${encodeURIComponent(symbol)}`
         );
 
+        if(!response.ok){
+            throw new Error(`Summary request failed: ${response.status}`);
+        }
+
         const data = await response.json();
 
-        if (data["Time Series (Daily)"]){
-            return data;
-        }
-        else{
-            console.log("Alpha Vantage incorrect response:", data);
-            return null;
-        }
+        
+        return data.data;
+        
+
     } catch (error) {
-        console.error('Error fetching company data:', error);
+        console.error('Error fetching price Summary:', error);
         return null;
     }
 }

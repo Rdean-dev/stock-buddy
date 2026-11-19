@@ -27,7 +27,7 @@ export default function StockDetailScreen() {
     const [selectedInterval, setSelectedInterval] = useState<number | null>(null);
     const [profileData, setProfileData] = useState<StockProfile | null>(null);
     const [priceActionSummary, setPriceActionSummary] = useState<PriceActionSummary | null>(null);
-    const [summaryLoading, setSummaryLoading] = useState<Boolean>(false);
+    const [summaryLoading, setSummaryLoading] = useState<boolean>(false);
     const [summaryError, setSummaryError] = useState<string>("");
 
 
@@ -61,17 +61,24 @@ export default function StockDetailScreen() {
         let ignore = false;
         
         setPriceActionSummary(null);
+        setSummaryError("");
+        setSummaryLoading(true)
         
         if (!ticker) {
             return;
         }
         const getData = async () => {
-            const stockData = await getStockData(ticker);
-            const stockProfile = await getStockProfile(ticker);
-            if (!ignore){ 
-                setSelectedStockData(stockData)
-                setProfileData(stockProfile);
-            };
+            const priceSummary = await getPriceActionSummary(ticker);
+
+            if (ignore) return;
+
+            if (priceSummary === null) {
+                setSummaryError("Unable to load price action summary.");
+            } else{
+                setPriceActionSummary(priceSummary);
+            }
+
+            setSummaryLoading(false);
         }
 
         getData();
@@ -148,6 +155,7 @@ export default function StockDetailScreen() {
                 </View>
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Price Action Summary</Text>
+                    {summaryLoading ? (<Text>Loading summary...</Text>) : summaryError ? (<Text>{summaryError}</Text>) : (<Text style={{fontSize: 14, color: theme.colors.labelColor, lineHeight: 22}}>{priceActionSummary?.summary}</Text>)}
                 </View>
                 <View style={[styles.rowContainer, {flexDirection: isMobile ? 'column' : 'row',}]}>
                     <View style={styles.halfSection}>
