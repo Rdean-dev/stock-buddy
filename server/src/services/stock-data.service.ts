@@ -8,7 +8,7 @@ import type {WatchlistStock, StockProfile, AlphaVantageDailyResponse, MarketStat
 const avApiKey = process.env.EXPO_PUBLIC_ALPHA_VANTAGE_API_KEY;
 const fmpApiKey = process.env.EXPO_PUBLIC_FINANCIAL_MODELING_PREP_API_KEY;
 const tvApiKey = process.env.EXPO_PUBLIC_TWELVE_DATA_API_KEY;
-
+const finnhubApiKey = process.env.FINNHUB_API_KEY;
 type TwelveDataSearchMatch = {
     symbol: string,
     instrument_name: string
@@ -122,4 +122,37 @@ export async function getMarketStatus(): Promise<MarketState | null>{
     }
 
 
+}
+
+export async function getCompanyNews(symbol:string, startDate: string, endDate: string,) {
+
+    if( startDate > endDate){
+        console.log("Start date must be on or before the end date.");
+        return null;
+    }
+    const encodedSymbol  = encodeURIComponent(symbol);
+    
+    const finnhubApiUrl = `https://finnhub.io/api/v1/company-news?symbol=${encodedSymbol}&from=${startDate}&to=${endDate}&token=${finnhubApiKey}`;
+
+    try{
+        const response = await fetch(finnhubApiUrl);
+
+        if(!response.ok) {
+            console.error('Company News request failed: ', response.status);
+            return null;
+        }
+
+        const data = await response.json();
+
+        if (Array.isArray(data)){
+            console.log("Company News:", data);
+            return data
+        }else {
+            console.log("FinnHub Incorrect Response:", data);
+            return null;
+        }
+    } catch (error) {
+        console.error('Error fetching company news: ',error);
+        return null;
+    }
 }

@@ -1,130 +1,167 @@
 # Stock Buddy — Project Notes
 
-**Last updated:** November 11, 2026  
-**Stage:** Functional prototype; UI refinement and data integration in progress  
-**Stack:** React Native, Expo, Expo Router, TypeScript migration in progress, React Native Paper, SVG (web sparklines), react-native-wagmi-charts (candlestick chart)
+Last updated: November 19, 2026
+Stage: Working frontend and first end-to-end AI backend feature; completing core research features and moving data responsibilities to the backend.
 
-## 1. Project overview
-Stock Buddy is a cross-platform stock research and educational app designed to make stock tracking, price action, and candlestick-pattern analysis approachable. The intended experience includes a watchlist, stock details, pattern scanner, market report, news, and eventually AI-assisted research explanations. It is **not yet a production-ready market-data application**.
+## Product direction
 
-## 2. Current status at a glance
-| Area | Current status | Next work |
+Stock Buddy is a cross-platform stock research and educational app built with React Native, Expo Router, and TypeScript. Its core experience is a watchlist, stock detail page, and candlestick pattern scanner, supported by news and market reporting.
+
+The immediate goal is a coherent, working app for one other user. Build and validate locally, then deploy the backend to cloud hosting. A homelab remains a separate learning interest, not a prerequisite for delivering the app. No hosting provider has been selected. Keep recurring costs at zero where practical; check current free-tier limits before deployment or provider decisions.
+
+AI is an implementation choice for features that benefit from synthesis, not a requirement for every feature. Keep the current price summary integration, but consider replacing this predictable recap with deterministic text later to reserve AI requests for richer news or research features.
+
+## Current status
+
+| Area | Status | Next milestone |
 |---|---|---|
-| Watchlist | User verified it works with live data; desktop column alignment fixed; mobile refinements completed during session | Treat as complete for now; revisit only concrete issues |
-| Sparklines | Custom web SVG implementation working; Android import issue addressed with a native placeholder approach | Confirm native placeholder is saved and Android loads; no native sparkline rendering required yet |
-| Pattern Scanner | Pattern chart extracted into a wrapper around shared StockChart | Regression-check markers, legend, date ranges, and native behavior |
-| Stock Detail | Shared chart renders for route ticker after reload; summary sections exist | Apply existing theme and Figma layout; finish header and responsive layout |
-| Backend / AI | Not implemented; all current app code runs in Expo | Begin after Stock Detail UI; first target is price-action summary |
-| TypeScript | Incremental migration ongoing | Keep shared component contracts accurate |
+| Watchlist | User verified live-data use; desktop and mobile table refinements completed | Preserve working behavior; add persistence and consistent request states as needed |
+| Stock Detail | Shared navigation, profile header, chart, company description, and research cards render | Fill remaining cards with useful data and handle unavailable sections explicitly |
+| Price Action Summary | Express → market data/metrics → OpenRouter → Expo card works; browser screenshot confirms display | Validate edge cases, completed-session selection, and failure paths |
+| Pattern Scanner | Existing client-side detection and chart annotations; shared chart extracted | Regression-check behavior, then migrate detection to backend |
+| Backend | Express + TypeScript server and summary endpoint running locally | Introduce reusable market-data endpoints and caching |
+| News / analyst sentiment / report | Planned research features; placeholder cards are not completed integrations | Select feasible data sources and deliver one feature at a time |
+| Deployment / database | Not yet implemented | Deploy after local flow is stable; persist watchlists when ready |
 
-## 3. Watchlist — November 11 update
-User confirmed live-data use works. Earlier notes describing the watchlist as mock-only are superseded by that confirmation; not every individual provider or edge case was audited this session.
+## Working architecture
 
-Completed/refined:
-- Company, Price, Today, Volume, and 7-Day Trend columns, plus remove control.
-- Matched column flex styles between titles and row cells; brought Price closer to Company.
-- Fixed numeric header alignment by removing outer paddingLeft: 24 from the Trend title. The Trend cell had padding on an inner View, so header and row flex allocation differed. Changing Volume text padding was not the actual fix.
-- Mobile subtitle/status alignment: alignItems: center and override subtitle paddingBottom: 20 to zero on mobile.
-- Price text constrained to one line; mobile price-column width increased to avoid truncation. Mobile left alignment discussed through justifyContent: flex-start.
-- Android could not resolve web-only Sparkline.web.tsx. Proposed Sparkline.native.tsx with matching props and return null, keeping the extensionless import. Native placeholder implementation was not separately shown or verified.
+Frontend: Expo UI, navigation, rendering, chart interaction, selected date ranges, and request display states.
 
-Custom web SVG sparkline implementation retained:
-- Seven chronological closing prices, 120 × 35 px SVG, 3 px padding.
-- Independent first-to-last trend color; gradient under line; unique useId gradient IDs.
-- Fewer-than-two-points guard and centered flat-series handling.
-- Web-only SVG elements; mobile trend hidden by responsive UI.
+Backend: Express routes/controllers, provider calls and secrets, data validation/normalization, price calculations, AI requests, and eventually caching, pattern detection, and persistence.
 
-Watchlist persistence, loading/error handling, market-status refresh, and global search remain broader follow-up items where not already implemented. They do not block the current decision to move on from Watchlist styling.
+The backend lives under `server/` with its own package.json, dependencies, tsconfig, and src folder. Source code is stored in the project; a running Node process serves requests. Cloud deployment will run that process on a remote host.
 
-## 4. Market-status integration
-**Recorded October 26:** Added Twelve Data NYSE market-status request, HTTP and boolean validation for `is_market_open`, and watchlist labels for open, closed, and unavailable. Request fires when Watchlist mounts. **Not yet verified complete:** scheduled refresh using `time_to_close` / `time_to_open`, timer cleanup, foreground refresh, and neutral unavailable-state styling.
+Do not import Expo service files into the backend. Their package/module settings and location are outside server/src. Keep backend implementations and required types under server/src for now. Consider a shared types package later only when duplication creates a concrete maintenance problem.
 
-## 5. Pattern Scanner
-Core functionality documented as implemented:
-- Stock search; historical Alpha Vantage daily time-series normalization.
-- Candlestick pattern detection, including Doji, Hammer, Bullish/Bearish Engulfing, Morning/Evening Star, and Bullish/Bearish Harami; other patterns have been explored or implemented but need per-pattern verification.
-- Date selection, validation, 1M/3M/6M/1Y presets, and selected-pattern multi-select controls.
-- Interactive candlestick chart with crosshair, price/date/OHLC information, annotations, and legend.
-- Responsive scanner controls and a shared visual marker configuration.
+### Running locally
 
-**Next:** Improve compact PatternCard results, date typography, spacing, and mobile layout; verify every selectable detection function and annotation alignment; test end-to-end scanner workflow and loading/error states. `react-native-wagmi-charts` is still used for the candlestick chart; replacing the watchlist sparkline did **not** replace this chart.
+- Project root: `npx expo start`.
+- Separate terminal, inside server/: `npm run dev`.
+- Express currently uses localhost:3000; Expo web uses localhost:8081.
+- Test the summary in Command Prompt with `curl.exe -i http://localhost:3000/api/price-action-summary/IBM`.
+- localhost works for the computer's browser. Physical-device testing needs an address reachable from that device.
+- Run the backend build before deployment to check the actual TypeScript compilation path.
 
-## 6. Stock Detail and chart refactor — November 11
-### Figma and UI
-Learned basic Figma frame, zoom, text, rectangles, fill, border, and spacing controls. Desktop frame started at 1440 × 1024 and was extended vertically to fit scrolling content. The current mockup includes:
-- Stock identity, ticker/exchange, price, daily change.
-- Large chart card with 1M/3M/6M/1Y controls and chart placeholder.
-- Full-width Price Action Summary.
-- Technical Pattern Signals and Analyst Sentiment side by side, with 24 px gap.
-- Full-width Recent News Summary.
-- Shared targets: white cards, 12 px corners, E2E8F0 borders, 24 px gaps/insets; body text 14 px Regular in 475569.
+NodeNext backend imports use explicit .js extensions for local TypeScript modules. JSON imports use `with { type: "json" }`. Keep required mock files within the backend source tree.
 
-User chose to leave out the AI Research Summary button. The existing screen still contained an empty AI Research Summary section; reconcile this when styling. Sample prose, dates, analyst counts, and news in Figma are fictional layout content, not verified financial information.
+## Price action summary — implemented flow
 
-Figma work mostly became a wireframe. User wanted visual decisions resolved before coding, not a prolonged recreation of the paper sketch. Reuse the established Watchlist design language; avoid repeating low-value placeholder work.
+1. Expo service `services/priceActionService.ts` requests GET /api/price-action-summary/:symbol.
+2. Express router connects the route to the controller.
+3. Controller validates the symbol with Zod and awaits getSummary; errors go to error middleware.
+4. Backend price-action service gets historical data from stock-data.service.ts, checks availability, normalizes candles, calculates metrics, and calls generatePriceSummary.
+5. ai-summary.service.ts sends a POST to https://openrouter.ai/api/v1/chat/completions using model openrouter/free.
+6. Backend responds with `{ data: { symbol, summary } }`.
+7. Frontend checks response.ok, parses JSON, returns data.data, and returns null on caught failure.
+8. Stock Detail displays loading, error, or the summary text.
 
-### Component responsibilities
-- StockChart: reusable candles, axes, crosshair/tooltip, OHLC inspection, date-range controls, chart provider and shared layout.
-- PatternStockChart: pattern-match calculation, PatternAnnotations, PatternLegend, and their styles; composes StockChart.
-- StockChart accepts optional annotations and legend as React.ReactNode props. Render annotations inside CandlestickChart and its Provider; render legend below. No variant needed for this composition.
-- StockChart now takes symbol: string instead of selectedStock: WatchlistStock; wrapper should pass selectedStock.symbol.
-- Pattern props belong in the wrapper, not the shared chart.
-- Both currently normalize the same stock data and dates; duplicate normalization is intentionally tolerated for this refactor. Later consider passing one normalized Candle[] rather than changing scope now.
-- PatternAnnotations uses flatMap: skip missing candles or nonpositive price ranges with []; return one annotation in an array otherwise. Existing marker stacking by date remains.
-- Remove obsolete imports/types/styles from each file as cleanup; completion of all cleanup was not independently verified.
+GET represents retrieving the symbol's recap. The separate backend-to-OpenRouter request uses POST to submit the prompt and metrics. If a future app endpoint accepts arbitrary metrics in a request body, reconsider POST for that endpoint rather than changing methods without an input-contract reason.
 
-### Stock Detail data flow
-- Read ticker from useLocalSearchParams.
-- Fetch getStockData(ticker) in effect depending on ticker; guard with !ticker; reset selectedStockData and ignore stale results during cleanup.
-- startDate/endDate and selectedStockData currently begin as null.
-- Mount-only effect calls dateInterval(1). Do NOT depend on the dates this function changes: that caused a render loop in an intermediate version.
-- dateInterval updates start/end dates and selectedInterval for month presets.
-- Render StockChart only once dates and selectedStockData exist; pass stockData={selectedStockData}, symbol={ticker}, and dateInterval.
-- Removed scanner-only custom-date handlers that referenced undefined setDateError.
+### Data and calculations
 
-The reported stockData-is-not-defined error persisted despite corrected pasted code; reloading resolved it. User confirmed chart works, with screenshot showing AAPL candles and dates without pattern markers. Screenshot alone does not establish whether this historical response is live or mocked.
+Backend normalizeCandleData accepts an optional limit, sorts date entries newest first, slices before parsing, and returns numeric candles in newest-first order. Latest candle is index 0; previous candle is index 1. This convention is specific to the backend utility; do not silently change the frontend chart's chronological ordering.
 
-Latest screenshot still shows dark page/section styling, white chart, default stock-detail navigation header, and largely empty summary cards. This has NOT yet been styled to match the light Figma/Watchlist design.
+A limit reduces conversion work, not the size of the provider response. Use a compact historical response where appropriate; avoid fetching full history unnecessarily.
 
-### AI/backend decision
-Goal: a short price-action summary generated from supplied market facts. Proposed architecture: Expo UI -> small TypeScript/Node backend -> hosted AI API via SDK -> summary returned to UI. No backend, model provider, SDK, hosting, or endpoint has been implemented/chosen conclusively. Express was proposed as a starting server library.
+Metrics currently prepared:
 
-Keep secret AI keys server-side. Calculate numeric facts in code and ask AI to explain those facts; do not ask a model for current stock facts from ticker alone. Initial scope discussed: latest completed trading day, OHLCV and prior close; no news explanations or predictions. No database/auth required for the initial learning endpoint, though public deployment needs separate consideration.
+| Metric | Definition |
+|---|---|
+| sessionDate / previousSessionDate | Dates from the selected daily candles |
+| open, high, low, close, volume | Latest selected session |
+| previousClose | Previous session close |
+| priceChange | close − previousClose |
+| priceChangePercent | priceChange / previousClose × 100 |
+| volumeChangePercent | (volume − previousVolume) / previousVolume × 100 |
+| sessionRange / previousSessionRange | Each session's high − low |
+| closePositionPercent | (close − low) / sessionRange × 100 |
 
-User wants UI first, then backend integration, and is interested but nervous about backend learning. Teach through small working checkpoints; let user write code. Do not start backend setup before the current UI milestone unless user changes priority.
+Zero denominators produce null for the affected percentage. Missing historical data or fewer than two candles stop summary generation with an error. These are different conditions: one unavailable metric need not invalidate the whole recap.
 
-## 7. Navigation and layout
-Expo Router is used. Earlier notes document desktop left-side tabs and mobile bottom tabs. A collapsible desktop sidebar and global stock search remain future work. Current watchlist screenshot confirms a left navigation rail and global header on desktop, but not full functionality of every header control.
+Completed-session selection remains unfinished. Latest two entries are not automatically two completed sessions. Filter/select completed sessions before limiting to two, or retrieve enough candidates to exclude an unfinished day. Use exchange dates/time zone and session information rather than the user's local date alone. Return sessionDate as structured response metadata when improving the contract, so the UI need not extract it from prose.
 
-## 8. Data sources and architecture
-- **Alpha Vantage:** daily historical time-series format, normalization, and earlier scanner symbol-search work; user reports live Watchlist works; exact per-provider coverage not independently audited.
-- **Twelve Data:** symbol-search exploration/integration and NYSE market status.
-- **FMP:** company-profile API considered/planned; implementation status not verified.
-- **Current data strategy:** live Watchlist use confirmed by user; mocks remain useful for UI development. Caching, refresh, quota handling, and exact provider coverage need review as backend work begins.
-- **Architecture principle:** keep normalization/data fetching separate from presentation; avoid premature abstractions.
+Validate parsed numeric data: finite prices/volume, valid OHLC relationships, nonnegative volume, and enough usable candles. Missing or malformed inputs must not silently become zero or misleading summary text.
 
-## 9. Next work sequence
-1. Style Stock Detail using existing theme and Figma reference: background, stock header, card spacing, chart container, and responsive stacked mobile summaries.
-2. Confirm time-range buttons and crosshair/OHLC interaction; regression-check scanner annotations after extraction.
-3. Add clear loading/error/empty handling for Stock Detail fetching as needed.
-4. Begin backend learning with one endpoint returning a fixed response; connect Expo before introducing AI.
-5. Replace fixed response with price-action generation using validated market facts; add summary loading/error handling.
-6. Broader later work: persistence, caching/quotas, market-status refresh, search, authentication.
+### Prompt and output
 
-## 10. Future product ideas (not current deliverables)
-Daily AI market report; AI research summaries; analyst sentiment; stock news; stock screener/multi-stock pattern scanning; user accounts; persistent personalized watchlists; public landing page; dark theme; collapsible sidebar. Prior branding concept: approachable green/navy identity and a handshake-like money-stack logo; final logo not selected in the supplied notes.
+Prompt requests exactly two short plain-language sentences providing a daily price action recap, connecting movement, closing position, and volume rather than listing all metrics. It identifies ticker and actual session date, displays date as Month D, YYYY, uses supplied computed percentages, omits missing/null values, rounds prices/percentages, and returns plain text.
 
-## 11. Next-session handoff
-**Stop point:** User reloaded Stock Detail and confirmed the extracted shared chart renders successfully. Session ended November 11, local time.
+Restrictions: no invented causes, predictions, trading advice, or unsupported interpretations. closePositionPercent is position between session low (0) and high (100), not percentage change from the prior close. Two daily candles support a daily recap, not a broader trend/support/resistance analysis.
 
-**Start next time:** Continue Stock Detail UI styling, not backend yet. Reuse the Watchlist theme and existing chart. Review current files before editing; snippets in these notes describe the session, not an authoritative repository snapshot.
+An early output confused closing position with change from previous close. The prompt was clarified, and subsequent displayed price calculations and volume comparison were checked. A working prompt reduces errors but does not establish that every future output is correct.
 
-**Verification still worth doing:** 1M/3M/6M/1Y ranges, scanner annotations/legend after the refactor, and Android rendering. User said done after earlier checks, but no complete test record or commit hash was provided.
+Before calling this feature robust: ensure AI response content is a nonempty string; type PriceActionMetrics explicitly; validate required environment variables; add a bounded request timeout and sensible unavailable behavior. Cache by symbol/session/input version to avoid regenerating identical summaries on every visit. Avoid broad automatic retries that consume free quotas.
 
-Suggested commit messages discussed:
-- Refine watchlist column spacing and header alignment
-- Extract reusable stock chart and connect stock detail screen
+## Verification and debugging completed
 
-**Collaboration preference:** Mentor/senior-engineer guidance; user implements. No full code unless requested. Explain architectural reasoning and provide targeted corrections without slow-walking familiar UI tasks.
+- Initial sample endpoint returned 200 for valid input and 400 for invalid input using curl (before the route changed from POST to GET).
+- Actual GET endpoint returned an AI-generated IBM recap using mock historical data.
+- Wrong OpenRouter homepage URL returned HTML, causing JSON parsing failure; corrected to the chat completions endpoint.
+- User independently verified the volume calculation against raw volumes.
+- Browser integration initially failed because CORS headers were missing. Configured cors middleware before routes to allow http://localhost:8081; summary now displays in Stock Detail.
+- Curl does not enforce browser CORS, so a curl success alone is not an end-to-end browser test.
+- Expo transient closed-stream error appeared during page loading; page recovered. Do not assume it was caused by the Express endpoint.
+- React useAnimations DOM warning remains a separate cleanup issue.
 
+Latest screenshot shows AAPL summary dated November 18 while chart dates remain August–September. User knows the chart is mock. Summary service was previously IBM-mocked; latest screenshot suggests its source changed, but final backend fetch code was not reviewed. Confirm configuration rather than assuming every source is live.
 
+## Request state decisions
+
+Stock Detail uses separate summary data, loading boolean, and error string. This distinguishes no request, pending, success, and failure; null data alone cannot explain all of them.
+
+On a new request: clear old data/error and set loading. On success: store data and clear loading. On failure: set error and clear loading. Cleanup ignore flag must be checked after await before state updates to prevent older results overwriting a different ticker's summary.
+
+Three useState calls were chosen for readability, not as a universal rule. A combined discriminated-union status is a later option if transitions become difficult to maintain. Apply the same reasoning to other independent requests: identify what the UI must distinguish, then model it clearly.
+
+## Existing UI and chart decisions
+
+- Watchlist live-data use verified by user; Company/Price/Today/Volume/Trend alignment and mobile price sizing refined. Avoid reopening styling without a concrete problem.
+- Web sparkline uses custom SVG with gradient, unique IDs, and flat/insufficient-data handling. Native fallback approach was discussed; Android verification remains worth doing.
+- StockChart owns candles/provider, axes, crosshair/tooltip, OHLC inspection, date controls, optional title (default symbol), and configurable height.
+- PatternStockChart composes StockChart with optional annotations and legend React nodes. Annotations render within the chart provider; no variant prop is required.
+- Shared chart height must also reach YAxis; Stock Detail uses 250 rather than the shared default 350.
+- Shared formatStockProfile utility supplies display formatting; it accepts missing/null profile data.
+- Stock Detail profile header includes logo, company, ticker/exchange, price, and colored daily change. About Company uses a short description.
+- White cards, subtle borders, 12px corners, 24px spacing; paired research cards stack on mobile.
+- Stock Detail route moved into app/(tabs) so desktop sidebar and AppHeader remain visible; href:null hides it from menu items. Global search and Watchlist can both navigate to the same ticker route.
+- Figma is a visual planning aid; reuse the app's established design language without prolonging placeholder work.
+
+## Forward development plan
+
+### 1. Finish the summary milestone
+
+Confirm current frontend effect and backend response guards, test failure/loading behavior, add completed-session selection, and remove temporary debug logging. Retain AI for now. Keep chart mock data intentional until its source is switched. Commit this working milestone.
+
+### 2. Establish backend market-data access
+
+Move provider requests behind reusable server endpoints for historical candles and company profiles, followed by symbol search and market status. Keep rendering/formatting in Expo. Route chart and summary through consistent underlying data. Add HTTP/provider response validation, clear errors, caching, and quota handling. Avoid duplicate provider fetches for a single screen load.
+
+Current providers: Alpha Vantage historical daily data, FMP company profiles, Twelve Data symbol search and market status. Reconfirm availability/limits when implementing; do not assume free-tier allowances are permanent.
+
+### 3. Move pattern analysis to the backend
+
+Reuse existing detection logic as pure functions over validated candles. Add a scan endpoint accepting the symbol/date range/selected patterns needed by the scanner. Keep selected controls, chart interaction, annotation positioning, and legends in Expo. Verify representative known matches, no-match cases, date boundaries, and alignment after migration. Populate Stock Detail's Technical Pattern Signals from the same detection logic rather than maintaining a second implementation.
+
+### 4. Complete useful research content
+
+Implement Recent News with source links and timestamps first; add summarization only if it adds value. Implement Analyst Sentiment only after confirming an accessible data source and clearly separating consensus from app-generated interpretation. Keep broader AI research and Daily Report scoped to available data and useful user questions; placeholders are not commitments to invent content.
+
+### 5. Add persistence
+
+Use PostgreSQL for saved watchlists and later preferences/accounts. Start with the actual one-user requirement; design ownership so accounts can be added cleanly if remote access requires them. API keys remain server-side. No database is necessary merely to call the summary service. Decide cache persistence separately from user data persistence.
+
+### 6. Deploy and validate for the intended user
+
+Compare current cloud free tiers, then deploy the Express backend with configured environment variables, production CORS origins, HTTPS, and an Expo API base URL configured per environment. Review authentication/access limits and request rate limits before exposing AI/provider-backed endpoints. Test the real user's browser/device, unavailable providers, cold starts, and quota exhaustion. Cloud remains the preferred delivery path; no hardware purchase is needed now.
+
+## Next-session starting point
+
+Do not restart the tutorial or redesign the working page. Review current code, close the summary correctness/response-validation gaps, then begin the reusable backend historical-data endpoint. The next substantial architecture milestone is sharing market data between chart, summary, and scanner without repeated provider calls.
+
+Suggested milestone commit: `Integrate AI price action summaries into stock details`.
+
+## Collaboration and engineering learning
+
+User writes the code and wants ownership of decisions. Provide targeted examples when asked; avoid full implementations by default. Explain corrections in terms of assumption, possible failure, and chosen response. Review the working path, boundaries, and meaningful edge cases rather than adding guard clauses everywhere.
+
+Keep plans forward-looking and practical. Distinguish implemented behavior from planned work, but do not turn notes into a word-for-word transcript or repeatedly qualify routine progress. Read current files before changes; these notes are a handoff, not an authoritative code snapshot.

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getPriceActionSummary} from "../controllers/price-action.controller.js";
+import { getPriceActionSummary} from "../controllers/stock-summary.controller.js";
 
 const router = Router();
 
