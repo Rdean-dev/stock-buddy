@@ -2,12 +2,12 @@ import {getStockData} from "./stock-data.service.js"
 import normalizeCandleData from "../utils/normalizeCandleData.js"
 import {generatePriceSummary} from "../services/ai-summary.service.js";
 
-export interface PriceActionSummary {
+export interface Summary {
     symbol: string;
     summary: string;
 }
 
-export async function getSummary(symbol: string): Promise<PriceActionSummary>{
+export async function getSummary(symbol: string): Promise<Summary>{
     
     const stockData = await getStockData(symbol);
 

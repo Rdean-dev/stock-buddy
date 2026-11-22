@@ -47,3 +47,4 @@ app-example
 server/node_modules/
 server/dist/
 server/.env
+server/testNewsSummary.ts

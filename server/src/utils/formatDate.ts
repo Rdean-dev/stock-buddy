@@ -1,4 +1,4 @@
-export function formatDateAsISODate(date: Date | null){
+export function formatDateAsString(date: Date | null){
     if (date == null){
         return ""
     }

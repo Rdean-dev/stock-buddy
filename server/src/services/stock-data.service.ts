@@ -2,7 +2,7 @@ import datas from '../mockdata/mockDailyIBMData.json' with {type: "json"};
 //import datas from '../mockdata/mockSearchDataBA.json' with {type: "json"};
 
 
-import type {WatchlistStock, StockProfile, AlphaVantageDailyResponse, MarketState} from '../types/stock.js';
+import type {CompanyNews, WatchlistStock, StockProfile, AlphaVantageDailyResponse, MarketState} from '../types/stock.js';
 
 
 const avApiKey = process.env.EXPO_PUBLIC_ALPHA_VANTAGE_API_KEY;
@@ -124,7 +124,7 @@ export async function getMarketStatus(): Promise<MarketState | null>{
 
 }
 
-export async function getCompanyNews(symbol:string, startDate: string, endDate: string,) {
+export async function getCompanyNews(symbol:string, startDate: string, endDate: string,): Promise<CompanyNews[] | null>{
 
     if( startDate > endDate){
         console.log("Start date must be on or before the end date.");
