@@ -1,4 +1,4 @@
-import type {AlphaVantageDailyResponse, LineChartPoint} from '../types/stock';
+import type {AlphaVantageDailyResponse, LineChartPoint} from '../types/stock.js';
 
 
 export default function normalizeLineChartData(stockData: AlphaVantageDailyResponse): LineChartPoint[] {
@@ -9,7 +9,7 @@ export default function normalizeLineChartData(stockData: AlphaVantageDailyRespo
 
     const filteredArrayOfLineChartObjects: LineChartPoint[] = [];
 
-    arrayOfLineChartObjects.toReversed().slice(-7).forEach((dataEntry) => {
+    arrayOfLineChartObjects.slice(0, 7).reverse().forEach((dataEntry) => {
         const entryDate = dataEntry[0];
         const timestamp = new Date(entryDate).getTime();
         

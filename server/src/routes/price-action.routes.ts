@@ -6,4 +6,5 @@ const router = Router();
 
 router.get("/:symbol", getPriceActionSummary);
 
+
 export default router;

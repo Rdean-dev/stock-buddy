@@ -1,5 +1,5 @@
 
-import type { WatchlistStock, StockProfile, AlphaVantageDailyResponse } from '../types/stock';
+import type { WatchlistStock, StockProfile, AlphaVantageDailyResponse } from '../types/stock.js';
 
 export default function formatStockProfile(profile:StockProfile | undefined | null, ) {
 

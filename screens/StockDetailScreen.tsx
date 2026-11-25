@@ -1,16 +1,14 @@
 
 import { useLocalSearchParams } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { Image, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import StockChart from "../components/StockChart";
-import React, { useState, useEffect} from "react";
-import { Pressable, useWindowDimensions, ScrollView, Image,StyleSheet, Text, View } from 'react-native';
-import { formatDateAsISODate as formatDate, formatDisplayDate } from "../utils/formatDate";
-import { getStockData, getStockProfile } from "../services/stockService";
 import { Breakpoints } from '../constants/breakpoints';
-import { mockWatchlist, mockProfileData, mockHistoricalData, } from '../utils/test';
-import type {WatchlistStock, StockProfile, PriceActionSummary,MarketState, PatternName, AlphaVantageDailyResponse} from '../types/stock';
 import { theme } from "../constants/theme";
+import { getStockData, getStockProfile } from "../services/stockService";
+import { getPriceActionSummary, getRecentNewsSummary } from "../services/stockSummaryService";
+import type { AlphaVantageDailyResponse, StockProfile, StockSummary } from '../types/stock';
 import formatStockProfile from "../utils/formatStockProfile";
-import { getPriceActionSummary } from "../services/priceActionService";
 
 const USE_MOCK_DATA = false;
 
@@ -26,9 +24,12 @@ export default function StockDetailScreen() {
     const [selectedStockData, setSelectedStockData] = useState<AlphaVantageDailyResponse | null>(null);
     const [selectedInterval, setSelectedInterval] = useState<number | null>(null);
     const [profileData, setProfileData] = useState<StockProfile | null>(null);
-    const [priceActionSummary, setPriceActionSummary] = useState<PriceActionSummary | null>(null);
-    const [summaryLoading, setSummaryLoading] = useState<boolean>(false);
-    const [summaryError, setSummaryError] = useState<string>("");
+    const [priceActionSummary, setPriceActionSummary] = useState<StockSummary | null>(null);
+    const [priceSummaryLoading, setPriceSummaryLoading] = useState<boolean>(false);
+    const [priceSummaryError, setPriceSummaryError] = useState<string>("");
+    const [newsSummary, setNewsSummary] = useState<StockSummary | null>(null);
+    const [newsSummaryLoading, setNewsSummaryLoading] = useState<boolean>(false);
+    const [newsSummaryError, setNewsSummaryError] = useState<string>("");
 
 
     useEffect(() => {
@@ -61,24 +62,57 @@ export default function StockDetailScreen() {
         let ignore = false;
         
         setPriceActionSummary(null);
-        setSummaryError("");
-        setSummaryLoading(true)
+        setPriceSummaryError("");
+        
         
         if (!ticker) {
             return;
         }
+        setPriceSummaryLoading(true)
         const getData = async () => {
             const priceSummary = await getPriceActionSummary(ticker);
 
             if (ignore) return;
 
             if (priceSummary === null) {
-                setSummaryError("Unable to load price action summary.");
+                setPriceSummaryError("Unable to load price action summary.");
             } else{
                 setPriceActionSummary(priceSummary);
             }
 
-            setSummaryLoading(false);
+            setPriceSummaryLoading(false);
+        }
+
+        getData();
+        
+        return () => {
+            ignore = true;
+        };
+    }, [ticker]);
+    useEffect(() => {
+        if(USE_MOCK_DATA) return;
+        let ignore = false;
+        
+        setNewsSummary(null);
+        setNewsSummaryError("");
+        
+        
+        if (!ticker) {
+            return;
+        }
+        setNewsSummaryLoading(true)
+        const getData = async () => {
+            const newsSummary = await getRecentNewsSummary(ticker);
+
+            if (ignore) return;
+
+            if (newsSummary === null) {
+                setNewsSummaryError("Unable to load Recent News Summary.");
+            } else{
+                setNewsSummary(newsSummary);
+            }
+
+            setNewsSummaryLoading(false);
         }
 
         getData();
@@ -111,6 +145,10 @@ export default function StockDetailScreen() {
     };
 
     const {formattedPrice, formattedChange, changePercentage, formattedPercentage, volume, companyName, description, exchange, exchangeFullName, symbol, image} = formatStockProfile(profileData)
+    
+    const summary = newsSummary?.summary.split(";").map(bullet => bullet.trim()).filter(bullet => bullet.length > 0);
+
+
     
     return (
         <>
@@ -155,7 +193,9 @@ export default function StockDetailScreen() {
                 </View>
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Price Action Summary</Text>
-                    {summaryLoading ? (<Text>Loading summary...</Text>) : summaryError ? (<Text>{summaryError}</Text>) : (<Text style={{fontSize: 14, color: theme.colors.labelColor, lineHeight: 22}}>{priceActionSummary?.summary}</Text>)}
+                    {priceSummaryLoading ? (<Text>Loading Price Action Summary...</Text>) : 
+                        priceSummaryError ? (<Text>{priceSummaryError}</Text>) : 
+                        (<Text style={{fontSize: 14, color: theme.colors.labelColor, lineHeight: 22}}>{priceActionSummary?.summary}</Text>)}
                 </View>
                 <View style={[styles.rowContainer, {flexDirection: isMobile ? 'column' : 'row',}]}>
                     <View style={styles.halfSection}>
@@ -167,6 +207,11 @@ export default function StockDetailScreen() {
                 </View>
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Recent News Summary</Text>
+                    {newsSummaryLoading ? (<Text>Loading Recent News Summary...</Text>) : 
+                        newsSummaryError ? (<Text>{newsSummaryError}</Text>) : 
+                        (<><Text style={{fontSize: 14, color: theme.colors.labelColor, lineHeight: 22}}>{summary?.[0]}</Text>
+                            <View>{summary?.slice(1).map((bullet, index) => (<Text key={index}>• {bullet}</Text>))}</View>
+                        </>)}
                 </View>
             </ScrollView>
         </>

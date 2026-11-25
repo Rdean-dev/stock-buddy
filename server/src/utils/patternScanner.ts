@@ -1,6 +1,6 @@
-import { isDoji, isHammer, isMorningStar, isEveningStar, isBearishEngulfing, isBullishEngulfing, isShootingStar, isHangingMan, isBullishHarami, isBearishHarami, isPiercingLine, isDarkCloudCover, isThreeWhiteSoldiers, isThreeBlackCrows, isInvertedHammer } from './patternCalculations';
-import  normalizeCandleData  from "./normalizeCandleData";
-import type {PatternName, AlphaVantageDailyResponse, Candle} from '../types/stock';
+import { isDoji, isHammer, isMorningStar, isEveningStar, isBearishEngulfing, isBullishEngulfing, isShootingStar, isHangingMan, isBullishHarami, isBearishHarami, isPiercingLine, isDarkCloudCover, isThreeWhiteSoldiers, isThreeBlackCrows, isInvertedHammer } from './patternCalculations.js';
+import  normalizeCandleData  from "./normalizeCandleData.js";
+import type {PatternName, AlphaVantageDailyResponse, Candle} from '../types/stock.js';
 
 type PatternDetector = 
     | {
@@ -18,7 +18,9 @@ type PatternDetector =
 
 export default function scanPatterns (startDate: string, endDate:string, selectedPatterns: PatternName[], stockData: AlphaVantageDailyResponse) {
     
-    const filteredArrayOfCandlestickObjects = normalizeCandleData(stockData, startDate, endDate);
+    const filteredArrayOfCandlestickObjects = normalizeCandleData(stockData)
+        .filter(({ date }) => date >= startDate && date <= endDate)
+        .reverse();
 
     const patternDetectors: Record<PatternName, PatternDetector> = {
         Doji: {
@@ -99,10 +101,10 @@ export default function scanPatterns (startDate: string, endDate:string, selecte
             const firstCandle = filteredArrayOfCandlestickObjects[index - 2];
 
 
-            if (index >= 2 && patterns.candlesRequired === 3 && patterns.detector(firstCandle, previousCandle, candle)) {
+            if (firstCandle && previousCandle && patterns.candlesRequired === 3 && patterns.detector(firstCandle, previousCandle, candle)) {
                 patternResults.push(candle);
             }
-            else if (index >= 1 && patterns.candlesRequired === 2 && patterns.detector(previousCandle, candle)) {
+            else if (previousCandle && patterns.candlesRequired === 2 && patterns.detector(previousCandle, candle)) {
                 patternResults.push(candle);
             }
             else if (patterns.candlesRequired === 1 && patterns.detector(candle)) {

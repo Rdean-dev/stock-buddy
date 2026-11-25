@@ -1,4 +1,4 @@
-import type {Candle} from '../types/stock';
+import type {Candle} from '../types/stock.js';
 
 export function isDoji(candle: Candle){
 

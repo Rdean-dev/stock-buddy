@@ -1,4 +1,4 @@
-import type { AlphaVantageDailyResponse } from '../types/stock';
+import type { AlphaVantageDailyResponse } from '../types/stock.js';
 
 export const mockWatchlist = [
   { symbol: 'AAPL', name: 'Apple Inc.' },

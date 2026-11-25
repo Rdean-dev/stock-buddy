@@ -61,7 +61,7 @@ export type LineChartPoint = {
     value: number,
 };
 
-export type PriceActionSummary = {
+export type StockSummary = {
     symbol: string;
     summary: string;
 };

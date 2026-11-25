@@ -4,7 +4,7 @@ import type { Summary } from '../types/stock.js';
 import {generateNewsSummary} from './ai-summary.service.js';
 import { fileURLToPath } from 'node:url';
 
-export async function getRecentNewsSummary(symbol:string): Promise<Summary>{
+export async function getRecentNewsSummaryService(symbol:string): Promise<Summary>{
     
     const todayDate = new Date();
 
