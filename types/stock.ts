@@ -62,6 +62,16 @@ export type LineChartPoint = {
 };
 
 export type StockSummary = {
-    symbol: string;
-    summary: string;
+    symbol: string,
+    summary: string,
+};
+
+export type RecommendationTrends = {
+    buy: number,
+    hold: number,
+    period: string,
+    sell: number,
+    strongBuy: number,
+    strongSell: number,
+    symbol: string
 };

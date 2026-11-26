@@ -1,13 +1,13 @@
 import datas from '../data/mockDailyIBMData.json';
 //import datas from '../data/mockSearchDataBA.json';
 
-import type {WatchlistStock, StockProfile, AlphaVantageDailyResponse, MarketState} from '../types/stock';
+import type {RecommendationTrends, WatchlistStock, StockProfile, AlphaVantageDailyResponse, MarketState} from '../types/stock';
 
 
 const avApiKey = process.env.EXPO_PUBLIC_ALPHA_VANTAGE_API_KEY;
 const fmpApiKey = process.env.EXPO_PUBLIC_FINANCIAL_MODELING_PREP_API_KEY;
 const tvApiKey = process.env.EXPO_PUBLIC_TWELVE_DATA_API_KEY;
-
+const finnhubApiKey = process.env.EXPO_PUBLIC_FINNHUB_API_KEY;
 type TwelveDataSearchMatch = {
     symbol: string,
     instrument_name: string
@@ -121,4 +121,31 @@ export async function getMarketStatus(): Promise<MarketState | null>{
     }
 
 
+}
+
+export async function getRecommendsTrends(symbol:string): Promise<RecommendationTrends[] | null>{
+    
+    const finnhubAPIUrl = `https://finnhub.io/api/v1/stock/recommendation?symbol=${encodeURIComponent(symbol)}&token=${finnhubApiKey}`
+
+    try {
+        const response = await fetch(finnhubAPIUrl);
+
+        if(!response.ok) {
+            console.error('Recommendation Trends request failed:', response.status);
+            return null
+        }
+
+        const data = await response.json();
+
+        if (Array.isArray(data)){
+            console.log("Recommendation Trends:", data);
+            return data
+        }else {
+            console.log("FinnHub Incorrect Response:", data);
+            return null;
+        }
+    } catch (error) {
+        console.error('Error fetching recommendation trends: ',error);
+        return null;
+    }
 }
