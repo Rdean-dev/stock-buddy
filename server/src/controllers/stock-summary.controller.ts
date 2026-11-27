@@ -2,6 +2,7 @@ import type {Request, Response, NextFunction} from "express";
 import { z } from "zod";
 import { getSummary } from "../services/price-action.service.js";
 import { getRecentNewsSummaryService } from "../services/recent-news.service.js";
+import {getRecommendsTrends} from "../services/stock-data.service.js"
 
 const symbolSchema = z.string().trim().min(1);
 
@@ -48,6 +49,36 @@ export async function getRecentNewsSummary (req: Request, res: Response, next: N
         return res.status(200).json({
             data: summary,
         });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getAnalystRecommendations(req: Request, res: Response, next: NextFunction) {
+    try {
+        const result = symbolSchema.safeParse(req.params.symbol);
+
+        if(!result.success) {
+            return res.status(400).json({
+                error: {
+                    code: "INVALID_INPUT",
+                    message: "Invalid Input",
+                },
+            });
+        }
+
+        const recommendations = await getRecommendsTrends(result.data.toUpperCase());
+
+        if (recommendations === null) {
+            return res.status(502).json({
+                error: {
+                    code: "UPSTREAM_ERROR",
+                    message: "Unable to load analyst recommendations.",
+                },
+            });
+        }
+
+        return res.status(200).json({ data: recommendations });
     } catch (error) {
         next(error);
     }

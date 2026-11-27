@@ -1,16 +1,28 @@
 
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Image, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, useWindowDimensions, View, ActivityIndicator} from 'react-native';
 import StockChart from "../components/StockChart";
 import { Breakpoints } from '../constants/breakpoints';
 import { theme } from "../constants/theme";
 import { getStockData, getStockProfile } from "../services/stockService";
-import { getPriceActionSummary, getRecentNewsSummary } from "../services/stockSummaryService";
-import type { AlphaVantageDailyResponse, StockProfile, StockSummary } from '../types/stock';
+import { getPriceActionSummary, getRecentNewsSummary, getAnalystRecommendations } from "../services/stockSummaryService";
+import type { AlphaVantageDailyResponse, StockProfile, StockSummary, RecommendationTrends} from '../types/stock';
 import formatStockProfile from "../utils/formatStockProfile";
+import AnalystSentimentCard from "../components/AnalystSentimentCard";
+import { useQuery } from "@tanstack/react-query";
+
 
 const USE_MOCK_DATA = false;
+const mockRecommendation: RecommendationTrends = {
+    symbol: "AAPL",
+    period: "2026-11-01",
+    strongSell: 0,
+    sell: 0,
+    hold: 10,
+    buy: 30,
+    strongBuy: 0,
+};
 
 export default function StockDetailScreen() {
     const { width } = useWindowDimensions();
@@ -126,6 +138,15 @@ export default function StockDetailScreen() {
         dateInterval(1)
 
     }, [selectedStockData])
+
+    const recommendationsQuery = useQuery({
+        queryKey: ["analyst-recommendations", ticker],
+        queryFn: () => {
+            if (!ticker) throw new Error("A ticker is required.");
+            return getAnalystRecommendations(ticker);
+        },
+        enabled: Boolean(ticker) && !USE_MOCK_DATA,
+    });
     
     const dateInterval = (numOfMonths: number) => {
         const latestDate = Object.keys(selectedStockData?.["Time Series (Daily)"] ?? {}).sort().pop();
@@ -148,6 +169,7 @@ export default function StockDetailScreen() {
     
     const summary = newsSummary?.summary.split(";").map(bullet => bullet.trim()).filter(bullet => bullet.length > 0);
 
+    const latestRecommends = USE_MOCK_DATA ? mockRecommendation : recommendationsQuery.data?.[0];
 
     
     return (
@@ -203,6 +225,10 @@ export default function StockDetailScreen() {
                     </View>
                     <View style={styles.halfSection}>
                         <Text style={styles.sectionTitle}>Analyst Sentiment</Text>
+                        {recommendationsQuery.isLoading ? (<View style={{flexDirection: 'row'}}><ActivityIndicator/> <Text>Loading analyst ratings...</Text></View>):
+                        recommendationsQuery.isError ? (<Text>Unable to load analyst ratings.</Text>):
+                        latestRecommends ? (<AnalystSentimentCard latestRecommends={latestRecommends}/>):
+                        (<Text>No analyst ratings available.</Text>)}
                     </View>
                 </View>
                 <View style={styles.section}>

@@ -1,6 +1,7 @@
 import express from "express";
 import priceActionRoutes from "./routes/price-action.routes.js";
-import recentNewsRoutes from "./routes/recent-news.routes.js"
+import recentNewsRoutes from "./routes/recent-news.routes.js";
+import AnalystRecommendationRoutes from "./routes/analyst-recommendations.routes.js"
 import { notFound } from "./middleware/not-found.js";
 import { errorHandler } from "./middleware/error-handler.js";
 import cors from "cors";
@@ -22,6 +23,7 @@ app.get("/health", (_req, res) => {
 
 app.use("/api/price-action-summary", priceActionRoutes);
 app.use("/api/recent-news-summary", recentNewsRoutes);
+app.use("/api/analyst-recommendations", AnalystRecommendationRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

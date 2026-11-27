@@ -2,7 +2,7 @@ import datas from '../mockdata/mockDailyIBMData.json' with {type: "json"};
 //import datas from '../mockdata/mockSearchDataBA.json' with {type: "json"};
 
 
-import type {CompanyNews, WatchlistStock, StockProfile, AlphaVantageDailyResponse, MarketState} from '../types/stock.js';
+import type {RecommendationTrends,CompanyNews, WatchlistStock, StockProfile, AlphaVantageDailyResponse, MarketState} from '../types/stock.js';
 
 
 const avApiKey = process.env.EXPO_PUBLIC_ALPHA_VANTAGE_API_KEY;
@@ -153,6 +153,31 @@ export async function getCompanyNews(symbol:string, startDate: string, endDate: 
         }
     } catch (error) {
         console.error('Error fetching company news: ',error);
+        return null;
+    }
+}
+export async function getRecommendsTrends(symbol:string): Promise<RecommendationTrends[] | null>{
+
+    const finnhubAPIUrl = `https://finnhub.io/api/v1/stock/recommendation?symbol=${encodeURIComponent(symbol)}&token=${finnhubApiKey}`
+
+    try {
+        const response = await fetch(finnhubAPIUrl);
+
+        if(!response.ok) {
+            console.error('Recommendation Trends request failed:', response.status);
+            return null
+        }
+
+        const data = await response.json();
+
+        if (Array.isArray(data) && data.every((trend) => trend?.symbol === symbol)) {
+            return data;
+        }
+
+        console.error("Invalid Finnhub recommendation trends response");
+        return null;
+    } catch (error) {
+        console.error('Error fetching recommendation trends: ',error);
         return null;
     }
 }
